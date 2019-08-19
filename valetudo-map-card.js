@@ -4,7 +4,25 @@ class ValetudoMapCard extends HTMLElement {
     this.attachShadow({ mode: 'open' });
   };
 
+  calculateColor(container, ...colors) {
+    for (let color of colors) {
+      if (!color) continue;
+      if (color.startsWith('--')) {
+        let possibleColor = getComputedStyle(container).getPropertyValue(color);
+        if (!possibleColor) continue;
+        return possibleColor;
+      };
+      return color;
+    };
+  };
+
   drawMap(container, mapData) {
+    // Calculate colours
+    const floorColor = this.calculateColor(container, this._config.floor_color, '--valetudo-map-floor-color', '--secondary-background-color');
+    const obstacleWeakColor = this.calculateColor(container, this._config.obstacle_weak_color, '--valetudo-map-obstacle-weak-color', '--divider-color');
+    const obstacleStrongColor = this.calculateColor(container, this._config.obstacle_strong_color, '--valetudo-map-obstacle-strong-color', '--accent-color');
+    const pathColor = this.calculateColor(container, this._config.path_color, '--valetudo-map-path-color', '--primary-text-color');
+
     // Delete previous map
     while (container.firstChild) {
       container.firstChild.remove();
@@ -42,17 +60,17 @@ class ValetudoMapCard extends HTMLElement {
     containerContainer.appendChild(pathCanvas);
 
     const mapCtx = mapCanvas.getContext("2d");
-    mapCtx.fillStyle = this._config.floor_color;
+    mapCtx.fillStyle = floorColor;
     for (let item of mapData.attributes.image.pixels.floor) {
       mapCtx.fillRect(item[0], item[1], 1, 1);
     };
 
-    mapCtx.fillStyle = this._config.obstacle_weak_color;
+    mapCtx.fillStyle = obstacleWeakColor;
     for (let item of mapData.attributes.image.pixels.obstacle_weak) {
       mapCtx.fillRect(item[0], item[1], 1, 1);
     };
 
-    mapCtx.fillStyle = this._config.obstacle_strong_color;
+    mapCtx.fillStyle = obstacleStrongColor;
     for (let item of mapData.attributes.image.pixels.obstacle_strong) {
       mapCtx.fillRect(item[0], item[1], 1, 1);
     };
@@ -65,7 +83,7 @@ class ValetudoMapCard extends HTMLElement {
       const heightScale = 50;
       const leftOffset = mapData.attributes.image.position.left;
       const topOffset = mapData.attributes.image.position.top;
-      pathCtx.strokeStyle = this._config.path_color;
+      pathCtx.strokeStyle = pathColor;
 
       let first = true;
       pathCtx.beginPath();
@@ -84,11 +102,6 @@ class ValetudoMapCard extends HTMLElement {
   };
 
   setConfig(config) {
-    config.floor_color = config.floor_color || 'black';
-    config.obstacle_weak_color = config.obstacle_weak_color || 'orange';
-    config.obstacle_strong_color = config.obstacle_strong_color || 'red';
-    config.path_color = config.path_color || 'white';
-
     let cardContainer = document.createElement('ha-card');
 
     while (this.shadowRoot.firstChild) {

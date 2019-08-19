@@ -29,8 +29,14 @@ Card:
 ```yaml
 type: 'custom:valetudo-map-card'
 entity: sensor.xiaomi_map
-floor_color: 'black'
-obstacle_weak_color: 'orange'
-obstacle_strong_color: 'red'
-path_color: 'white'
 ```
+
+## Options
+| Name | Type | Default | Description
+| ---- | ---- | ------- | -----------
+| type | string | **Required** | `custom:valetudo-map-card`
+| entity | string | **Required** | Sensor to get state from
+| floor_color | string | '--valetudo-map-floor-color', '--secondary-background-color' | Floor color
+| obstacle_weak_color | string | '--valetudo-map-obstacle-weak-color', '--divider-color' | Weak obstacle color
+| obstacle_strong_color | string | '--valetudo-map-obstacle-strong-color', '--accent-color' | Strong obstacle color
+| path_color | string | '--valetudo-map-path-color', '--primary-text-color' | Path color
