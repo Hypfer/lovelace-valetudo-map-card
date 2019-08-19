@@ -15,6 +15,8 @@ class ValetudoMapCard extends HTMLElement {
     containerContainerStyle.textContent = `
       div {
         position: relative;
+        margin-left: auto;
+        margin-right: auto;
         width: ${mapData.attributes.image.dimensions.width}px;
         height: ${mapData.attributes.image.dimensions.height}px;
       }
