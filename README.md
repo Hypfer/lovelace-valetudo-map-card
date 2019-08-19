@@ -4,6 +4,13 @@ Draws the map available from a Xiaomi Vacuum cleaner flashed with [Valetudo](htt
 
 ## Configuration 
 
+lovelace.yaml:
+```yaml
+resources:
+  - type: js
+    url: /community_plugin/lovelace-valetudo-map-card/valetudo-map-card.js
+```
+
 configuration.yaml:
 ```yaml
 sensor:
