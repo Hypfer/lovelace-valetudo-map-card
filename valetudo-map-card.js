@@ -101,18 +101,33 @@ class ValetudoMapCard extends HTMLElement {
       pathCtx.strokeStyle = pathColor;
 
       let first = true;
+      let prevX = 0;
+      let prevY = 0;
+      let x = 0;
+      let y = 0;
       pathCtx.beginPath();
-      for (let item of mapData.attributes.path.points) {
-        let x = Math.floor((item[0]) / widthScale) - leftOffset;
-        let y = Math.floor((item[1]) / heightScale) - topOffset;
+      for (let i = 0; i < mapData.attributes.path.points.length; i++) {
+        let item = mapData.attributes.path.points[i];
+        if (!first) {
+          prevX = x;
+          prevY = y;
+        };
+        x = Math.floor((item[0]) / widthScale) - leftOffset;
+        y = Math.floor((item[1]) / heightScale) - topOffset;
         if (first) {
           pathCtx.moveTo(x, y);
           first = false;
         } else {
           pathCtx.lineTo(x, y);
         };
+
       };
       pathCtx.stroke();
+
+      // Update vacuum angle
+      if (!first) {
+        vacuumHTML.style.transform = `rotate(${(Math.atan2(y - prevY, x - prevX) * 180 / Math.PI) + 90}deg)`;
+      };
     };
   };
 
