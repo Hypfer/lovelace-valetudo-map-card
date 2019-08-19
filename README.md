@@ -23,6 +23,7 @@ sensor:
       - charger
       - robot
     value_template: 'OK'
+    scan_interval: 5
 ```
 
 Card:
