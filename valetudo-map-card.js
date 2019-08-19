@@ -58,11 +58,13 @@ class ValetudoMapCard extends HTMLElement {
     mapCanvas.style.zIndex = 1;
 
     const chargerHTML = document.createElement('ha-icon');
-    chargerHTML.icon = 'mdi:flash';
-    chargerHTML.style.left = `${Math.floor(mapData.attributes.charger[0] / widthScale) - leftOffset - 12}px`;
-    chargerHTML.style.top = `${Math.floor(mapData.attributes.charger[1] / heightScale) - topOffset - 12}px`;
-    chargerHTML.style.color = 'green';
-    chargerHTML.style.zIndex = 2;
+    if (this._config.show_dock) {
+      chargerHTML.icon = 'mdi:flash';
+      chargerHTML.style.left = `${Math.floor(mapData.attributes.charger[0] / widthScale) - leftOffset - 12}px`;
+      chargerHTML.style.top = `${Math.floor(mapData.attributes.charger[1] / heightScale) - topOffset - 12}px`;
+      chargerHTML.style.color = 'green';
+      chargerHTML.style.zIndex = 2;
+    };
 
     const pathCanvas = document.createElement('canvas');
     pathCanvas.width = mapData.attributes.image.dimensions.width;
@@ -70,10 +72,12 @@ class ValetudoMapCard extends HTMLElement {
     pathCanvas.style.zIndex = 3;
 
     const vacuumHTML = document.createElement('ha-icon');
-    vacuumHTML.icon = 'mdi:robot-vacuum';
-    vacuumHTML.style.left = `${Math.floor(mapData.attributes.robot[0] / widthScale) - leftOffset - 12}px`;
-    vacuumHTML.style.top = `${Math.floor(mapData.attributes.robot[1] / heightScale) - topOffset - 12}px`;
-    vacuumHTML.style.zIndex = 4;
+    if (this._config.show_vacuum) {
+      vacuumHTML.icon = 'mdi:robot-vacuum';
+      vacuumHTML.style.left = `${Math.floor(mapData.attributes.robot[0] / widthScale) - leftOffset - 12}px`;
+      vacuumHTML.style.top = `${Math.floor(mapData.attributes.robot[1] / heightScale) - topOffset - 12}px`;
+      vacuumHTML.style.zIndex = 4;
+    }
 
     containerContainer.appendChild(mapCanvas);
     containerContainer.appendChild(chargerHTML);
@@ -122,7 +126,8 @@ class ValetudoMapCard extends HTMLElement {
         };
 
       };
-      pathCtx.stroke();
+
+      if (this._config.show_path) pathCtx.stroke();
 
       // Update vacuum angle
       if (!first) {
@@ -133,6 +138,10 @@ class ValetudoMapCard extends HTMLElement {
 
   setConfig(config) {
     let cardContainer = document.createElement('ha-card');
+
+    if (config.show_dock === undefined) config.show_dock = true;
+    if (config.show_vacuum === undefined) config.show_vacuum = true;
+    if (config.show_path === undefined) config.show_path = true;
 
     while (this.shadowRoot.firstChild) {
       this.shadowRoot.firstChild.remove();

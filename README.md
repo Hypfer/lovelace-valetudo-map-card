@@ -41,3 +41,6 @@ entity: sensor.xiaomi_map
 | obstacle_weak_color | string | '--valetudo-map-obstacle-weak-color', '--divider-color' | Weak obstacle color
 | obstacle_strong_color | string | '--valetudo-map-obstacle-strong-color', '--accent-color' | Strong obstacle color
 | path_color | string | '--valetudo-map-path-color', '--primary-text-color' | Path color
+| show_dock | boolean | true | Draw the charging dock on the map
+| show_vacuum | boolean | true | Draw the vacuum on the map
+| show_path | boolean | true | Draw the path the vacuum took
