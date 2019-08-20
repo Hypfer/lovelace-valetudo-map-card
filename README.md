@@ -44,3 +44,5 @@ entity: sensor.xiaomi_map
 | show_dock | boolean | true | Draw the charging dock on the map
 | show_vacuum | boolean | true | Draw the vacuum on the map
 | show_path | boolean | true | Draw the path the vacuum took
+| map_scale | number | 1 | Scale the map by this value
+| icon_scale | number | 1 | Scale the icons (vacuum & dock) by this value
