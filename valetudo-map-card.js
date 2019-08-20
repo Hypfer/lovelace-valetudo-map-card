@@ -59,7 +59,7 @@ class ValetudoMapCard extends HTMLElement {
 
     const chargerHTML = document.createElement('ha-icon');
     if (this._config.show_dock) {
-      chargerHTML.icon = 'mdi:flash';
+      chargerHTML.icon = this._config.dock_icon || 'mdi:flash';
       chargerHTML.style.left = `${Math.floor(mapData.attributes.charger[0] / widthScale) - leftOffset - (12 * this._config.icon_scale)}px`;
       chargerHTML.style.top = `${Math.floor(mapData.attributes.charger[1] / heightScale) - topOffset - (12 * this._config.icon_scale)}px`;
       chargerHTML.style.color = 'green';
@@ -74,7 +74,7 @@ class ValetudoMapCard extends HTMLElement {
 
     const vacuumHTML = document.createElement('ha-icon');
     if (this._config.show_vacuum) {
-      vacuumHTML.icon = 'mdi:robot-vacuum';
+      vacuumHTML.icon = this._config.vacuum_icon || 'mdi:robot-vacuum';
       vacuumHTML.style.left = `${Math.floor(mapData.attributes.robot[0] / widthScale) - leftOffset - (12 * this._config.icon_scale)}px`;
       vacuumHTML.style.top = `${Math.floor(mapData.attributes.robot[1] / heightScale) - topOffset - (12 * this._config.icon_scale)}px`;
       vacuumHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale})`;
