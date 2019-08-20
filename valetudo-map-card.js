@@ -156,7 +156,15 @@ class ValetudoMapCard extends HTMLElement {
     this._hass = hass;
     const config = this._config;
     let mapEntity = this._hass.states[this._config.entity];
-    if (!mapEntity) return;
+    if (!mapEntity) {
+      let warning = document.createElement('hui-warning');
+      warning.textContent = `Entity not available: ${this._config.entity}`;
+      while (this.shadowRoot.firstChild) {
+        this.shadowRoot.firstChild.remove();
+      };
+      this.shadowRoot.appendChild(warning);
+      return;
+    }
     this.drawMap(this.shadowRoot.firstChild, mapEntity);
   };
 
