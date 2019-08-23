@@ -30,6 +30,12 @@ Card:
 ```yaml
 type: 'custom:valetudo-map-card'
 entity: sensor.xiaomi_map
+rotate: 0
+crop:
+  top: 0
+  bottom: 0
+  left: 0
+  right: 0
 ```
 
 ## Options
@@ -49,3 +55,4 @@ entity: sensor.xiaomi_map
 | map_scale | number | 1 | Scale the map by this value
 | icon_scale | number | 1 | Scale the icons (vacuum & dock) by this value
 | rotate | number | 0 | Value to rotate the map by (default is in deg, but a value like `2rad` is valid too)
+| crop | Object | {top: 0, bottom: 0, left: 0, right: 0} | Crop the map

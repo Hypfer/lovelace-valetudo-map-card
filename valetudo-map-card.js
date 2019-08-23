@@ -100,17 +100,29 @@ class ValetudoMapCard extends HTMLElement {
     const mapCtx = mapCanvas.getContext("2d");
     mapCtx.fillStyle = floorColor;
     for (let item of mapData.attributes.image.pixels.floor) {
-      mapCtx.fillRect(item[0] * this._config.map_scale, item[1] * this._config.map_scale, this._config.map_scale, this._config.map_scale);
+      let x = item[0] * this._config.map_scale;
+      if (x < this._config.crop.left || x > (mapCanvas.width - this._config.crop.right)) continue;
+      let y = item[1] * this._config.map_scale;
+      if (y < this._config.crop.top || y > (mapCanvas.height - this._config.crop.bottom)) continue;
+      mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
     };
 
     mapCtx.fillStyle = obstacleWeakColor;
     for (let item of mapData.attributes.image.pixels.obstacle_weak) {
-      mapCtx.fillRect(item[0] * this._config.map_scale, item[1] * this._config.map_scale, this._config.map_scale, this._config.map_scale);
+      let x = item[0] * this._config.map_scale;
+      if (x < this._config.crop.left || x > (mapCanvas.width - this._config.crop.right)) continue;
+      let y = item[1] * this._config.map_scale;
+      if (y < this._config.crop.top || y > (mapCanvas.height - this._config.crop.bottom)) continue;
+      mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
     };
 
     mapCtx.fillStyle = obstacleStrongColor;
     for (let item of mapData.attributes.image.pixels.obstacle_strong) {
-      mapCtx.fillRect(item[0] * this._config.map_scale, item[1] * this._config.map_scale, this._config.map_scale, this._config.map_scale);
+      let x = item[0] * this._config.map_scale;
+      if (x < this._config.crop.left || x > (mapCanvas.width - this._config.crop.right)) continue;
+      let y = item[1] * this._config.map_scale;
+      if (y < this._config.crop.top || y > (mapCanvas.height - this._config.crop.bottom)) continue;
+      mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
     };
 
     if (mapData.attributes.path.points) {
@@ -159,6 +171,11 @@ class ValetudoMapCard extends HTMLElement {
     if (config.icon_scale === undefined) config.icon_scale = 1;
     if (config.rotate === undefined) config.rotate = 0;
     if (Number(config.rotate)) config.rotate = `${config.rotate}deg`;
+    if (config.crop !== Object(config.crop)) config.crop = {};
+    if (config.crop.top === undefined) config.crop.top = 0;
+    if (config.crop.bottom === undefined) config.crop.bottom = 0;
+    if (config.crop.left === undefined) config.crop.left = 0;
+    if (config.crop.right === undefined) config.crop.right = 0;
 
     while (this.shadowRoot.firstChild) {
       this.shadowRoot.firstChild.remove();
