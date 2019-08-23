@@ -43,13 +43,13 @@ class ValetudoMapCard extends HTMLElement {
         margin-right: auto;
         width: ${mapData.attributes.image.dimensions.width * this._config.map_scale}px;
         height: ${mapData.attributes.image.dimensions.height * this._config.map_scale}px;
+        transform: rotate(${this._config.rotate});
       }
       div div {
         position: absolute;
         background-color: transparent;
         width: 100%;
         height: 100%;
-        transform: rotate(${this._config.rotate});
       }
     `
     container.appendChild(containerContainer);
