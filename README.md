@@ -24,7 +24,12 @@ sensor:
       - robot
     value_template: 'OK'
     scan_interval: 5
+    authentication: basic
+    username: !secret xiaomi_map_username
+    password: !secret xiaomi_map_password
 ```
+
+`authentication`, `username` and `password` configuration variables are required if using Valetudo Password Authentication (undocumented). Otherwise, omit.
 
 Card:
 ```yaml
