@@ -35,9 +35,10 @@ class ValetudoMapCard extends HTMLElement {
     };
 
     const containerContainer = document.createElement('div');
+    containerContainer.id = 'lovelaceValetudoCard';
     const containerContainerStyle = document.createElement('style');
     containerContainerStyle.textContent = `
-      div {
+      #lovelaceValetudoCard {
         position: relative;
         margin-left: auto;
         margin-right: auto;
@@ -45,7 +46,7 @@ class ValetudoMapCard extends HTMLElement {
         height: ${mapData.attributes.image.dimensions.height * this._config.map_scale}px;
         transform: rotate(${this._config.rotate});
       }
-      div div {
+      #lovelaceValetudoCard div {
         position: absolute;
         background-color: transparent;
         width: 100%;
