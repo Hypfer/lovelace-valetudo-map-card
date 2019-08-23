@@ -44,19 +44,25 @@ class ValetudoMapCard extends HTMLElement {
         width: ${mapData.attributes.image.dimensions.width * this._config.map_scale}px;
         height: ${mapData.attributes.image.dimensions.height * this._config.map_scale}px;
       }
-      div canvas, div ha-icon {
+      div div {
         position: absolute;
         background-color: transparent;
+        width: 100%;
+        height: 100%;
+        transform: rotate(${this._config.rotate});
       }
     `
     container.appendChild(containerContainer);
     container.appendChild(containerContainerStyle);
 
+    const mapContainer = document.createElement('div');
     const mapCanvas = document.createElement('canvas');
     mapCanvas.width = mapData.attributes.image.dimensions.width * this._config.map_scale;
     mapCanvas.height = mapData.attributes.image.dimensions.height * this._config.map_scale;
-    mapCanvas.style.zIndex = 1;
+    mapContainer.style.zIndex = 1;
+    mapContainer.appendChild(mapCanvas);
 
+    const chargerContainer = document.createElement('div');
     const chargerHTML = document.createElement('ha-icon');
     if (this._config.show_dock) {
       chargerHTML.icon = this._config.dock_icon || 'mdi:flash';
@@ -64,27 +70,32 @@ class ValetudoMapCard extends HTMLElement {
       chargerHTML.style.top = `${Math.floor(mapData.attributes.charger[1] / heightScale) - topOffset - (12 * this._config.icon_scale)}px`;
       chargerHTML.style.color = 'green';
       chargerHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale})`;
-      chargerHTML.style.zIndex = 2;
     };
+    chargerContainer.style.zIndex = 2;
+    chargerContainer.appendChild(chargerHTML);
 
+    const pathContainer = document.createElement('div');
     const pathCanvas = document.createElement('canvas');
     pathCanvas.width = mapData.attributes.image.dimensions.width * this._config.map_scale;
     pathCanvas.height = mapData.attributes.image.dimensions.height * this._config.map_scale;
-    pathCanvas.style.zIndex = 3;
+    pathContainer.style.zIndex = 3;
+    pathContainer.appendChild(pathCanvas);
 
+    const vacuumContainer = document.createElement('div');
     const vacuumHTML = document.createElement('ha-icon');
     if (this._config.show_vacuum) {
       vacuumHTML.icon = this._config.vacuum_icon || 'mdi:robot-vacuum';
       vacuumHTML.style.left = `${Math.floor(mapData.attributes.robot[0] / widthScale) - leftOffset - (12 * this._config.icon_scale)}px`;
       vacuumHTML.style.top = `${Math.floor(mapData.attributes.robot[1] / heightScale) - topOffset - (12 * this._config.icon_scale)}px`;
       vacuumHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale})`;
-      vacuumHTML.style.zIndex = 4;
     }
+    vacuumContainer.style.zIndex = 4;
+    vacuumContainer.appendChild(vacuumHTML);
 
-    containerContainer.appendChild(mapCanvas);
-    containerContainer.appendChild(chargerHTML);
-    containerContainer.appendChild(pathCanvas);
-    containerContainer.appendChild(vacuumHTML);
+    containerContainer.appendChild(mapContainer);
+    containerContainer.appendChild(chargerContainer);
+    containerContainer.appendChild(pathContainer);
+    containerContainer.appendChild(vacuumContainer);
 
     const mapCtx = mapCanvas.getContext("2d");
     mapCtx.fillStyle = floorColor;
@@ -146,6 +157,8 @@ class ValetudoMapCard extends HTMLElement {
     if (config.show_path === undefined) config.show_path = true;
     if (config.map_scale === undefined) config.map_scale = 1;
     if (config.icon_scale === undefined) config.icon_scale = 1;
+    if (config.rotate === undefined) config.rotate = 0;
+    if (Number(config.rotate)) config.rotate = `${config.rotate}deg`;
 
     while (this.shadowRoot.firstChild) {
       this.shadowRoot.firstChild.remove();

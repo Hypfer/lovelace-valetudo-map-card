@@ -48,3 +48,4 @@ entity: sensor.xiaomi_map
 | vacuum_icon | string | mdi:robot-vacuum | The icon to use for the vacuum
 | map_scale | number | 1 | Scale the map by this value
 | icon_scale | number | 1 | Scale the icons (vacuum & dock) by this value
+| rotate | number | 0 | Value to rotate the map by (default is in deg, but a value like `2rad` is valid too)
