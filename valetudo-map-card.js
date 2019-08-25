@@ -16,12 +16,10 @@ class ValetudoMapCard extends HTMLElement {
     };
   };
 
-  drawMap(container, mapData) {
-    // Calculate colours
-    const floorColor = this.calculateColor(container, this._config.floor_color, '--valetudo-map-floor-color', '--secondary-background-color');
-    const obstacleWeakColor = this.calculateColor(container, this._config.obstacle_weak_color, '--valetudo-map-obstacle-weak-color', '--divider-color');
-    const obstacleStrongColor = this.calculateColor(container, this._config.obstacle_strong_color, '--valetudo-map-obstacle-strong-color', '--accent-color');
-    const pathColor = this.calculateColor(container, this._config.path_color, '--valetudo-map-path-color', '--primary-text-color');
+  drawMap(shadowRoot, mapData, floorColor, obstacleWeakColor, obstacleStrongColor, pathColor) {
+    // Calculate map height and width
+    const mapWidth = mapData.attributes.image.dimensions.width - this._config.crop.right;
+    const mapHeight = mapData.attributes.image.dimensions.height - this._config.crop.bottom;
 
     // Points to pixels
     const widthScale = 50 / this._config.map_scale;
@@ -30,21 +28,26 @@ class ValetudoMapCard extends HTMLElement {
     const topOffset = mapData.attributes.image.position.top * this._config.map_scale;
 
     // Delete previous map
-    while (container.firstChild) {
-      container.firstChild.remove();
+    while (shadowRoot.firstChild) {
+      shadowRoot.firstChild.remove();
     };
 
-    const containerContainer = document.createElement('div');
-    containerContainer.id = 'lovelaceValetudoCard';
-    const containerContainerStyle = document.createElement('style');
-    containerContainerStyle.textContent = `
+    const cardContainer = document.createElement('ha-card');
+    const cardContainerStyle = document.createElement('style');
+    cardContainerStyle.textContent = `
+      ha-card {
+        height: ${(mapHeight * this._config.map_scale) - this._config.crop.top}px;
+        overflow: hidden;
+      }
       #lovelaceValetudoCard {
         position: relative;
         margin-left: auto;
         margin-right: auto;
-        width: ${mapData.attributes.image.dimensions.width * this._config.map_scale}px;
-        height: ${mapData.attributes.image.dimensions.height * this._config.map_scale}px;
+        width: ${mapWidth * this._config.map_scale}px;
+        height: ${mapHeight * this._config.map_scale}px;
         transform: rotate(${this._config.rotate});
+        top: -${this._config.crop.top}px;
+        left: -${this._config.crop.left}px;
       }
       #lovelaceValetudoCard div {
         position: absolute;
@@ -53,13 +56,17 @@ class ValetudoMapCard extends HTMLElement {
         height: 100%;
       }
     `
-    container.appendChild(containerContainer);
-    container.appendChild(containerContainerStyle);
+    cardContainer.appendChild(cardContainerStyle);
+
+    // Create all objects
+    const containerContainer = document.createElement('div');
+    containerContainer.id = 'lovelaceValetudoCard';
+    cardContainer.appendChild(containerContainer);
 
     const mapContainer = document.createElement('div');
     const mapCanvas = document.createElement('canvas');
-    mapCanvas.width = mapData.attributes.image.dimensions.width * this._config.map_scale;
-    mapCanvas.height = mapData.attributes.image.dimensions.height * this._config.map_scale;
+    mapCanvas.width = mapWidth * this._config.map_scale;
+    mapCanvas.height = mapHeight * this._config.map_scale;
     mapContainer.style.zIndex = 1;
     mapContainer.appendChild(mapCanvas);
 
@@ -77,8 +84,8 @@ class ValetudoMapCard extends HTMLElement {
 
     const pathContainer = document.createElement('div');
     const pathCanvas = document.createElement('canvas');
-    pathCanvas.width = mapData.attributes.image.dimensions.width * this._config.map_scale;
-    pathCanvas.height = mapData.attributes.image.dimensions.height * this._config.map_scale;
+    pathCanvas.width = mapWidth * this._config.map_scale;
+    pathCanvas.height = mapHeight * this._config.map_scale;
     pathContainer.style.zIndex = 3;
     pathContainer.appendChild(pathCanvas);
 
@@ -93,6 +100,7 @@ class ValetudoMapCard extends HTMLElement {
     vacuumContainer.style.zIndex = 4;
     vacuumContainer.appendChild(vacuumHTML);
 
+    // Put objects in container
     containerContainer.appendChild(mapContainer);
     containerContainer.appendChild(chargerContainer);
     containerContainer.appendChild(pathContainer);
@@ -102,27 +110,21 @@ class ValetudoMapCard extends HTMLElement {
     mapCtx.fillStyle = floorColor;
     for (let item of mapData.attributes.image.pixels.floor) {
       let x = item[0] * this._config.map_scale;
-      if (x < this._config.crop.left || x > (mapCanvas.width - this._config.crop.right)) continue;
       let y = item[1] * this._config.map_scale;
-      if (y < this._config.crop.top || y > (mapCanvas.height - this._config.crop.bottom)) continue;
       mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
     };
 
     mapCtx.fillStyle = obstacleWeakColor;
     for (let item of mapData.attributes.image.pixels.obstacle_weak) {
       let x = item[0] * this._config.map_scale;
-      if (x < this._config.crop.left || x > (mapCanvas.width - this._config.crop.right)) continue;
       let y = item[1] * this._config.map_scale;
-      if (y < this._config.crop.top || y > (mapCanvas.height - this._config.crop.bottom)) continue;
       mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
     };
 
     mapCtx.fillStyle = obstacleStrongColor;
     for (let item of mapData.attributes.image.pixels.obstacle_strong) {
       let x = item[0] * this._config.map_scale;
-      if (x < this._config.crop.left || x > (mapCanvas.width - this._config.crop.right)) continue;
       let y = item[1] * this._config.map_scale;
-      if (y < this._config.crop.top || y > (mapCanvas.height - this._config.crop.bottom)) continue;
       mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
     };
 
@@ -160,11 +162,15 @@ class ValetudoMapCard extends HTMLElement {
         vacuumHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale}) rotate(${(Math.atan2(y - prevY, x - prevX) * 180 / Math.PI) + 90}deg)`;
       };
     };
+
+    // Replace everything
+    while (shadowRoot.firstChild) {
+      shadowRoot.firstChild.remove();
+    };
+    shadowRoot.appendChild(cardContainer);
   };
 
   setConfig(config) {
-    let cardContainer = document.createElement('ha-card');
-
     if (config.show_dock === undefined) config.show_dock = true;
     if (config.show_vacuum === undefined) config.show_vacuum = true;
     if (config.show_path === undefined) config.show_path = true;
@@ -177,12 +183,6 @@ class ValetudoMapCard extends HTMLElement {
     if (config.crop.bottom === undefined) config.crop.bottom = 0;
     if (config.crop.left === undefined) config.crop.left = 0;
     if (config.crop.right === undefined) config.crop.right = 0;
-
-    while (this.shadowRoot.firstChild) {
-      this.shadowRoot.firstChild.remove();
-    };
-
-    this.shadowRoot.appendChild(cardContainer);
 
     this._config = config;
   };
@@ -199,8 +199,15 @@ class ValetudoMapCard extends HTMLElement {
       };
       this.shadowRoot.appendChild(warning);
       return;
-    }
-    this.drawMap(this.shadowRoot.firstChild, mapEntity);
+    };
+
+    // Calculate colours
+    const floorColor = this.calculateColor(this, this._config.floor_color, '--valetudo-map-floor-color', '--secondary-background-color');
+    const obstacleWeakColor = this.calculateColor(this, this._config.obstacle_weak_color, '--valetudo-map-obstacle-weak-color', '--divider-color');
+    const obstacleStrongColor = this.calculateColor(this, this._config.obstacle_strong_color, '--valetudo-map-obstacle-strong-color', '--accent-color');
+    const pathColor = this.calculateColor(this, this._config.path_color, '--valetudo-map-path-color', '--primary-text-color');
+
+    this.drawMap(this.shadowRoot, mapEntity, floorColor, obstacleWeakColor, obstacleStrongColor, pathColor);
   };
 
   getCardSize() {
