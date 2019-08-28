@@ -16,11 +16,7 @@ class ValetudoMapCard extends HTMLElement {
     };
   };
 
-  drawMap(shadowRoot, mapData, floorColor, obstacleWeakColor, obstacleStrongColor, pathColor) {
-    // Calculate map height and width
-    const mapWidth = mapData.attributes.image.dimensions.width - this._config.crop.right;
-    const mapHeight = mapData.attributes.image.dimensions.height - this._config.crop.bottom;
-
+  drawMap(shadowRoot, mapData, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, pathColor) {
     // Points to pixels
     const widthScale = 50 / this._config.map_scale;
     const heightScale = 50 / this._config.map_scale;
@@ -201,13 +197,38 @@ class ValetudoMapCard extends HTMLElement {
       return;
     };
 
-    // Calculate colours
-    const floorColor = this.calculateColor(this, this._config.floor_color, '--valetudo-map-floor-color', '--secondary-background-color');
-    const obstacleWeakColor = this.calculateColor(this, this._config.obstacle_weak_color, '--valetudo-map-obstacle-weak-color', '--divider-color');
-    const obstacleStrongColor = this.calculateColor(this, this._config.obstacle_strong_color, '--valetudo-map-obstacle-strong-color', '--accent-color');
-    const pathColor = this.calculateColor(this, this._config.path_color, '--valetudo-map-path-color', '--primary-text-color');
+    // Calculate map height and width
+    const mapWidth = mapEntity.attributes.image.dimensions.width - this._config.crop.right;
+    const mapHeight = mapEntity.attributes.image.dimensions.height - this._config.crop.bottom;
 
-    this.drawMap(this.shadowRoot, mapEntity, floorColor, obstacleWeakColor, obstacleStrongColor, pathColor);
+    // Wait until we can read colours from the UI
+    // FIXME: Figure out why this takes so long instead of faking loading
+    if (!this.parentElement) {
+        const cardContainer = document.createElement('ha-card');
+        const loadingContainer = document.createElement('div');
+        loadingContainer.style.height = `${mapHeight}px`;
+        loadingContainer.style.width = '100%';
+        loadingContainer.style.textAlign = 'center';
+        const loadingSpinner = document.createElement('paper-spinner');
+        loadingSpinner.style.top = '50%';
+        loadingSpinner.style.transform = 'translateY(-50%)';
+        loadingSpinner.setAttribute("active", "");
+        loadingContainer.appendChild(loadingSpinner);
+        cardContainer.appendChild(loadingContainer);
+        while (this.shadowRoot.firstChild) {
+          this.shadowRoot.firstChild.remove();
+        };
+        this.shadowRoot.appendChild(cardContainer);
+        return;
+    };
+
+    // Calculate colours
+    const floorColor = this.calculateColor(this.parentElement, this._config.floor_color, '--valetudo-map-floor-color', '--secondary-background-color');
+    const obstacleWeakColor = this.calculateColor(this.parentElement, this._config.obstacle_weak_color, '--valetudo-map-obstacle-weak-color', '--divider-color');
+    const obstacleStrongColor = this.calculateColor(this.parentElement, this._config.obstacle_strong_color, '--valetudo-map-obstacle-strong-color', '--accent-color');
+    const pathColor = this.calculateColor(this.parentElement, this._config.path_color, '--valetudo-map-path-color', '--primary-text-color');
+
+    this.drawMap(this.shadowRoot, mapEntity, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, pathColor);
   };
 
   getCardSize() {
