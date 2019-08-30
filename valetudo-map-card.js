@@ -1,7 +1,13 @@
 class ValetudoMapCard extends HTMLElement {
   constructor() {
     super();
+    this.drawing = false;
+    this.lastChanged = "";
     this.attachShadow({ mode: 'open' });
+  };
+
+  shouldDraw(state) {
+    return !this.drawing && this.lastChanged != state.last_changed;
   };
 
   calculateColor(container, ...colors) {
@@ -17,6 +23,9 @@ class ValetudoMapCard extends HTMLElement {
   };
 
   drawMap(shadowRoot, mapData, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, pathColor) {
+    // We're drawing
+    this.drawing = true;
+
     // Points to pixels
     const widthScale = 50 / this._config.map_scale;
     const heightScale = 50 / this._config.map_scale;
@@ -164,6 +173,9 @@ class ValetudoMapCard extends HTMLElement {
       shadowRoot.firstChild.remove();
     };
     shadowRoot.appendChild(cardContainer);
+
+    // We're done drawing
+    this.drawing = false;
   };
 
   setConfig(config) {
@@ -221,6 +233,11 @@ class ValetudoMapCard extends HTMLElement {
         this.shadowRoot.appendChild(cardContainer);
         return;
     };
+
+    // Don't draw unnecessarily often
+    if (!this.shouldDraw(mapEntity)) return;
+
+    this.lastChanged = mapEntity.last_changed;
 
     // Calculate colours
     const floorColor = this.calculateColor(this.parentElement, this._config.floor_color, '--valetudo-map-floor-color', '--secondary-background-color');
