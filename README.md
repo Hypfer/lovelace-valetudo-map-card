@@ -43,6 +43,14 @@ crop:
   right: 0
 ```
 
+It's highly recommended to exclude the sensor from recorder in configuration.yaml to keep database small:
+```yaml
+recorder:
+  exclude:
+    entities:
+      - sensor.xiaomi_map
+```
+
 ## Options
 | Name | Type | Default | Description
 | ---- | ---- | ------- | -----------
