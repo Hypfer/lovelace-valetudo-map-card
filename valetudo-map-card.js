@@ -2,12 +2,12 @@ class ValetudoMapCard extends HTMLElement {
   constructor() {
     super();
     this.drawing = false;
-    this.lastChanged = "";
+    this.lastUpdated = "";
     this.attachShadow({ mode: 'open' });
   };
 
   shouldDraw(state) {
-    return !this.drawing && this.lastChanged != state.last_changed;
+    return !this.drawing && this.lastUpdated != state.last_updated;
   };
 
   calculateColor(container, ...colors) {
@@ -237,14 +237,13 @@ class ValetudoMapCard extends HTMLElement {
     // Don't draw unnecessarily often
     if (!this.shouldDraw(mapEntity)) return;
 
-    this.lastChanged = mapEntity.last_changed;
+    this.lastUpdated = mapEntity.last_updated;
 
     // Calculate colours
     const floorColor = this.calculateColor(this.parentElement, this._config.floor_color, '--valetudo-map-floor-color', '--secondary-background-color');
     const obstacleWeakColor = this.calculateColor(this.parentElement, this._config.obstacle_weak_color, '--valetudo-map-obstacle-weak-color', '--divider-color');
     const obstacleStrongColor = this.calculateColor(this.parentElement, this._config.obstacle_strong_color, '--valetudo-map-obstacle-strong-color', '--accent-color');
     const pathColor = this.calculateColor(this.parentElement, this._config.path_color, '--valetudo-map-path-color', '--primary-text-color');
-
     this.drawMap(this.shadowRoot, mapEntity, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, pathColor);
   };
 
