@@ -4,6 +4,7 @@ class ValetudoMapCard extends HTMLElement {
     this.drawing = false;
     this.lastUpdated = "";
     this.attachShadow({ mode: 'open' });
+    this.lastValidRobotPosition = [];
   };
 
   shouldDraw(state) {
@@ -96,10 +97,17 @@ class ValetudoMapCard extends HTMLElement {
 
     const vacuumContainer = document.createElement('div');
     const vacuumHTML = document.createElement('ha-icon');
-    if (this._config.show_vacuum) {
+
+    let robotPosition = mapData.attributes.robot;
+    if(!robotPosition) {
+      robotPosition = this.lastValidRobotPosition;
+    }
+
+    if (this._config.show_vacuum && robotPosition) {
+      this.lastValidRobotPosition = robotPosition;
       vacuumHTML.icon = this._config.vacuum_icon || 'mdi:robot-vacuum';
-      vacuumHTML.style.left = `${Math.floor(mapData.attributes.robot[0] / widthScale) - leftOffset - (12 * this._config.icon_scale)}px`;
-      vacuumHTML.style.top = `${Math.floor(mapData.attributes.robot[1] / heightScale) - topOffset - (12 * this._config.icon_scale)}px`;
+      vacuumHTML.style.left = `${Math.floor(robotPosition[0] / widthScale) - leftOffset - (12 * this._config.icon_scale)}px`;
+      vacuumHTML.style.top = `${Math.floor(robotPosition[1] / heightScale) - topOffset - (12 * this._config.icon_scale)}px`;
       vacuumHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale})`;
     }
     vacuumContainer.style.zIndex = 4;
@@ -132,7 +140,7 @@ class ValetudoMapCard extends HTMLElement {
       let y = item[1] * this._config.map_scale;
       mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
     };
-
+    
     if (mapData.attributes.path.points) {
       const pathCtx = pathCanvas.getContext("2d");
       pathCtx.strokeStyle = pathColor;
