@@ -78,7 +78,7 @@ class ValetudoMapCard extends HTMLElement {
 
     const chargerContainer = document.createElement('div');
     const chargerHTML = document.createElement('ha-icon');
-    if (this._config.show_dock) {
+    if (this._config.show_dock && mapData.attributes.charger) {
       chargerHTML.icon = this._config.dock_icon || 'mdi:flash';
       chargerHTML.style.left = `${Math.floor(mapData.attributes.charger[0] / widthScale) - leftOffset - (12 * this._config.icon_scale)}px`;
       chargerHTML.style.top = `${Math.floor(mapData.attributes.charger[1] / heightScale) - topOffset - (12 * this._config.icon_scale)}px`;
