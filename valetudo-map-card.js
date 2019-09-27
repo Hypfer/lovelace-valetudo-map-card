@@ -5,6 +5,11 @@ class ValetudoMapCard extends HTMLElement {
     this.lastUpdated = "";
     this.attachShadow({ mode: 'open' });
     this.lastValidRobotPosition = [];
+
+    this.cardContainer = document.createElement('ha-card');
+    this.cardContainerStyle = document.createElement('style');
+    this.shadowRoot.appendChild(this.cardContainer);
+    this.shadowRoot.appendChild(this.cardContainerStyle);
   };
 
   shouldDraw(state) {
@@ -23,7 +28,11 @@ class ValetudoMapCard extends HTMLElement {
     };
   };
 
-  drawMap(shadowRoot, mapData, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, pathColor) {
+  isOutsideBounds(x, y, mapCanvas, config) {
+    return (x < this._config.crop.left) || (x > mapCanvas.width) || (y < config.crop.top) || (y > mapCanvas.height);
+  };
+
+  drawMap(cardContainer, mapData, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, pathColor) {
     // We're drawing
     this.drawing = true;
 
@@ -33,41 +42,9 @@ class ValetudoMapCard extends HTMLElement {
     const leftOffset = mapData.attributes.image.position.left * this._config.map_scale;
     const topOffset = mapData.attributes.image.position.top * this._config.map_scale;
 
-    // Delete previous map
-    while (shadowRoot.firstChild) {
-      shadowRoot.firstChild.remove();
-    };
-
-    const cardContainer = document.createElement('ha-card');
-    const cardContainerStyle = document.createElement('style');
-    cardContainerStyle.textContent = `
-      ha-card {
-        height: ${(mapHeight * this._config.map_scale) - this._config.crop.top}px;
-        overflow: hidden;
-      }
-      #lovelaceValetudoCard {
-        position: relative;
-        margin-left: auto;
-        margin-right: auto;
-        width: ${mapWidth * this._config.map_scale}px;
-        height: ${mapHeight * this._config.map_scale}px;
-        transform: rotate(${this._config.rotate});
-        top: -${this._config.crop.top}px;
-        left: -${this._config.crop.left}px;
-      }
-      #lovelaceValetudoCard div {
-        position: absolute;
-        background-color: transparent;
-        width: 100%;
-        height: 100%;
-      }
-    `
-    cardContainer.appendChild(cardContainerStyle);
-
     // Create all objects
     const containerContainer = document.createElement('div');
     containerContainer.id = 'lovelaceValetudoCard';
-    cardContainer.appendChild(containerContainer);
 
     const mapContainer = document.createElement('div');
     const mapCanvas = document.createElement('canvas');
@@ -124,6 +101,7 @@ class ValetudoMapCard extends HTMLElement {
     for (let item of mapData.attributes.image.pixels.floor) {
       let x = item[0] * this._config.map_scale;
       let y = item[1] * this._config.map_scale;
+      if (this.isOutsideBounds(x, y, mapCanvas, this._config)) continue;
       mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
     };
 
@@ -131,6 +109,7 @@ class ValetudoMapCard extends HTMLElement {
     for (let item of mapData.attributes.image.pixels.obstacle_weak) {
       let x = item[0] * this._config.map_scale;
       let y = item[1] * this._config.map_scale;
+      if (this.isOutsideBounds(x, y, mapCanvas, this._config)) continue;
       mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
     };
 
@@ -138,6 +117,7 @@ class ValetudoMapCard extends HTMLElement {
     for (let item of mapData.attributes.image.pixels.obstacle_strong) {
       let x = item[0] * this._config.map_scale;
       let y = item[1] * this._config.map_scale;
+      if (this.isOutsideBounds(x, y, mapCanvas, this._config)) continue;
       mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
     };
     
@@ -159,6 +139,7 @@ class ValetudoMapCard extends HTMLElement {
         };
         x = Math.floor((item[0]) / widthScale) - leftOffset;
         y = Math.floor((item[1]) / heightScale) - topOffset;
+        if (this.isOutsideBounds(x, y, mapCanvas, this._config)) continue;
         if (first) {
           pathCtx.moveTo(x, y);
           first = false;
@@ -176,11 +157,11 @@ class ValetudoMapCard extends HTMLElement {
       };
     };
 
-    // Replace everything
-    while (shadowRoot.firstChild) {
-      shadowRoot.firstChild.remove();
+    // Put our newly generated map in there
+    while (cardContainer.firstChild) {
+      cardContainer.firstChild.remove();
     };
-    shadowRoot.appendChild(cardContainer);
+    cardContainer.appendChild(containerContainer);
 
     // We're done drawing
     this.drawing = false;
@@ -199,6 +180,7 @@ class ValetudoMapCard extends HTMLElement {
     if (config.crop.bottom === undefined) config.crop.bottom = 0;
     if (config.crop.left === undefined) config.crop.left = 0;
     if (config.crop.right === undefined) config.crop.right = 0;
+    if (config.min_height === undefined) config.min_height = 0;
 
     this._config = config;
   };
@@ -221,10 +203,46 @@ class ValetudoMapCard extends HTMLElement {
     const mapWidth = mapEntity.attributes.image.dimensions.width - this._config.crop.right;
     const mapHeight = mapEntity.attributes.image.dimensions.height - this._config.crop.bottom;
 
+    // Calculate desired container height
+    let containerHeight = (mapHeight * this._config.map_scale) - this._config.crop.top
+    let minHeight = this._config.min_height;
+
+    // Want height based on container width
+    if (String(this._config.min_height).endsWith('w')) {
+        minHeight = this._config.min_height.slice(0, -1) * this.cardContainer.offsetWidth;
+    }
+
+    let containerMinHeightPadding = minHeight > containerHeight ? (minHeight - containerHeight) / 2 : 0;
+
+    // Set container CSS
+    this.cardContainerStyle.textContent = `
+      ha-card {
+        height: ${containerHeight}px;
+        padding-top: ${containerMinHeightPadding}px;
+        padding-bottom: ${containerMinHeightPadding}px;
+        overflow: hidden;
+      }
+      #lovelaceValetudoCard {
+        position: relative;
+        margin-left: auto;
+        margin-right: auto;
+        width: ${mapWidth * this._config.map_scale}px;
+        height: ${mapHeight * this._config.map_scale}px;
+        transform: rotate(${this._config.rotate});
+        top: -${this._config.crop.top}px;
+        left: -${this._config.crop.left}px;
+      }
+      #lovelaceValetudoCard div {
+        position: absolute;
+        background-color: transparent;
+        width: 100%;
+        height: 100%;
+      }
+    `
+
     // Wait until we can read colours from the UI
     // FIXME: Figure out why this takes so long instead of faking loading
     if (!this.parentElement) {
-        const cardContainer = document.createElement('ha-card');
         const loadingContainer = document.createElement('div');
         loadingContainer.style.height = `${mapHeight}px`;
         loadingContainer.style.width = '100%';
@@ -234,11 +252,10 @@ class ValetudoMapCard extends HTMLElement {
         loadingSpinner.style.transform = 'translateY(-50%)';
         loadingSpinner.setAttribute("active", "");
         loadingContainer.appendChild(loadingSpinner);
-        cardContainer.appendChild(loadingContainer);
-        while (this.shadowRoot.firstChild) {
-          this.shadowRoot.firstChild.remove();
+        while (this.cardContainer.firstChild) {
+          this.cardContainer.firstChild.remove();
         };
-        this.shadowRoot.appendChild(cardContainer);
+        this.cardContainer.appendChild(loadingContainer);
         return;
     };
 
@@ -252,7 +269,7 @@ class ValetudoMapCard extends HTMLElement {
     const obstacleWeakColor = this.calculateColor(this.parentElement, this._config.obstacle_weak_color, '--valetudo-map-obstacle-weak-color', '--divider-color');
     const obstacleStrongColor = this.calculateColor(this.parentElement, this._config.obstacle_strong_color, '--valetudo-map-obstacle-strong-color', '--accent-color');
     const pathColor = this.calculateColor(this.parentElement, this._config.path_color, '--valetudo-map-path-color', '--primary-text-color');
-    this.drawMap(this.shadowRoot, mapEntity, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, pathColor);
+    this.drawMap(this.cardContainer, mapEntity, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, pathColor);
   };
 
   getCardSize() {
