@@ -209,7 +209,7 @@ class ValetudoMapCard extends HTMLElement {
 
     // Want height based on container width
     if (String(this._config.min_height).endsWith('w')) {
-        minHeight = this._config.min_height.slice(0, -1) * this.cardContainer.offsetWidth;
+        minHeight = this.cardContainer.offsetWidth / this._config.min_height.slice(0, -1);
     }
 
     let containerMinHeightPadding = minHeight > containerHeight ? (minHeight - containerHeight) / 2 : 0;
