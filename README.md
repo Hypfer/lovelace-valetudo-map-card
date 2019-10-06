@@ -14,14 +14,10 @@ resources:
 configuration.yaml:
 ```yaml
 sensor:
-  - platform: rest
-    resource: http://ip_of_your_vacuum/api/map/latest
+  - platform: mqtt
+    state_topic: "valetudo/roborock/state"
+    json_attributes_topic: "valetudo/roborock/map_data"
     name: xiaomi_map
-    json_attributes:
-      - image
-      - path
-      - charger
-      - robot
     value_template: 'OK'
     scan_interval: 5
     authentication: basic
