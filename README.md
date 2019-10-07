@@ -12,7 +12,7 @@ resources:
 ```
 
 configuration.yaml:
-Valetudo prefers MQTT, with the preferred example configuration as follows. See below for an alternative example configuration using Valetudo's REST API (unsupported) if you prefer not to use MQTT.
+Valetudo officially supports MQTT, with the preferred example configuration as follows. See below for an alternative example configuration using Valetudo's REST API (unsupported) if you prefer not to use MQTT.
 ```yaml
 sensor:
   - platform: mqtt
