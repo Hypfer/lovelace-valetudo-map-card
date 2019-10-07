@@ -12,6 +12,7 @@ resources:
 ```
 
 configuration.yaml:
+Valetudo prefers MQTT, with the preferred example configuration as follows. See below for an alternative example configuration using Valetudo's REST API (unsupported) if you prefer not to use MQTT.
 ```yaml
 sensor:
   - platform: mqtt
@@ -26,6 +27,24 @@ sensor:
 ```
 
 `authentication`, `username` and `password` configuration variables are required if using Valetudo Password Authentication (undocumented). Otherwise, omit.
+
+Alternative configuration.yaml, using REST (unsupported):
+```yaml
+sensor:
+  - platform: rest
+    resource: http://ip_of_your_vacuum/api/map/latest
+    name: xiaomi_map
+    json_attributes:
+      - image
+      - path
+      - charger
+      - robot
+    value_template: 'OK'
+    scan_interval: 5
+    authentication: basic
+    username: !secret xiaomi_map_username
+    password: !secret xiaomi_map_password
+```
 
 Card:
 ```yaml
