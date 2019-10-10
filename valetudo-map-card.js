@@ -32,7 +32,7 @@ class ValetudoMapCard extends HTMLElement {
     return (x < this._config.crop.left) || (x > mapCanvas.width) || (y < config.crop.top) || (y > mapCanvas.height);
   };
 
-  drawMap(cardContainer, mapData, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, pathColor) {
+  drawMap(cardContainer, mapData, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, pathColor, chargerColor, vacuumColor) {
     // We're drawing
     this.drawing = true;
 
@@ -59,7 +59,7 @@ class ValetudoMapCard extends HTMLElement {
       chargerHTML.icon = this._config.dock_icon || 'mdi:flash';
       chargerHTML.style.left = `${Math.floor(mapData.attributes.charger[0] / widthScale) - leftOffset - (12 * this._config.icon_scale)}px`;
       chargerHTML.style.top = `${Math.floor(mapData.attributes.charger[1] / heightScale) - topOffset - (12 * this._config.icon_scale)}px`;
-      chargerHTML.style.color = 'green';
+      chargerHTML.style.color = chargerColor;
       chargerHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale})`;
     };
     chargerContainer.style.zIndex = 2;
@@ -83,6 +83,7 @@ class ValetudoMapCard extends HTMLElement {
     if (this._config.show_vacuum && robotPosition) {
       this.lastValidRobotPosition = robotPosition;
       vacuumHTML.icon = this._config.vacuum_icon || 'mdi:robot-vacuum';
+      vacuumHTML.style.color = vacuumColor;
       vacuumHTML.style.left = `${Math.floor(robotPosition[0] / widthScale) - leftOffset - (12 * this._config.icon_scale)}px`;
       vacuumHTML.style.top = `${Math.floor(robotPosition[1] / heightScale) - topOffset - (12 * this._config.icon_scale)}px`;
       vacuumHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale})`;
@@ -269,7 +270,10 @@ class ValetudoMapCard extends HTMLElement {
     const obstacleWeakColor = this.calculateColor(this.parentElement, this._config.obstacle_weak_color, '--valetudo-map-obstacle-weak-color', '--divider-color');
     const obstacleStrongColor = this.calculateColor(this.parentElement, this._config.obstacle_strong_color, '--valetudo-map-obstacle-strong-color', '--accent-color');
     const pathColor = this.calculateColor(this.parentElement, this._config.path_color, '--valetudo-map-path-color', '--primary-text-color');
-    this.drawMap(this.cardContainer, mapEntity, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, pathColor);
+    const chargerColor = this.calculateColor(this.parentElement, this._config.dock_color, 'green');
+    const vacuumColor = this.calculateColor(this.parentElement, this._config.vacuum_color, '--primary-text-color');
+
+    this.drawMap(this.cardContainer, mapEntity, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, pathColor, chargerColor, vacuumColor);
   };
 
   getCardSize() {

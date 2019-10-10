@@ -65,7 +65,9 @@ recorder:
 | show_vacuum | boolean | true | Draw the vacuum on the map
 | show_path | boolean | true | Draw the path the vacuum took
 | dock_icon | string | mdi:flash | The icon to use for the charging dock
+| dock_color | string | 'green' | The color to use for the charging dock icon
 | vacuum_icon | string | mdi:robot-vacuum | The icon to use for the vacuum
+| vacuum_color | string | '--primary-text-color' | The color to use for the vacuum icon
 | map_scale | number | 1 | Scale the map by this value
 | icon_scale | number | 1 | Scale the icons (vacuum & dock) by this value
 | rotate | number | 0 | Value to rotate the map by (default is in deg, but a value like `2rad` is valid too)
