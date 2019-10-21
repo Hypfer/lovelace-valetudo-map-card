@@ -12,6 +12,18 @@ resources:
 ```
 
 configuration.yaml:
+Valetudo officially supports MQTT, with the preferred example configuration as follows. Unfortunately Home Assistant does not support authentication via MQTT. See below for an alternative example configuration using Valetudo's REST API (unsupported) if you prefer not to use MQTT or require authentication.
+```yaml
+sensor:
+  - platform: mqtt
+    state_topic: "valetudo/roborock/state"
+    json_attributes_topic: "valetudo/roborock/map_data"
+    name: xiaomi_map
+    value_template: 'OK'
+    scan_interval: 5
+```
+
+Alternative configuration.yaml, using REST (unsupported):
 ```yaml
 sensor:
   - platform: rest
