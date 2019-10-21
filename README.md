@@ -12,7 +12,7 @@ resources:
 ```
 
 configuration.yaml:
-Valetudo officially supports MQTT, with the preferred example configuration as follows. See below for an alternative example configuration using Valetudo's REST API (unsupported) if you prefer not to use MQTT.
+Valetudo officially supports MQTT, with the preferred example configuration as follows. Unfortunately Home Assistant does not support authentication via MQTT. See below for an alternative example configuration using Valetudo's REST API (unsupported) if you prefer not to use MQTT or require authentication.
 ```yaml
 sensor:
   - platform: mqtt
@@ -21,12 +21,7 @@ sensor:
     name: xiaomi_map
     value_template: 'OK'
     scan_interval: 5
-    authentication: basic
-    username: !secret xiaomi_map_username
-    password: !secret xiaomi_map_password
 ```
-
-`authentication`, `username` and `password` configuration variables are required if using Valetudo Password Authentication (undocumented). Otherwise, omit.
 
 Alternative configuration.yaml, using REST (unsupported):
 ```yaml
@@ -45,6 +40,8 @@ sensor:
     username: !secret xiaomi_map_username
     password: !secret xiaomi_map_password
 ```
+
+`authentication`, `username` and `password` configuration variables are required if using Valetudo Password Authentication (undocumented). Otherwise, omit.
 
 Card:
 ```yaml
