@@ -34,6 +34,8 @@ sensor:
       - path
       - charger
       - robot
+      - virtual_walls
+      - no_go_areas
     value_template: 'OK'
     scan_interval: 5
     authentication: basic
@@ -72,6 +74,7 @@ recorder:
 | floor_color | string | '--valetudo-map-floor-color', '--secondary-background-color' | Floor color
 | obstacle_weak_color | string | '--valetudo-map-obstacle-weak-color', '--divider-color' | Weak obstacle color
 | obstacle_strong_color | string | '--valetudo-map-obstacle-strong-color', '--accent-color' | Strong obstacle color
+| virtual_wall_color | string | '--valetudo-virtual-wall-color', '--accent-color' | Virtual wall color
 | path_color | string | '--valetudo-map-path-color', '--primary-text-color' | Path color
 | show_dock | boolean | true | Draw the charging dock on the map
 | show_vacuum | boolean | true | Draw the vacuum on the map

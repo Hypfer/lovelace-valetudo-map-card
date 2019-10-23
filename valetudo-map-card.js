@@ -32,7 +32,7 @@ class ValetudoMapCard extends HTMLElement {
     return (x < this._config.crop.left) || (x > mapCanvas.width) || (y < config.crop.top) || (y > mapCanvas.height);
   };
 
-  drawMap(cardContainer, mapData, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, pathColor, chargerColor, vacuumColor) {
+  drawMap(cardContainer, mapData, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, virtualWallColor, pathColor, chargerColor, vacuumColor) {
     // We're drawing
     this.drawing = true;
 
@@ -120,6 +120,19 @@ class ValetudoMapCard extends HTMLElement {
       let y = item[1] * this._config.map_scale;
       if (this.isOutsideBounds(x, y, mapCanvas, this._config)) continue;
       mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
+    };
+
+    mapCtx.strokeStyle = virtualWallColor;
+    for (let item of mapData.attributes.virtual_walls) {
+      let fromX = Math.floor(item[0] / widthScale) - leftOffset;
+      let fromY = Math.floor(item[1] / heightScale) - topOffset;
+      let toX = Math.floor(item[2] / widthScale) - leftOffset;
+      let toY = Math.floor(item[3] / heightScale) - topOffset;
+      if (this.isOutsideBounds(fromX, fromY, mapCanvas, this._config)) continue;
+      if (this.isOutsideBounds(toX, toY, mapCanvas, this._config)) continue;
+      mapCtx.moveTo(fromX, fromY);
+      mapCtx.lineTo(toX, toY);
+      mapCtx.stroke();
     };
     
     if (mapData.attributes.path.points) {
@@ -269,11 +282,12 @@ class ValetudoMapCard extends HTMLElement {
     const floorColor = this.calculateColor(this.parentElement, this._config.floor_color, '--valetudo-map-floor-color', '--secondary-background-color');
     const obstacleWeakColor = this.calculateColor(this.parentElement, this._config.obstacle_weak_color, '--valetudo-map-obstacle-weak-color', '--divider-color');
     const obstacleStrongColor = this.calculateColor(this.parentElement, this._config.obstacle_strong_color, '--valetudo-map-obstacle-strong-color', '--accent-color');
+    const virtualWallColor = this.calculateColor(this.parentElement, this._config.virtual_wall_color, '--valetudo-virtual-wall-color', '--accent-color');
     const pathColor = this.calculateColor(this.parentElement, this._config.path_color, '--valetudo-map-path-color', '--primary-text-color');
     const chargerColor = this.calculateColor(this.parentElement, this._config.dock_color, 'green');
     const vacuumColor = this.calculateColor(this.parentElement, this._config.vacuum_color, '--primary-text-color');
 
-    this.drawMap(this.cardContainer, mapEntity, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, pathColor, chargerColor, vacuumColor);
+    this.drawMap(this.cardContainer, mapEntity, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, virtualWallColor, pathColor, chargerColor, vacuumColor);
   };
 
   getCardSize() {
