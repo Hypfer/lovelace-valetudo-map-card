@@ -122,18 +122,20 @@ class ValetudoMapCard extends HTMLElement {
       mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
     };
 
-    mapCtx.strokeStyle = virtualWallColor;
-    mapCtx.lineWidth = this._config.virtual_wall_width || 1;
-    for (let item of mapData.attributes.virtual_walls) {
-      let fromX = Math.floor(item[0] / widthScale) - leftOffset;
-      let fromY = Math.floor(item[1] / heightScale) - topOffset;
-      let toX = Math.floor(item[2] / widthScale) - leftOffset;
-      let toY = Math.floor(item[3] / heightScale) - topOffset;
-      if (this.isOutsideBounds(fromX, fromY, mapCanvas, this._config)) continue;
-      if (this.isOutsideBounds(toX, toY, mapCanvas, this._config)) continue;
-      mapCtx.moveTo(fromX, fromY);
-      mapCtx.lineTo(toX, toY);
-      mapCtx.stroke();
+    if (mapData.attributes.virtual_walls) {
+      mapCtx.strokeStyle = virtualWallColor;
+      mapCtx.lineWidth = this._config.virtual_wall_width || 1;
+      for (let item of mapData.attributes.virtual_walls) {
+        let fromX = Math.floor(item[0] / widthScale) - leftOffset;
+        let fromY = Math.floor(item[1] / heightScale) - topOffset;
+        let toX = Math.floor(item[2] / widthScale) - leftOffset;
+        let toY = Math.floor(item[3] / heightScale) - topOffset;
+        if (this.isOutsideBounds(fromX, fromY, mapCanvas, this._config)) continue;
+        if (this.isOutsideBounds(toX, toY, mapCanvas, this._config)) continue;
+        mapCtx.moveTo(fromX, fromY);
+        mapCtx.lineTo(toX, toY);
+        mapCtx.stroke();
+      };
     };
     
     if (mapData.attributes.path.points) {
