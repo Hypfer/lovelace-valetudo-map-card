@@ -123,6 +123,7 @@ class ValetudoMapCard extends HTMLElement {
     };
 
     mapCtx.strokeStyle = virtualWallColor;
+    mapCtx.lineWidth = this._config.virtual_wall_width || 1;
     for (let item of mapData.attributes.virtual_walls) {
       let fromX = Math.floor(item[0] / widthScale) - leftOffset;
       let fromY = Math.floor(item[1] / heightScale) - topOffset;
@@ -138,6 +139,7 @@ class ValetudoMapCard extends HTMLElement {
     if (mapData.attributes.path.points) {
       const pathCtx = pathCanvas.getContext("2d");
       pathCtx.strokeStyle = pathColor;
+      pathCtx.lineWidth = this._config.path_width || 1;
 
       let first = true;
       let prevX = 0;

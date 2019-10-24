@@ -75,7 +75,9 @@ recorder:
 | obstacle_weak_color | string | '--valetudo-map-obstacle-weak-color', '--divider-color' | Weak obstacle color
 | obstacle_strong_color | string | '--valetudo-map-obstacle-strong-color', '--accent-color' | Strong obstacle color
 | virtual_wall_color | string | '--valetudo-virtual-wall-color', '--accent-color' | Virtual wall color
+| virtual_wall_width | number | 1 | Virtual wall line width
 | path_color | string | '--valetudo-map-path-color', '--primary-text-color' | Path color
+| path_width | number | 1 | Path line width
 | show_dock | boolean | true | Draw the charging dock on the map
 | show_vacuum | boolean | true | Draw the vacuum on the map
 | show_path | boolean | true | Draw the path the vacuum took
