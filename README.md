@@ -74,6 +74,7 @@ recorder:
 | floor_color | string | '--valetudo-map-floor-color', '--secondary-background-color' | Floor color
 | obstacle_weak_color | string | '--valetudo-map-obstacle-weak-color', '--divider-color' | Weak obstacle color
 | obstacle_strong_color | string | '--valetudo-map-obstacle-strong-color', '--accent-color' | Strong obstacle color
+| no_go_area_color | string | '--valetudo-no-go-area-color', '--accent-color' | No go area color
 | virtual_wall_color | string | '--valetudo-virtual-wall-color', '--accent-color' | Virtual wall color
 | virtual_wall_width | number | 1 | Virtual wall line width
 | path_color | string | '--valetudo-map-path-color', '--primary-text-color' | Path color

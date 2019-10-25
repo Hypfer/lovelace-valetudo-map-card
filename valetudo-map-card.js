@@ -32,7 +32,7 @@ class ValetudoMapCard extends HTMLElement {
     return (x < this._config.crop.left) || (x > mapCanvas.width) || (y < config.crop.top) || (y > mapCanvas.height);
   };
 
-  drawMap(cardContainer, mapData, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, virtualWallColor, pathColor, chargerColor, vacuumColor) {
+  drawMap(cardContainer, mapData, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, noGoAreaColor, virtualWallColor, pathColor, chargerColor, vacuumColor) {
     // We're drawing
     this.drawing = true;
 
@@ -120,6 +120,24 @@ class ValetudoMapCard extends HTMLElement {
       let y = item[1] * this._config.map_scale;
       if (this.isOutsideBounds(x, y, mapCanvas, this._config)) continue;
       mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
+    };
+
+    if (mapData.attributes.no_go_areas) {
+      mapCtx.fillStyle = noGoAreaColor;
+      for (let item of mapData.attributes.no_go_areas) {
+        mapCtx.beginPath();
+        for (let i = 0; i < item.length; i+=2) {
+          let x = Math.floor(item[i] / widthScale) - leftOffset;
+          let y = Math.floor(item[i + 1] / heightScale) - topOffset;
+          if (i == 0) {
+            mapCtx.moveTo(x, y);
+          } else {
+            mapCtx.lineTo(x, y);
+          }
+          if (this.isOutsideBounds(x, y, mapCanvas, this._config)) continue;
+        };
+        mapCtx.fill();
+      };
     };
 
     if (mapData.attributes.virtual_walls) {
@@ -286,12 +304,13 @@ class ValetudoMapCard extends HTMLElement {
     const floorColor = this.calculateColor(this.parentElement, this._config.floor_color, '--valetudo-map-floor-color', '--secondary-background-color');
     const obstacleWeakColor = this.calculateColor(this.parentElement, this._config.obstacle_weak_color, '--valetudo-map-obstacle-weak-color', '--divider-color');
     const obstacleStrongColor = this.calculateColor(this.parentElement, this._config.obstacle_strong_color, '--valetudo-map-obstacle-strong-color', '--accent-color');
+    const noGoAreaColor = this.calculateColor(this.parentElement, this._config.no_go_area_color, '--valetudo-no-go-area-color', '--accent-color');
     const virtualWallColor = this.calculateColor(this.parentElement, this._config.virtual_wall_color, '--valetudo-virtual-wall-color', '--accent-color');
     const pathColor = this.calculateColor(this.parentElement, this._config.path_color, '--valetudo-map-path-color', '--primary-text-color');
     const chargerColor = this.calculateColor(this.parentElement, this._config.dock_color, 'green');
     const vacuumColor = this.calculateColor(this.parentElement, this._config.vacuum_color, '--primary-text-color');
 
-    this.drawMap(this.cardContainer, mapEntity, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, virtualWallColor, pathColor, chargerColor, vacuumColor);
+    this.drawMap(this.cardContainer, mapEntity, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, noGoAreaColor, virtualWallColor, pathColor, chargerColor, vacuumColor);
   };
 
   getCardSize() {
