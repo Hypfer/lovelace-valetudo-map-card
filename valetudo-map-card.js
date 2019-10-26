@@ -98,7 +98,10 @@ class ValetudoMapCard extends HTMLElement {
     containerContainer.appendChild(vacuumContainer);
 
     const mapCtx = mapCanvas.getContext("2d");
+    mapCtx.strokeStyle = floorColor;
+    mapCtx.lineWidth = 1;
     mapCtx.fillStyle = floorColor;
+    mapCtx.beginPath();
     for (let item of mapData.attributes.image.pixels.floor) {
       let x = item[0] * this._config.map_scale;
       let y = item[1] * this._config.map_scale;
@@ -106,7 +109,10 @@ class ValetudoMapCard extends HTMLElement {
       mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
     };
 
+    mapCtx.strokeStyle = obstacleStrongColor;
+    mapCtx.lineWidth = 1;
     mapCtx.fillStyle = obstacleWeakColor;
+    mapCtx.beginPath();
     for (let item of mapData.attributes.image.pixels.obstacle_weak) {
       let x = item[0] * this._config.map_scale;
       let y = item[1] * this._config.map_scale;
@@ -114,7 +120,10 @@ class ValetudoMapCard extends HTMLElement {
       mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
     };
 
+    mapCtx.strokeStyle = obstacleStrongColor;
+    mapCtx.lineWidth = 1;
     mapCtx.fillStyle = obstacleStrongColor;
+    mapCtx.beginPath();
     for (let item of mapData.attributes.image.pixels.obstacle_strong) {
       let x = item[0] * this._config.map_scale;
       let y = item[1] * this._config.map_scale;
@@ -123,6 +132,8 @@ class ValetudoMapCard extends HTMLElement {
     };
 
     if (mapData.attributes.no_go_areas) {
+      mapCtx.strokeStyle = noGoAreaColor;
+      mapCtx.lineWidth = 1;
       mapCtx.fillStyle = noGoAreaColor;
       for (let item of mapData.attributes.no_go_areas) {
         mapCtx.beginPath();
@@ -143,6 +154,7 @@ class ValetudoMapCard extends HTMLElement {
     if (mapData.attributes.virtual_walls) {
       mapCtx.strokeStyle = virtualWallColor;
       mapCtx.lineWidth = this._config.virtual_wall_width || 1;
+      mapCtx.beginPath();
       for (let item of mapData.attributes.virtual_walls) {
         let fromX = Math.floor(item[0] / widthScale) - leftOffset;
         let fromY = Math.floor(item[1] / heightScale) - topOffset;
