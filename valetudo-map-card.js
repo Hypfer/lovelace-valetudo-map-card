@@ -287,40 +287,21 @@ class ValetudoMapCard extends HTMLElement {
         height: 100%;
       }
     `
-
-    // Wait until we can read colours from the UI
-    // FIXME: Figure out why this takes so long instead of faking loading
-    if (!this.parentElement) {
-        const loadingContainer = document.createElement('div');
-        loadingContainer.style.height = `${mapHeight}px`;
-        loadingContainer.style.width = '100%';
-        loadingContainer.style.textAlign = 'center';
-        const loadingSpinner = document.createElement('paper-spinner');
-        loadingSpinner.style.top = '50%';
-        loadingSpinner.style.transform = 'translateY(-50%)';
-        loadingSpinner.setAttribute("active", "");
-        loadingContainer.appendChild(loadingSpinner);
-        while (this.cardContainer.firstChild) {
-          this.cardContainer.firstChild.remove();
-        };
-        this.cardContainer.appendChild(loadingContainer);
-        return;
-    };
-
     // Don't draw unnecessarily often
     if (!this.shouldDraw(mapEntity)) return;
 
     this.lastUpdated = mapEntity.last_updated;
 
     // Calculate colours
-    const floorColor = this.calculateColor(this.parentElement, this._config.floor_color, '--valetudo-map-floor-color', '--secondary-background-color');
-    const obstacleWeakColor = this.calculateColor(this.parentElement, this._config.obstacle_weak_color, '--valetudo-map-obstacle-weak-color', '--divider-color');
-    const obstacleStrongColor = this.calculateColor(this.parentElement, this._config.obstacle_strong_color, '--valetudo-map-obstacle-strong-color', '--accent-color');
-    const noGoAreaColor = this.calculateColor(this.parentElement, this._config.no_go_area_color, '--valetudo-no-go-area-color', '--accent-color');
-    const virtualWallColor = this.calculateColor(this.parentElement, this._config.virtual_wall_color, '--valetudo-virtual-wall-color', '--accent-color');
-    const pathColor = this.calculateColor(this.parentElement, this._config.path_color, '--valetudo-map-path-color', '--primary-text-color');
-    const chargerColor = this.calculateColor(this.parentElement, this._config.dock_color, 'green');
-    const vacuumColor = this.calculateColor(this.parentElement, this._config.vacuum_color, '--primary-text-color');
+    const homeAssistant = document.getElementsByTagName('home-assistant')[0];
+    const floorColor = this.calculateColor(homeAssistant, this._config.floor_color, '--valetudo-map-floor-color', '--secondary-background-color');
+    const obstacleWeakColor = this.calculateColor(homeAssistant, this._config.obstacle_weak_color, '--valetudo-map-obstacle-weak-color', '--divider-color');
+    const obstacleStrongColor = this.calculateColor(homeAssistant, this._config.obstacle_strong_color, '--valetudo-map-obstacle-strong-color', '--accent-color');
+    const noGoAreaColor = this.calculateColor(homeAssistant, this._config.no_go_area_color, '--valetudo-no-go-area-color', '--accent-color');
+    const virtualWallColor = this.calculateColor(homeAssistant, this._config.virtual_wall_color, '--valetudo-virtual-wall-color', '--accent-color');
+    const pathColor = this.calculateColor(homeAssistant, this._config.path_color, '--valetudo-map-path-color', '--primary-text-color');
+    const chargerColor = this.calculateColor(homeAssistant, this._config.dock_color, 'green');
+    const vacuumColor = this.calculateColor(homeAssistant, this._config.vacuum_color, '--primary-text-color');
 
     this.drawMap(this.cardContainer, mapEntity, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, noGoAreaColor, virtualWallColor, pathColor, chargerColor, vacuumColor);
   };
