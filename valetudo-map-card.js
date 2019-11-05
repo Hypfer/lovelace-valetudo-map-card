@@ -102,33 +102,39 @@ class ValetudoMapCard extends HTMLElement {
     mapCtx.lineWidth = 1;
     mapCtx.fillStyle = floorColor;
     mapCtx.beginPath();
-    for (let item of mapData.attributes.image.pixels.floor) {
-      let x = item[0] * this._config.map_scale;
-      let y = item[1] * this._config.map_scale;
-      if (this.isOutsideBounds(x, y, mapCanvas, this._config)) continue;
-      mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
+    if (mapData.attributes.image.pixels.floor) {
+      for (let item of mapData.attributes.image.pixels.floor) {
+        let x = item[0] * this._config.map_scale;
+        let y = item[1] * this._config.map_scale;
+        if (this.isOutsideBounds(x, y, mapCanvas, this._config)) continue;
+        mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
+      };
     };
 
     mapCtx.strokeStyle = obstacleStrongColor;
     mapCtx.lineWidth = 1;
     mapCtx.fillStyle = obstacleWeakColor;
     mapCtx.beginPath();
-    for (let item of mapData.attributes.image.pixels.obstacle_weak) {
-      let x = item[0] * this._config.map_scale;
-      let y = item[1] * this._config.map_scale;
-      if (this.isOutsideBounds(x, y, mapCanvas, this._config)) continue;
-      mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
+    if (mapData.attributes.image.pixels.obstacle_weak) {
+      for (let item of mapData.attributes.image.pixels.obstacle_weak) {
+        let x = item[0] * this._config.map_scale;
+        let y = item[1] * this._config.map_scale;
+        if (this.isOutsideBounds(x, y, mapCanvas, this._config)) continue;
+        mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
+      };
     };
 
     mapCtx.strokeStyle = obstacleStrongColor;
     mapCtx.lineWidth = 1;
     mapCtx.fillStyle = obstacleStrongColor;
     mapCtx.beginPath();
-    for (let item of mapData.attributes.image.pixels.obstacle_strong) {
-      let x = item[0] * this._config.map_scale;
-      let y = item[1] * this._config.map_scale;
-      if (this.isOutsideBounds(x, y, mapCanvas, this._config)) continue;
-      mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
+    if (mapData.attributes.image.pixels.obstacle_weak) {
+      for (let item of mapData.attributes.image.pixels.obstacle_strong) {
+        let x = item[0] * this._config.map_scale;
+        let y = item[1] * this._config.map_scale;
+        if (this.isOutsideBounds(x, y, mapCanvas, this._config)) continue;
+        mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
+      };
     };
 
     if (mapData.attributes.no_go_areas) {
