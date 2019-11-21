@@ -1,18 +1,18 @@
 # Lovelace Valetudo Map Card
 
-Draws the map available from a Xiaomi Vacuum cleaner flashed with [Valetudo](https://github.com/Hypfer/Valetudo) in a [Home Assistant](https://www.home-assistant.io/) Lovelace card.
+Draws the map that is provided by [ICantBelieveItsNotValetudo](https://github.com/Hypfer/ICantBelieveItsNotValetudo) from a Xiaomi vacuum cleaner, that is rooted and flashed with [Valetudo](https://github.com/Hypfer/Valetudo) in a [Home Assistant](https://www.home-assistant.io/) Lovelace card.
 
 ## Configuration 
 
-lovelace.yaml:
+`lovelace.yaml`: Add custom Lovelace configuration in Home Assistant to enable valetudo-map-card JavaScript. Go to your HA overview, then right top "Configure UI", then right top again on the 3 dots and "Raw config editor".
 ```yaml
 resources:
   - type: js
     url: /community_plugin/lovelace-valetudo-map-card/valetudo-map-card.js
 ```
 
-configuration.yaml:
-Valetudo officially supports MQTT, with the preferred example configuration as follows. Unfortunately Home Assistant does not support authentication via MQTT. See below for an alternative example configuration using Valetudo's REST API (unsupported) if you prefer not to use MQTT or require authentication.
+`configuration.yaml`:
+[Valetudo officially supports MQTT](https://github.com/Hypfer/Valetudo/wiki/Home-Assistant-Integration), with the preferred example configuration as follows. Unfortunately Home Assistant does not support authentication via MQTT. See below for a deprecated alternative example configuration using Valetudo's REST API (unsupported) if you prefer not to use MQTT or require authentication.
 ```yaml
 sensor:
   - platform: mqtt
@@ -23,7 +23,7 @@ sensor:
     scan_interval: 5
 ```
 
-Alternative configuration.yaml, using REST (unsupported):
+Deprecated alternative `configuration.yaml`, using authentication via REST (unsupported):
 ```yaml
 sensor:
   - platform: rest
@@ -45,7 +45,7 @@ sensor:
 
 `authentication`, `username` and `password` configuration variables are required if using Valetudo Password Authentication (undocumented). Otherwise, omit.
 
-Card:
+Add Lovelace custom card in HA:
 ```yaml
 type: 'custom:valetudo-map-card'
 entity: sensor.xiaomi_map
@@ -58,7 +58,7 @@ crop:
 min_height: 0
 ```
 
-It's highly recommended to exclude the sensor from recorder in configuration.yaml to keep database small:
+It's highly recommended to exclude the sensor from recorder in `configuration.yaml` to keep database small:
 ```yaml
 recorder:
   exclude:
@@ -91,3 +91,5 @@ recorder:
 | rotate | number | 0 | Value to rotate the map by (default is in deg, but a value like `2rad` is valid too)
 | crop | Object | {top: 0, bottom: 0, left: 0, right: 0} | Crop the map
 | min_height | string | 0 | The minimum height of the card the map is displayed in, regardless of the map's size itself. Suffix with 'w' if you want it to be times the width (ex: 0.5625w is equivalent to a picture card's 16x9 aspect_ratio)
+
+Colors can be any hex code in the card config, e.g. `path_color = '#FF0000'`.
