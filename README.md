@@ -11,8 +11,7 @@ resources:
     url: /community_plugin/lovelace-valetudo-map-card/valetudo-map-card.js
 ```
 
-`configuration.yaml`:
-[Valetudo officially supports MQTT](https://github.com/Hypfer/Valetudo/wiki/Home-Assistant-Integration), with the preferred example configuration as follows. Unfortunately Home Assistant does not support authentication via MQTT. See below for a deprecated alternative example configuration using Valetudo's REST API (unsupported) if you prefer not to use MQTT or require authentication.
+`configuration.yaml`: Valetudo officially supports MQTT, with the preferred example configuration as follows. Unfortunately Home Assistant does not support authentication via MQTT. See below for a deprecated alternative example configuration using Valetudo's REST API (unsupported) if you prefer not to use MQTT or require authentication.
 ```yaml
 sensor:
   - platform: mqtt
