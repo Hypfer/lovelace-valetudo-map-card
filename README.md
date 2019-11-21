@@ -1,6 +1,6 @@
 # Lovelace Valetudo Map Card
 
-Draws the map that is provided by [ICantBelieveItsNotValetudo](https://github.com/Hypfer/ICantBelieveItsNotValetudo) from a Xiaomi vacuum cleaner, that is rooted and flashed with [Valetudo](https://github.com/Hypfer/Valetudo) in a [Home Assistant](https://www.home-assistant.io/) Lovelace card.
+Draws the map from a Xiaomi vacuum cleaner, that is rooted and flashed with [Valetudo](https://github.com/Hypfer/Valetudo), in a [Home Assistant](https://www.home-assistant.io/) Lovelace card.
 
 ## Configuration 
 
