@@ -24,13 +24,13 @@ resources:
 ```yaml
 sensor:
   - platform: mqtt
-    state_topic: "valetudo/roborock/state"
-    json_attributes_topic: "valetudo/roborock/map_data"
+    state_topic: "valetudo/rockrobo/state"
+    json_attributes_topic: "valetudo/rockrobo/map_data"
     name: xiaomi_map
     value_template: 'OK'
     scan_interval: 5
 ```
-Note: If you are using Valetudo RE with valetudo-mapper, use `valetudo/roborock/map_data_parsed` as `json_attributes_topic` instead.
+Note: If you are using Valetudo RE with valetudo-mapper, use `valetudo/rockrobo/map_data_parsed` as `json_attributes_topic` instead.
 
 Deprecated alternative `configuration.yaml`, using authentication via REST (unsupported):
 ```yaml
