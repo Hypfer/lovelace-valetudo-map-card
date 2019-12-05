@@ -243,7 +243,7 @@ class ValetudoMapCard extends HTMLElement {
     this._hass = hass;
     const config = this._config;
     let mapEntity = this._hass.states[this._config.entity];
-    if (!mapEntity || mapEntity['state'] == 'unavailable') {
+    if (!mapEntity || mapEntity['state'] == 'unavailable' || !mapEntity.attributes || !mapEntity.attributes.image) {
       let warning = document.createElement('hui-warning');
       warning.textContent = `Entity not available: ${this._config.entity}`;
       while (this.shadowRoot.firstChild) {
