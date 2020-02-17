@@ -80,6 +80,7 @@ recorder:
 | ---- | ---- | ------- | -----------
 | type | string | **Required** | `custom:valetudo-map-card`
 | entity | string | **Required** | Sensor to get state from
+| vacuum_entity | string | | Vacuum to show buttons to control for
 | floor_color | string | '--valetudo-map-floor-color', '--secondary-background-color' | Floor color
 | obstacle_weak_color | string | '--valetudo-map-obstacle-weak-color', '--divider-color' | Weak obstacle color
 | obstacle_strong_color | string | '--valetudo-map-obstacle-strong-color', '--accent-color' | Strong obstacle color
