@@ -337,8 +337,32 @@ class ValetudoMapCard extends HTMLElement {
 
     this.drawMap(this.cardContainer, mapEntity, mapHeight, mapWidth, floorColor, obstacleWeakColor, obstacleStrongColor, noGoAreaColor, virtualWallColor, pathColor, chargerColor, vacuumColor);
 
-    // Draw controls
+    // Draw status and controls
     if (this._config.vacuum_entity) {
+        let infoEntity = this._hass.states[this._config.vacuum_entity]
+
+        this.infoBox = document.createElement('div');
+        this.infoBox.classList.add('flex-box');
+
+        if (infoEntity && infoEntity.attributes && infoEntity.attributes.status) {
+            const statusInfo = document.createElement('p');
+            statusInfo.innerHTML = infoEntity.attributes.status
+            this.infoBox.appendChild(statusInfo)
+        };
+
+        if (infoEntity && infoEntity.attributes && infoEntity.attributes.battery_icon && infoEntity.attributes.battery_level) {
+            const batteryData = document.createElement('div');
+            batteryData.style.display = "flex"
+            batteryData.style.alignItems = "center"
+            const batteryIcon = document.createElement('ha-icon');
+            const batteryText = document.createElement('span');
+            batteryIcon.icon = infoEntity.attributes.battery_icon
+            batteryText.innerHTML = " " + infoEntity.attributes.battery_level + " %"
+            batteryData.appendChild(batteryIcon);
+            batteryData.appendChild(batteryText);
+            this.infoBox.appendChild(batteryData);
+        };
+
         this.controlFlexBox = document.createElement('div');
         this.controlFlexBox.classList.add('flex-box');
 
@@ -380,6 +404,7 @@ class ValetudoMapCard extends HTMLElement {
         while (this.controlContainer.firstChild) {
           this.controlContainer.firstChild.remove();
         };
+        this.controlContainer.append(this.infoBox);
         this.controlContainer.append(this.controlFlexBox);
     };
   };
