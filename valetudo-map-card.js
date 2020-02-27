@@ -228,21 +228,21 @@ class ValetudoMapCard extends HTMLElement {
   };
 
   setConfig(config) {
-    if (config.show_dock === undefined) config.show_dock = true;
-    if (config.show_vacuum === undefined) config.show_vacuum = true;
-    if (config.show_path === undefined) config.show_path = true;
-    if (config.map_scale === undefined) config.map_scale = 1;
-    if (config.icon_scale === undefined) config.icon_scale = 1;
-    if (config.rotate === undefined) config.rotate = 0;
-    if (Number(config.rotate)) config.rotate = `${config.rotate}deg`;
-    if (config.crop !== Object(config.crop)) config.crop = {};
-    if (config.crop.top === undefined) config.crop.top = 0;
-    if (config.crop.bottom === undefined) config.crop.bottom = 0;
-    if (config.crop.left === undefined) config.crop.left = 0;
-    if (config.crop.right === undefined) config.crop.right = 0;
-    if (config.min_height === undefined) config.min_height = 0;
+    this._config = Object.create(config);
 
-    this._config = config;
+    if (this._config.show_dock === undefined) this._config.show_dock = true;
+    if (this._config.show_vacuum === undefined) this._config.show_vacuum = true;
+    if (this._config.show_path === undefined) this._config.show_path = true;
+    if (this._config.map_scale === undefined) this._config.map_scale = 1;
+    if (this._config.icon_scale === undefined) this._config.icon_scale = 1;
+    if (this._config.rotate === undefined) this._config.rotate = 0;
+    if (Number(this._config.rotate)) this._config.rotate = `${this._config.rotate}deg`;
+    if (this._config.crop !== Object(this._config.crop)) this._config.crop = {};
+    if (this._config.crop.top === undefined) this._config.crop.top = 0;
+    if (this._config.crop.bottom === undefined) this._config.crop.bottom = 0;
+    if (this._config.crop.left === undefined) this._config.crop.left = 0;
+    if (this._config.crop.right === undefined) this._config.crop.right = 0;
+    if (this._config.min_height === undefined) this._config.min_height = 0;
   };
 
   set hass(hass) {
