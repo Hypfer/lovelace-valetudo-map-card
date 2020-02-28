@@ -228,7 +228,7 @@ class ValetudoMapCard extends HTMLElement {
   };
 
   setConfig(config) {
-    this._config = Object.create(config);
+    this._config = Object.assign({}, config);
 
     if (this._config.show_dock === undefined) this._config.show_dock = true;
     if (this._config.show_vacuum === undefined) this._config.show_vacuum = true;
