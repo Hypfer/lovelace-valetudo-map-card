@@ -2,6 +2,15 @@
 
 Draws the map from a Xiaomi vacuum cleaner, that is rooted and flashed with [Valetudo](https://github.com/Hypfer/Valetudo), in a [Home Assistant](https://www.home-assistant.io/) Lovelace card.
 
+## Valetudo
+Currently, there are 2 big Valetudo projects:
+
+### Valetudo
+The original Valetudo, found on https://github.com/Hypfer/Valetudo. For this one, both the MQTT and REST methods are supported. No further tools are necessary.
+
+### Valetudo RE
+A popular fork, found on https://github.com/rand256/valetudo. If you want to use this repository with Valetudo RE, you will have to set up [valetudo-mapper](https://github.com/rand256/valetudo-mapper) and set `publishMapData` to `true` in that `/app/config.json`. You will have to use the MQTT configuration for this repository.
+
 ## Configuration 
 
 `lovelace.yaml`: Add custom Lovelace configuration in Home Assistant to enable valetudo-map-card JavaScript. Go to your HA overview, then right top "Configure UI", then right top again on the 3 dots and "Raw config editor".
@@ -15,12 +24,13 @@ resources:
 ```yaml
 sensor:
   - platform: mqtt
-    state_topic: "valetudo/roborock/state"
-    json_attributes_topic: "valetudo/roborock/map_data"
+    state_topic: "valetudo/rockrobo/state"
+    json_attributes_topic: "valetudo/rockrobo/map_data"
     name: xiaomi_map
     value_template: 'OK'
     scan_interval: 5
 ```
+Note: If you are using Valetudo RE with valetudo-mapper, use `valetudo/rockrobo/map_data_parsed` as `json_attributes_topic` instead.
 
 Deprecated alternative `configuration.yaml`, using authentication via REST (unsupported):
 ```yaml
@@ -69,7 +79,8 @@ recorder:
 | Name | Type | Default | Description
 | ---- | ---- | ------- | -----------
 | type | string | **Required** | `custom:valetudo-map-card`
-| entity | string | **Required** | Sensor to get state from
+| entity | string | | Sensor to get state from
+| vacuum_entity | string | | Vacuum to show buttons to control for
 | floor_color | string | '--valetudo-map-floor-color', '--secondary-background-color' | Floor color
 | obstacle_weak_color | string | '--valetudo-map-obstacle-weak-color', '--divider-color' | Weak obstacle color
 | obstacle_strong_color | string | '--valetudo-map-obstacle-strong-color', '--accent-color' | Strong obstacle color
