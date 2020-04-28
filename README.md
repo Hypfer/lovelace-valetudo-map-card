@@ -79,6 +79,7 @@ recorder:
 | Name | Type | Default | Description
 | ---- | ---- | ------- | -----------
 | type | string | **Required** | `custom:valetudo-map-card`
+| title | string | Vacuum | Title to show in the card header
 | entity | string | | Sensor to get state from
 | vacuum_entity | string | | Vacuum to show buttons to control for
 | floor_color | string | '--valetudo-map-floor-color', '--secondary-background-color' | Floor color
