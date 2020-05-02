@@ -267,7 +267,12 @@ class ValetudoMapCard extends HTMLElement {
     if (this._config.crop.right === undefined) this._config.crop.right = 0;
     if (this._config.min_height === undefined) this._config.min_height = 0;
 
-    // Set card title
+    // Set card title and hide the header completely if the title is set to an empty value
+    if (!this._config.title) {
+        this.cardHeader.style.display = 'none';
+    } else {
+        this.cardHeader.style.display = 'block';
+    };
     this.cardTitle.textContent = this._config.title;
   };
 
