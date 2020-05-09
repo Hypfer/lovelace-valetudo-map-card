@@ -94,6 +94,7 @@ recorder:
 | path_width | number | 1 | Path line width
 | show_dock | boolean | true | Draw the charging dock on the map
 | show_vacuum | boolean | true | Draw the vacuum on the map
+| show_virtual_walls | boolean | true | Draw virtual walls on the map
 | show_path | boolean | true | Draw the path the vacuum took
 | dock_icon | string | mdi:flash | The icon to use for the charging dock
 | dock_color | string | 'green' | The color to use for the charging dock icon
