@@ -94,6 +94,9 @@ recorder:
 | path_width | number | 1 | Path line width
 | show_dock | boolean | true | Draw the charging dock on the map
 | show_vacuum | boolean | true | Draw the vacuum on the map
+| show_weak_obstacles | boolean | true | Draw weak obstacles on the map
+| show_strong_obstacles | boolean | true | Draw strong obstacles on the map
+| show_no_go_areas | boolean | true | Draw no go areas on the map
 | show_virtual_walls | boolean | true | Draw virtual walls on the map
 | show_path | boolean | true | Draw the path the vacuum took
 | dock_icon | string | mdi:flash | The icon to use for the charging dock
