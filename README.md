@@ -84,6 +84,7 @@ recorder:
 | title | string | Vacuum | Title to show in the card header
 | entity | string | | Sensor to get state from
 | vacuum_entity | string | | Vacuum to show buttons to control for
+| background_color | string | | Background color of the card
 | floor_color | string | '--valetudo-map-floor-color', '--secondary-background-color' | Floor color
 | obstacle_weak_color | string | '--valetudo-map-obstacle-weak-color', '--divider-color' | Weak obstacle color
 | obstacle_strong_color | string | '--valetudo-map-obstacle-strong-color', '--accent-color' | Strong obstacle color
@@ -92,6 +93,7 @@ recorder:
 | virtual_wall_width | number | 1 | Virtual wall line width
 | path_color | string | '--valetudo-map-path-color', '--primary-text-color' | Path color
 | path_width | number | 1 | Path line width
+| show_floor | boolean | true | Draw the floor on the map
 | show_dock | boolean | true | Draw the charging dock on the map
 | show_vacuum | boolean | true | Draw the vacuum on the map
 | show_weak_obstacles | boolean | true | Draw weak obstacles on the map
@@ -110,3 +112,19 @@ recorder:
 | min_height | string | 0 | The minimum height of the card the map is displayed in, regardless of the map's size itself. Suffix with 'w' if you want it to be times the width (ex: 0.5625w is equivalent to a picture card's 16x9 aspect_ratio)
 
 Colors can be any valid CSS value in the card config, like name (red), hex code (#FF0000), rgb(255,255,255), rgba(255,255,255,0.8)...
+
+## Tips & Tricks
+### Displaying as overlay
+When combining this card with Home Assistant's `picture-elements`, you could use this to show your vacuum's position on top of your house. Make sure to set both `show_floor: false` and `background_color: transparent` in this card:
+
+```
+type: picture-elements
+image: https://online.visual-paradigm.com/repository/images/e5728e49-09ce-4c95-b83c-482deee24386.png
+elements:
+  - type: 'custom:valetudo-map-card'
+    entity: sensor.xiaomi_map
+    show_floor: false
+    background_color: transparent
+```
+
+Then use map_scale and crop to make it fit.
