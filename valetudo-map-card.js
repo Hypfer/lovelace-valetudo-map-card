@@ -299,6 +299,9 @@ class ValetudoMapCard extends HTMLElement {
   };
 
   set hass(hass) {
+    // Home Assistant 0.110.0 may call this function with undefined sometimes if inside another card
+    if (hass === undefined) return;
+
     this._hass = hass;
     const config = this._config;
     let mapEntity = this._hass.states[this._config.entity];
