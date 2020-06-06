@@ -88,6 +88,7 @@ recorder:
 | floor_color | string | '--valetudo-map-floor-color', '--secondary-background-color' | Floor color
 | obstacle_weak_color | string | '--valetudo-map-obstacle-weak-color', '--divider-color' | Weak obstacle color
 | obstacle_strong_color | string | '--valetudo-map-obstacle-strong-color', '--accent-color' | Strong obstacle color
+| currently_cleaned_zones_color | string | '--valetudo-currently_cleaned_zones_color', '--secondary-text-color' | Color of zones selected for cleanup
 | no_go_area_color | string | '--valetudo-no-go-area-color', '--accent-color' | No go area color
 | virtual_wall_color | string | '--valetudo-virtual-wall-color', '--accent-color' | Virtual wall color
 | virtual_wall_width | number | 1 | Virtual wall line width
@@ -98,6 +99,7 @@ recorder:
 | show_vacuum | boolean | true | Draw the vacuum on the map
 | show_weak_obstacles | boolean | true | Draw weak obstacles on the map
 | show_strong_obstacles | boolean | true | Draw strong obstacles on the map
+| show_currently_cleaned_zones | boolean | true | Show zones selected for zoned cleanup on the map
 | show_no_go_areas | boolean | true | Draw no go areas on the map
 | show_virtual_walls | boolean | true | Draw virtual walls on the map
 | show_path | boolean | true | Draw the path the vacuum took
