@@ -104,13 +104,20 @@ recorder:
 | vacuum_entity | string | | Vacuum to show buttons to control for
 | background_color | string | | Background color of the card
 | floor_color | string | '--valetudo-map-floor-color', '--secondary-background-color' | Floor color
+| floor_opacity | number | 1 | Floor opacity
 | obstacle_weak_color | string | '--valetudo-map-obstacle-weak-color', '--divider-color' | Weak obstacle color
+| obstacle_weak_opacity | number | 1 | Weak obstacle opacity
 | obstacle_strong_color | string | '--valetudo-map-obstacle-strong-color', '--accent-color' | Strong obstacle color
-| currently_cleaned_zones_color | string | '--valetudo-currently_cleaned_zones_color', '--secondary-text-color' | Color of zones selected for cleanup
+| obstacle_strong_opacity | number | 1 | Strong obstacle opacity
+| currently_cleaned_zone_color | string | '--valetudo-currently_cleaned_zone_color', '--secondary-text-color' | Color of zones selected for cleanup
+| currently_cleaned_zone_opacity | number | 0.5 | Opacity of the currently cleaned zones
 | no_go_area_color | string | '--valetudo-no-go-area-color', '--accent-color' | No go area color
+| no_go_area_opacity | number | 0.5 | Opacity of the no go areas
 | virtual_wall_color | string | '--valetudo-virtual-wall-color', '--accent-color' | Virtual wall color
+| virtual_wall_opacity | number | 1 | Virtual wall opacity
 | virtual_wall_width | number | 1 | Virtual wall line width
 | path_color | string | '--valetudo-map-path-color', '--primary-text-color' | Path color
+| path_opacity | number | 1 | Path opacity
 | path_width | number | 1 | Path line width
 | show_floor | boolean | true | Draw the floor on the map
 | show_dock | boolean | true | Draw the charging dock on the map
