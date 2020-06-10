@@ -11,14 +11,25 @@ The original Valetudo, found on https://github.com/Hypfer/Valetudo. For this one
 ### Valetudo RE
 A popular fork, found on https://github.com/rand256/valetudo. If you want to use this repository with Valetudo RE, you will have to set up [valetudo-mapper](https://github.com/rand256/valetudo-mapper) and set `publishMapData` to `true` in that `/app/config.json`. You will have to use the MQTT configuration for this repository.
 
-## Configuration 
+## Install
 
+It is highly recommended to use [HACS](https://hacs.xyz/) for managing custom extensions of Home Assistant. It automatically manages the registration of additional resources required by custom cards and makes it easy to keep them up-to-date.
+
+To install HACS follow their [installation instructions](https://hacs.xyz/docs/installation/prerequisites). There is no need to manually add this repository to HACS, just wait for the **Valetudo Map Card** to appear in the **Frontend** Page of the HACS interface in your Home Assistant instance.
+
+## Configuration
+
+When using HACS there is no need to manually make Home Assistant aware of custom javascript resources of this custom card. If you do need to check this manually, it is visible in the **Configuration** -> **Lovelace Dashboards** -> **Resources** tab.
+
+On older versions you may need to add this to the lovelace configuration yaml manually.  
 `lovelace.yaml`: Add custom Lovelace configuration in Home Assistant to enable valetudo-map-card JavaScript. Go to your HA overview, then right top "Configure UI", then right top again on the 3 dots and "Raw config editor".
 ```yaml
 resources:
   - type: js
     url: /community_plugin/lovelace-valetudo-map-card/valetudo-map-card.js
 ```
+
+### MQTT
 
 `configuration.yaml`: Valetudo officially supports MQTT, with the preferred example configuration as follows. You will need to have MQTT configured in [Home Assistant](https://www.home-assistant.io/docs/mqtt/broker) and [Valetudo](https://hypfer.github.io/Valetudo/pages/integrations/home-assistant-integration.html).
 
@@ -33,6 +44,8 @@ sensor:
     scan_interval: 5
 ```
 Note: If you are using Valetudo RE with valetudo-mapper, use `valetudo/rockrobo/map_data_parsed` as `json_attributes_topic` instead.
+
+### Valetudo REST API
 
 Deprecated alternative `configuration.yaml`, using authentication via REST (unsupported):
 ```yaml
@@ -56,7 +69,10 @@ sensor:
 
 `authentication`, `username` and `password` configuration variables are required if using Valetudo Password Authentication (undocumented). Otherwise, omit.
 
-Add Lovelace custom card in HA:
+### Lovelace custom card
+
+Even when installing via HACS, the new card will **not** appear automatically in the list of card previews when hitting the "+" button on the UI. Instead, choose the "Manual" option and provide the following yaml content:
+
 ```yaml
 type: 'custom:valetudo-map-card'
 entity: sensor.xiaomi_map
@@ -69,7 +85,9 @@ crop:
 min_height: 0
 ```
 
-It's highly recommended to exclude the sensor from recorder in `configuration.yaml` to keep database small:
+Be sure to use the same entity name that you used for the sensor above.
+
+It's also highly recommended to exclude the sensor from the recorder component in `configuration.yaml` to keep the database small:
 ```yaml
 recorder:
   exclude:
