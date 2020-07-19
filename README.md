@@ -41,8 +41,9 @@ sensor:
     json_attributes_topic: "valetudo/rockrobo/map_data"
     name: xiaomi_map
     value_template: 'OK'
-    scan_interval: 5
 ```
+
+Yes, to show a camera feed as a background set property map_camera in configuration. This only works 
 Note: If you are using Valetudo RE with valetudo-mapper, use `valetudo/rockrobo/map_data_parsed` as `json_attributes_topic` instead.
 
 ### Valetudo REST API
