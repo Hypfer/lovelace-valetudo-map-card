@@ -28,8 +28,10 @@ resources:
   - type: js
     url: /community_plugin/lovelace-valetudo-map-card/valetudo-map-card.js
 ```
+### Home Assistant
+You will need to follow either the instructions for MQTT or for REST. Following the MQTT instructions is strongly recommended.
 
-### MQTT
+#### MQTT
 
 `configuration.yaml`: Valetudo officially supports MQTT, with the preferred example configuration as follows. You will need to have MQTT configured in [Home Assistant](https://www.home-assistant.io/docs/mqtt/broker) and [Valetudo](https://hypfer.github.io/Valetudo/pages/integrations/home-assistant-integration.html).
 
@@ -43,10 +45,9 @@ sensor:
     value_template: 'OK'
 ```
 
-Yes, to show a camera feed as a background set property map_camera in configuration. This only works 
 Note: If you are using Valetudo RE with valetudo-mapper, use `valetudo/rockrobo/map_data_parsed` as `json_attributes_topic` instead.
 
-### Valetudo REST API
+#### Valetudo REST API
 
 Deprecated alternative `configuration.yaml`, using authentication via REST (unsupported):
 ```yaml
