@@ -132,6 +132,19 @@ class ValetudoMapCard extends HTMLElement {
     };
   };
 
+  getGoToInfo(attributes, legacyMode) {
+    if (legacyMode) {
+      return null; // not supported in legacy mode
+    } else {
+      let layer = this.getEntities(attributes, 'go_to_target', 1)[0];
+      if (layer === undefined) {
+        return null;
+      };
+
+      return [layer.points[0], layer.points[1]];
+    };
+  };
+
   getFloorPoints(attributes, legacyMode) {
     if (legacyMode) {
       if (!attributes.image.pixels.floor) {
@@ -222,7 +235,7 @@ class ValetudoMapCard extends HTMLElement {
     };
   };
 
-  drawMap(mapLegacyMode, mapContainer, mapData, mapHeight, mapWidth, floorColor, wallColor, currentlyCleanedZoneColor, noGoAreaColor, virtualWallColor, pathColor, chargerColor, vacuumColor) {
+  drawMap(mapLegacyMode, mapContainer, mapData, mapHeight, mapWidth, floorColor, wallColor, currentlyCleanedZoneColor, noGoAreaColor, virtualWallColor, pathColor, chargerColor, vacuumColor, gotoTargetColor) {
     // Points to pixels
     let pixelSize = 50;
     if (!mapLegacyMode) {
@@ -297,11 +310,26 @@ class ValetudoMapCard extends HTMLElement {
     vacuumContainer.style.zIndex = 4;
     vacuumContainer.appendChild(vacuumHTML);
 
+    const goToTargetContainer = document.createElement('div');
+    const goToTargetHTML = document.createElement('ha-icon');
+    let goToInfo = this.getGoToInfo(mapData.attributes, mapLegacyMode);
+    if (this._config.show_goto_target && goToInfo) {
+      goToTargetHTML.style.position = 'absolute'; // Needed in Home Assistant 0.110.0 and up
+      goToTargetHTML.icon = this._config.goto_target_icon || 'mdi:pin';
+      goToTargetHTML.style.left = `${Math.floor(goToInfo[0] / widthScale) - objectLeftOffset - mapLeftOffset - (12 * this._config.icon_scale)}px`;
+      goToTargetHTML.style.top = `${Math.floor(goToInfo[1] / heightScale) - objectTopOffset - mapTopOffset - (22 * this._config.icon_scale)}px`;
+      goToTargetHTML.style.color = gotoTargetColor;
+      goToTargetHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale})`;
+    };
+    goToTargetContainer.style.zIndex = 5;
+    goToTargetContainer.appendChild(goToTargetHTML);
+
     // Put objects in container
     containerContainer.appendChild(drawnMapContainer);
     containerContainer.appendChild(chargerContainer);
     containerContainer.appendChild(pathContainer);
     containerContainer.appendChild(vacuumContainer);
+    containerContainer.appendChild(goToTargetContainer);
 
     const mapCtx = drawnMapCanvas.getContext("2d");
     if (this._config.show_floor) {
@@ -497,6 +525,7 @@ class ValetudoMapCard extends HTMLElement {
     if (this._config.show_virtual_walls === undefined) this._config.show_virtual_walls = true;
     if (this._config.show_path === undefined) this._config.show_path = true;
     if (this._config.show_predicted_path === undefined) this._config.show_predicted_path = true;
+    if (this._config.show_goto_target === undefined) this._config.show_goto_target = true;
 
     // Width settings
     if (this._config.virtual_wall_width === undefined) this._config.virtual_wall_width = 1;
@@ -656,13 +685,14 @@ class ValetudoMapCard extends HTMLElement {
       const pathColor = this.calculateColor(homeAssistant, this._config.path_color, '--valetudo-map-path-color', '--primary-text-color');
       const chargerColor = this.calculateColor(homeAssistant, this._config.dock_color, 'green');
       const vacuumColor = this.calculateColor(homeAssistant, this._config.vacuum_color, '--primary-text-color');
+      const gotoTargetColor = this.calculateColor(homeAssistant, this._config.goto_target_color, 'blue');
 
       // Don't redraw unnecessarily often
       if (this.shouldDrawMap(mapEntity, hass.selectedTheme)) {
         // Start drawing map
         this.drawingMap = true;
 
-        this.drawMap(mapLegacyMode, this.mapContainer, mapEntity, mapHeight, mapWidth, floorColor, wallColor, currentlyCleanedZoneColor, noGoAreaColor, virtualWallColor, pathColor, chargerColor, vacuumColor);
+        this.drawMap(mapLegacyMode, this.mapContainer, mapEntity, mapHeight, mapWidth, floorColor, wallColor, currentlyCleanedZoneColor, noGoAreaColor, virtualWallColor, pathColor, chargerColor, vacuumColor, gotoTargetColor);
 
         // Done drawing map
         this.lastUpdatedMap = mapEntity.last_updated;
