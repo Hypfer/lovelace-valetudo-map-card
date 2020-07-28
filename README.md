@@ -107,10 +107,8 @@ recorder:
 | background_color | string | | Background color of the card
 | floor_color | string | '--valetudo-map-floor-color', '--secondary-background-color' | Floor color
 | floor_opacity | number | 1 | Floor opacity
-| obstacle_weak_color | string | '--valetudo-map-obstacle-weak-color', '--divider-color' | Weak obstacle color
-| obstacle_weak_opacity | number | 1 | Weak obstacle opacity
-| obstacle_strong_color | string | '--valetudo-map-obstacle-strong-color', '--accent-color' | Strong obstacle color
-| obstacle_strong_opacity | number | 1 | Strong obstacle opacity
+| wall_color | string | '--valetudo-map-wall-color', '--accent-color' | Wall
+| wall_opacity | number | 1 | Wall opacity
 | currently_cleaned_zone_color | string | '--valetudo-currently_cleaned_zone_color', '--secondary-text-color' | Color of zones selected for cleanup
 | currently_cleaned_zone_opacity | number | 0.5 | Opacity of the currently cleaned zones
 | no_go_area_color | string | '--valetudo-no-go-area-color', '--accent-color' | No go area color
@@ -124,8 +122,7 @@ recorder:
 | show_floor | boolean | true | Draw the floor on the map
 | show_dock | boolean | true | Draw the charging dock on the map
 | show_vacuum | boolean | true | Draw the vacuum on the map
-| show_weak_obstacles | boolean | true | Draw weak obstacles on the map
-| show_strong_obstacles | boolean | true | Draw strong obstacles on the map
+| show_walls | boolean | true | Draw walls on the map
 | show_currently_cleaned_zones | boolean | true | Show zones selected for zoned cleanup on the map
 | show_no_go_areas | boolean | true | Draw no go areas on the map
 | show_virtual_walls | boolean | true | Draw virtual walls on the map
