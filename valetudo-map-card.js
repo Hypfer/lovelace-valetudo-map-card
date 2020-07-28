@@ -469,10 +469,7 @@ class ValetudoMapCard extends HTMLElement {
         };
       };
 
-      if (this._config.show_path && this._config.path_width > 0) pathCtx.stroke();
-
-      // Update vacuum angle
-      vacuumHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale}) rotate(${robotInfo[2]}deg)`;
+      if (this._config.show_path && this._config.path_width > 0 && this._config.show_predicted_path) pathCtx.stroke();
 
       pathCtx.globalAlpha = 1;
     };
@@ -499,6 +496,7 @@ class ValetudoMapCard extends HTMLElement {
     if (this._config.show_no_go_areas === undefined) this._config.show_no_go_areas = true;
     if (this._config.show_virtual_walls === undefined) this._config.show_virtual_walls = true;
     if (this._config.show_path === undefined) this._config.show_path = true;
+    if (this._config.show_predicted_path === undefined) this._config.show_predicted_path = true;
 
     // Width settings
     if (this._config.virtual_wall_width === undefined) this._config.virtual_wall_width = 1;
