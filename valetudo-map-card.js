@@ -166,6 +166,19 @@ class ValetudoMapCard extends HTMLElement {
     };
   };
 
+  getVirtualWallPoints(attributes, legacyMode) {
+    if (legacyMode) {
+      virtual_walls = [];
+      for (let item of attributes.virtual_walls) {
+        virtual_walls.push({"points": item.flat()});
+      };
+
+      return virtual_walls;
+    } else {
+      return this.getEntities(attributes, 'virtual_wall');
+    };
+  };
+
   getPathPoints(attributes, legacyMode) {
     if (legacyMode) {
       if (!attributes.path && !attributes.path.points) {
@@ -364,17 +377,18 @@ class ValetudoMapCard extends HTMLElement {
       mapCtx.globalAlpha = 1.0;
     };
 
-    if (mapData.attributes.virtual_walls && this._config.show_virtual_walls && this._config.virtual_wall_width > 0) {
+    let virtualWallPoints = this.getVirtualWallPoints(mapData.attributes, mapLegacyMode);
+    if (virtualWallPoints && this._config.show_virtual_walls && this._config.virtual_wall_width > 0) {
       mapCtx.globalAlpha = this._config.virtual_wall_opacity;
 
       mapCtx.strokeStyle = virtualWallColor;
       mapCtx.lineWidth = this._config.virtual_wall_width;
       mapCtx.beginPath();
-      for (let item of mapData.attributes.virtual_walls) {
-        let fromX = Math.floor(item[0] / widthScale) - objectLeftOffset - mapLeftOffset;
-        let fromY = Math.floor(item[1] / heightScale) - objectTopOffset - mapTopOffset;
-        let toX = Math.floor(item[2] / widthScale) - objectLeftOffset - mapLeftOffset;
-        let toY = Math.floor(item[3] / heightScale) - objectTopOffset - mapTopOffset;
+      for (let item of virtualWallPoints) {
+        let fromX = Math.floor(item['points'][0] / widthScale) - objectLeftOffset - mapLeftOffset;
+        let fromY = Math.floor(item['points'][1] / heightScale) - objectTopOffset - mapTopOffset;
+        let toX = Math.floor(item['points'][2] / widthScale) - objectLeftOffset - mapLeftOffset;
+        let toY = Math.floor(item['points'][3] / heightScale) - objectTopOffset - mapTopOffset;
         if (this.isOutsideBounds(fromX, fromY, drawnMapCanvas, this._config)) continue;
         if (this.isOutsideBounds(toX, toY, drawnMapCanvas, this._config)) continue;
         mapCtx.moveTo(fromX, fromY);
