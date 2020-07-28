@@ -196,6 +196,19 @@ class ValetudoMapCard extends HTMLElement {
     };
   };
 
+  getPredictedPathPoints(attributes, legacyMode) {
+    if (legacyMode) {
+      return null;  // not supported in legacyMode
+    } else {
+      let layer = this.getEntities(attributes, 'predicted_path', 1)[0];
+      if (layer === undefined) {
+        return null;
+      };
+
+      return layer.points;
+    };
+  };
+
   getNoGoAreas(attributes, legacyMode) {
     if (legacyMode) {
       no_go_areas = [];
@@ -414,6 +427,39 @@ class ValetudoMapCard extends HTMLElement {
       for (let i = 0; i < pathPoints.length; i+=2) {
         x = Math.floor((pathPoints[i]) / widthScale) - objectLeftOffset - mapLeftOffset;
         y = Math.floor((pathPoints[i + 1]) / heightScale) - objectTopOffset - mapTopOffset;
+        if (this.isOutsideBounds(x, y, drawnMapCanvas, this._config)) continue;
+        if (first) {
+          pathCtx.moveTo(x, y);
+          first = false;
+        } else {
+          pathCtx.lineTo(x, y);
+        };
+      };
+
+      if (this._config.show_path && this._config.path_width > 0) pathCtx.stroke();
+
+      // Update vacuum angle
+      vacuumHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale}) rotate(${robotInfo[2]}deg)`;
+
+      pathCtx.globalAlpha = 1;
+    };
+
+    let predictedPathPoints = this.getPredictedPathPoints(mapData.attributes, mapLegacyMode);
+    if (predictedPathPoints) {
+      const pathCtx = pathCanvas.getContext("2d");
+      pathCtx.globalAlpha = this._config.path_opacity;
+
+      pathCtx.setLineDash([5,3]);
+      pathCtx.strokeStyle = pathColor;
+      pathCtx.lineWidth = this._config.path_width;
+
+      let x = 0;
+      let y = 0;
+      let first = true;
+      pathCtx.beginPath();
+      for (let i = 0; i < predictedPathPoints.length; i+=2) {
+        x = Math.floor((predictedPathPoints[i]) / widthScale) - objectLeftOffset - mapLeftOffset;
+        y = Math.floor((predictedPathPoints[i + 1]) / heightScale) - objectTopOffset - mapTopOffset;
         if (this.isOutsideBounds(x, y, drawnMapCanvas, this._config)) continue;
         if (first) {
           pathCtx.moveTo(x, y);
