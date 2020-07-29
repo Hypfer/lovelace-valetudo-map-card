@@ -585,7 +585,7 @@ class ValetudoMapCard extends HTMLElement {
     let canDrawControls = true;
 
     if (mapEntity && mapEntity['state'] != 'unavailable' && mapEntity.attributes) {
-        if (mapEntity.attributes.__class = 'ValetudoMap') {
+        if (mapEntity.attributes.__class == 'ValetudoMap') {
             canDrawMap = true;
         } else if (mapEntity.attributes.image) {
             canDrawMap = true;
