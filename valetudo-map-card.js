@@ -181,9 +181,11 @@ class ValetudoMapCard extends HTMLElement {
 
   getVirtualWallPoints(attributes, legacyMode) {
     if (legacyMode) {
-      virtual_walls = [];
-      for (let item of attributes.virtual_walls) {
-        virtual_walls.push({"points": item.flat()});
+      let virtual_walls = [];
+      if (attributes.virtual_walls) {
+        for (let item of attributes.virtual_walls) {
+          virtual_walls.push({"points": item.flat()});
+        };
       };
 
       return virtual_walls;
@@ -225,8 +227,10 @@ class ValetudoMapCard extends HTMLElement {
   getNoGoAreas(attributes, legacyMode) {
     if (legacyMode) {
       let no_go_areas = [];
-      for (let item of attributes.no_go_areas) {
-        no_go_areas.push({"points": item.flat()});
+      if (attributes.no_go_areas) {
+        for (let item of attributes.no_go_areas) {
+          no_go_areas.push({"points": item.flat()});
+        };
       };
 
       return no_go_areas;
