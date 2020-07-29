@@ -224,7 +224,7 @@ class ValetudoMapCard extends HTMLElement {
 
   getNoGoAreas(attributes, legacyMode) {
     if (legacyMode) {
-      no_go_areas = [];
+      let no_go_areas = [];
       for (let item of attributes.no_go_areas) {
         no_go_areas.push({"points": item.flat()});
       };
