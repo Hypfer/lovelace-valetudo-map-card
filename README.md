@@ -128,6 +128,10 @@ recorder:
 | show_virtual_walls | boolean | true | Draw virtual walls on the map
 | show_path | boolean | true | Draw the path the vacuum took
 | show_no_go_border | boolean | true | Draw a border around no go areas
+| show_predicted_path | boolean | true | Draw the predicted path for the vacuum
+| show_goto_target | boolean | true | Draw the go to target
+| goto_target_icon | string | mdi:pin | The icon to use for the go to target
+| goto_target_color | string | 'blue' | The color to use for the go to target icon
 | dock_icon | string | mdi:flash | The icon to use for the charging dock
 | dock_color | string | 'green' | The color to use for the charging dock icon
 | vacuum_icon | string | mdi:robot-vacuum | The icon to use for the vacuum
