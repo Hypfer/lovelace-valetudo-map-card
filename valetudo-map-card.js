@@ -784,10 +784,18 @@ class ValetudoMapCard extends HTMLElement {
 
         // Default to MQTT status, fall back to Home Assistant Xiaomi status
         let status = null;
-        if (infoEntity && infoEntity.attributes && infoEntity.attributes.valetudo_state && infoEntity.attributes.valetudo_state.name) {
-          status = infoEntity.attributes.valetudo_state.name;
-        } else if (infoEntity && infoEntity.attributes && infoEntity.attributes.status) {
-          status = infoEntity.attributes.status;
+        if (mapLegacyMode) {
+          if (infoEntity && infoEntity.attributes && infoEntity.attributes.valetudo_state && infoEntity.attributes.valetudo_state.name) {
+            status = infoEntity.attributes.valetudo_state.name;
+          } else if (infoEntity && infoEntity.attributes && infoEntity.attributes.status) {
+            status = infoEntity.attributes.status;
+          }
+        } else {
+          if (infoEntity && infoEntity.attributes && infoEntity.attributes.valetudo_state) {
+            status = infoEntity.attributes.valetudo_state;
+          } else if (infoEntity && infoEntity.attributes && infoEntity.attributes.status) {
+            status = infoEntity.attributes.status;
+          }
         }
 
         if (status) {
