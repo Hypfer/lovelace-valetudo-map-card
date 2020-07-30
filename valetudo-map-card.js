@@ -629,6 +629,10 @@ class ValetudoMapCard extends HTMLElement {
     } else {
       this.cardContainer.style.background = null;
     };
+
+    if (!Array.isArray(this._config.custom_buttons)) {
+      this._config.custom_buttons = [];
+    };
   };
 
   set hass(hass) {
@@ -881,12 +885,37 @@ class ValetudoMapCard extends HTMLElement {
           this.controlFlexBox.appendChild(homeButton);
         }
 
+        this.customControlFlexBox = document.createElement('div');
+        this.customControlFlexBox.classList.add('flex-box');
+
+        for (let i = 0; i < this._config.custom_buttons.length; i++) {
+          let custom_button = this._config.custom_buttons[i];
+          if (custom_button === Object(custom_button) && custom_button.service && custom_button.service.includes('.')) {
+            const customButton = document.createElement('paper-button');
+            const customButtonIcon = document.createElement('ha-icon');
+            const customButtonRipple = document.createElement('paper-ripple');
+            customButtonIcon.icon = custom_button["icon"] || 'mdi:radiobox-blank';
+            customButton.appendChild(customButtonIcon);
+            customButton.appendChild(customButtonRipple);
+            customButton.addEventListener('click', (event) => {
+              const args = custom_button["service"].split('.');
+              if (custom_button.service_data) {
+                this._hass.callService(args[0], args[1], custom_button.service_data).then();
+              } else {
+                this._hass.callService(args[0], args[1]).then();
+              }
+            });
+            this.customControlFlexBox.appendChild(customButton);
+          }
+        }
+
         // Replace existing controls
         while (this.controlContainer.firstChild) {
           this.controlContainer.firstChild.remove();
         };
         this.controlContainer.append(this.infoBox);
         this.controlContainer.append(this.controlFlexBox);
+        this.controlContainer.append(this.customControlFlexBox);
 
         // Done drawing controls
         this.lastUpdatedControls = infoEntity.last_updated;
