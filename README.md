@@ -133,6 +133,12 @@ recorder:
 | show_predicted_path | boolean | true | Draw the predicted path for the vacuum
 | show_goto_target | boolean | true | Draw the go to target
 | show_segments | boolean | true | Draw the floor segments on the map
+| show_status | boolean | true | Show the status of vacuum_entity
+| show_battery_level | boolean | true | Show the battery level of vacuum_entity
+| show_start_button | boolean | true | Show the start button for vacuum_entity
+| show_pause_button | boolean | true | Show the pause button for vacuum_entity
+| show_stop_button | boolean | true | Show the stop button for vacuum_entity
+| show_home_button | boolean | true | Show the home button for vacuum_entity
 | goto_target_icon | string | mdi:pin | The icon to use for the go to target
 | goto_target_color | string | 'blue' | The color to use for the go to target icon
 | dock_icon | string | mdi:flash | The icon to use for the charging dock
