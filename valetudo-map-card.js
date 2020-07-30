@@ -569,6 +569,14 @@ class ValetudoMapCard extends HTMLElement {
     if (this._config.show_predicted_path === undefined) this._config.show_predicted_path = true;
     if (this._config.show_goto_target === undefined) this._config.show_goto_target = true;
     if (this._config.show_segments === undefined) this._config.show_segments = true;
+    if (this._config.show_status === undefined) this._config.show_status = true;
+    if (this._config.show_battery_level === undefined) this._config.show_battery_level = true;
+
+    // Show button settings
+    if (this._config.show_start_button === undefined) this._config.show_start_button = true;
+    if (this._config.show_pause_button === undefined) this._config.show_pause_button = true;
+    if (this._config.show_stop_button === undefined) this._config.show_stop_button = true;
+    if (this._config.show_home_button === undefined) this._config.show_home_button = true;
 
     // Width settings
     if (this._config.virtual_wall_width === undefined) this._config.virtual_wall_width = 1;
@@ -798,13 +806,13 @@ class ValetudoMapCard extends HTMLElement {
           }
         }
 
-        if (status) {
+        if (status && this._config.show_status) {
           const statusInfo = document.createElement('p');
           statusInfo.innerHTML = status;
           this.infoBox.appendChild(statusInfo)
         };
 
-        if (infoEntity && infoEntity.attributes && infoEntity.attributes.battery_icon && infoEntity.attributes.battery_level) {
+        if (infoEntity && infoEntity.attributes && infoEntity.attributes.battery_icon && infoEntity.attributes.battery_level && this._config.show_battery_level) {
           const batteryData = document.createElement('div');
           batteryData.style.display = "flex"
           batteryData.style.alignItems = "center"
@@ -821,49 +829,57 @@ class ValetudoMapCard extends HTMLElement {
         this.controlFlexBox.classList.add('flex-box');
 
         // Create controls
-        const startButton = document.createElement('paper-button');
-        const startIcon = document.createElement('ha-icon');
-        const startRipple = document.createElement('paper-ripple');
-        startIcon.icon = 'mdi:play';
-        startButton.appendChild(startIcon);
-        startButton.appendChild(startRipple);
-        startButton.addEventListener('click', (event) => {
-          this._hass.callService('vacuum', 'start', { entity_id: this._config.vacuum_entity }).then();
-        });
-        this.controlFlexBox.appendChild(startButton);
+        if (this._config.show_start_button) {
+          const startButton = document.createElement('paper-button');
+          const startIcon = document.createElement('ha-icon');
+          const startRipple = document.createElement('paper-ripple');
+          startIcon.icon = 'mdi:play';
+          startButton.appendChild(startIcon);
+          startButton.appendChild(startRipple);
+          startButton.addEventListener('click', (event) => {
+            this._hass.callService('vacuum', 'start', { entity_id: this._config.vacuum_entity }).then();
+          });
+          this.controlFlexBox.appendChild(startButton);
+        }
 
-        const pauseButton = document.createElement('paper-button');
-        const pauseIcon = document.createElement('ha-icon');
-        const pauseRipple = document.createElement('paper-ripple');
-        pauseIcon.icon = 'mdi:pause';
-        pauseButton.appendChild(pauseIcon);
-        pauseButton.appendChild(pauseRipple);
-        pauseButton.addEventListener('click', (event) => {
-          this._hass.callService('vacuum', 'pause', { entity_id: this._config.vacuum_entity }).then();
-        });
-        this.controlFlexBox.appendChild(pauseButton);
+        if (this._config.show_pause_button) {
+          const pauseButton = document.createElement('paper-button');
+          const pauseIcon = document.createElement('ha-icon');
+          const pauseRipple = document.createElement('paper-ripple');
+          pauseIcon.icon = 'mdi:pause';
+          pauseButton.appendChild(pauseIcon);
+          pauseButton.appendChild(pauseRipple);
+          pauseButton.addEventListener('click', (event) => {
+            this._hass.callService('vacuum', 'pause', { entity_id: this._config.vacuum_entity }).then();
+          });
+          this.controlFlexBox.appendChild(pauseButton);
+        }
 
-        const stopButton = document.createElement('paper-button');
-        const stopIcon = document.createElement('ha-icon');
-        const stopRipple = document.createElement('paper-ripple');
-        stopIcon.icon = 'mdi:stop';
-        stopButton.appendChild(stopIcon);
-        stopButton.appendChild(stopRipple);
-        stopButton.addEventListener('click', (event) => {
-          this._hass.callService('vacuum', 'stop', { entity_id: this._config.vacuum_entity }).then();
-        });
-        this.controlFlexBox.appendChild(stopButton);
+        if (this._config.show_stop_button) {
+          const stopButton = document.createElement('paper-button');
+          const stopIcon = document.createElement('ha-icon');
+          const stopRipple = document.createElement('paper-ripple');
+          stopIcon.icon = 'mdi:stop';
+          stopButton.appendChild(stopIcon);
+          stopButton.appendChild(stopRipple);
+          stopButton.addEventListener('click', (event) => {
+            this._hass.callService('vacuum', 'stop', { entity_id: this._config.vacuum_entity }).then();
+          });
+          this.controlFlexBox.appendChild(stopButton);
+        }
 
-        const homeButton = document.createElement('paper-button');
-        const homeIcon = document.createElement('ha-icon');
-        const homeRipple = document.createElement('paper-ripple');
-        homeIcon.icon = 'hass:home-map-marker';
-        homeButton.appendChild(homeIcon);
-        homeButton.appendChild(homeRipple);
-        homeButton.addEventListener('click', (event) => {
-          this._hass.callService('vacuum', 'return_to_base', { entity_id: this._config.vacuum_entity }).then();
-        });
-        this.controlFlexBox.appendChild(homeButton);
+        if (this._config.show_home_button) {
+          const homeButton = document.createElement('paper-button');
+          const homeIcon = document.createElement('ha-icon');
+          const homeRipple = document.createElement('paper-ripple');
+          homeIcon.icon = 'hass:home-map-marker';
+          homeButton.appendChild(homeIcon);
+          homeButton.appendChild(homeRipple);
+          homeButton.addEventListener('click', (event) => {
+            this._hass.callService('vacuum', 'return_to_base', { entity_id: this._config.vacuum_entity }).then();
+          });
+          this.controlFlexBox.appendChild(homeButton);
+        }
 
         // Replace existing controls
         while (this.controlContainer.firstChild) {
