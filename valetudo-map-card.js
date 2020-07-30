@@ -879,8 +879,9 @@ class ValetudoMapCard extends HTMLElement {
 customElements.define('valetudo-map-card', ValetudoMapCard);
 
 /**
- * Credit for the following code goes to the authors of Valetudo: https://github.com/Hypfer/Valetudo
- */
+ * This class (FourColorTheoremSolver) is taken from https://github.com/Hypfer/Valetudo/blob/890120c76930bb8941459a7e0d1baa0af8577d83/client/zone/js-modules/map-color-finder.js under the Apache 2 license.
+ * See https://github.com/Hypfer/Valetudo/blob/890120c76930bb8941459a7e0d1baa0af8577d83/LICENSE for more information.
+**/
 class FourColorTheoremSolver {
 
   /**
@@ -1036,6 +1037,10 @@ class FourColorTheoremSolver {
   }
 }
 
+/**
+ * This class (MapAreaVertex) is taken from https://github.com/Hypfer/Valetudo/blob/890120c76930bb8941459a7e0d1baa0af8577d83/client/zone/js-modules/map-color-finder.js under the Apache 2 license.
+ * See https://github.com/Hypfer/Valetudo/blob/890120c76930bb8941459a7e0d1baa0af8577d83/LICENSE for more information.
+**/
 class MapAreaVertex {
   constructor(id) {
       this.id = id;
@@ -1050,6 +1055,10 @@ class MapAreaVertex {
   }
 }
 
+/**
+ * This class (MapAreaGraph) is taken from https://github.com/Hypfer/Valetudo/blob/890120c76930bb8941459a7e0d1baa0af8577d83/client/zone/js-modules/map-color-finder.js under the Apache 2 license.
+ * See https://github.com/Hypfer/Valetudo/blob/890120c76930bb8941459a7e0d1baa0af8577d83/LICENSE for more information.
+**/
 class MapAreaGraph {
   constructor(vertices) {
       this.vertices = vertices;

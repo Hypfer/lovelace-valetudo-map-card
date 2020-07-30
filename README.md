@@ -162,3 +162,6 @@ elements:
 ```
 
 Then use map_scale and crop to make it fit.
+
+## License
+Lovelace Valetudo Map Card is licensed under the MIT license. It includes some code from [the Valetudo project](https://github.com/Hypfer/Valetudo), which is available under the Apache 2 license. This third-party code is clearly marked as such.
