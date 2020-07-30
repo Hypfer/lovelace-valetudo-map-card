@@ -119,6 +119,8 @@ recorder:
 | path_color | string | '--valetudo-map-path-color', '--primary-text-color' | Path color
 | path_opacity | number | 1 | Path opacity
 | path_width | number | 1 | Path line width
+| segment_colors | array | '#19A1A1', '#7AC037', '#DF5618', '#F7C841' | Segment colors
+| segment_opacity | number | 0.75 | Segment opacity
 | show_floor | boolean | true | Draw the floor on the map
 | show_dock | boolean | true | Draw the charging dock on the map
 | show_vacuum | boolean | true | Draw the vacuum on the map
@@ -130,6 +132,7 @@ recorder:
 | show_no_go_border | boolean | true | Draw a border around no go areas
 | show_predicted_path | boolean | true | Draw the predicted path for the vacuum
 | show_goto_target | boolean | true | Draw the go to target
+| show_segments | boolean | true | Draw the floor segments on the map
 | goto_target_icon | string | mdi:pin | The icon to use for the go to target
 | goto_target_color | string | 'blue' | The color to use for the go to target icon
 | dock_icon | string | mdi:flash | The icon to use for the charging dock
@@ -159,3 +162,6 @@ elements:
 ```
 
 Then use map_scale and crop to make it fit.
+
+## License
+Lovelace Valetudo Map Card is licensed under the MIT license. It includes some code from [the Valetudo project](https://github.com/Hypfer/Valetudo), which is available under the Apache 2 license. This third-party code is clearly marked as such.
