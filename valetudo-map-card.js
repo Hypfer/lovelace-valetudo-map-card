@@ -398,12 +398,12 @@ class ValetudoMapCard extends HTMLElement {
 
     let noGoAreas = this.getNoGoAreas(mapData.attributes, mapLegacyMode);
     if (noGoAreas && this._config.show_no_go_areas) {
-      mapCtx.globalAlpha = this._config.no_go_area_opacity;
 
       mapCtx.strokeStyle = noGoAreaColor;
-      mapCtx.lineWidth = 1;
+      mapCtx.lineWidth = 2;
       mapCtx.fillStyle = noGoAreaColor;
       for (let item of noGoAreas) {
+        mapCtx.globalAlpha = this._config.no_go_area_opacity;
         mapCtx.beginPath();
         let points = item['points'];
         for (let i = 0; i < points.length; i+=2) {
@@ -417,8 +417,13 @@ class ValetudoMapCard extends HTMLElement {
           if (this.isOutsideBounds(x, y, drawnMapCanvas, this._config)) continue;
         };
         mapCtx.fill();
-      };
 
+        if (this._config.show_no_go_area_border) {
+          mapCtx.closePath();
+          mapCtx.globalAlpha = 1.0;
+          mapCtx.stroke();
+        }
+      };
       mapCtx.globalAlpha = 1.0;
     };
 
@@ -528,6 +533,7 @@ class ValetudoMapCard extends HTMLElement {
     if (this._config.show_no_go_areas === undefined) this._config.show_no_go_areas = true;
     if (this._config.show_virtual_walls === undefined) this._config.show_virtual_walls = true;
     if (this._config.show_path === undefined) this._config.show_path = true;
+    if (this._config.show_no_go_area_border === undefined) this._config.show_no_go_area_border = true;
     if (this._config.show_predicted_path === undefined) this._config.show_predicted_path = true;
     if (this._config.show_goto_target === undefined) this._config.show_goto_target = true;
 
