@@ -45,6 +45,18 @@ sensor:
     value_template: 'OK'
 ```
 
+If you're using Valetudo versions newer than 0.6.1, you'll need an additional `json_attributes_template` like this
+
+```yaml
+sensor:
+  - platform: mqtt
+    state_topic: "valetudo/rockrobo/state"
+    json_attributes_topic: "valetudo/rockrobo/map_data"
+    name: xiaomi_map
+    value_template: 'OK'
+    json_attributes_template: '{"deflatedMapAsBase64": "{{ value }}"}'
+```
+
 Note: If you are using Valetudo RE with valetudo-mapper, use `valetudo/rockrobo/map_data_parsed` as `json_attributes_topic` instead.
 
 #### Valetudo REST API
