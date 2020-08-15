@@ -3,13 +3,9 @@
 Draws the map from a Xiaomi vacuum cleaner, that is rooted and flashed with [Valetudo](https://github.com/Hypfer/Valetudo), in a [Home Assistant](https://www.home-assistant.io/) Lovelace card.
 
 ## Valetudo
-Currently, there are 2 big Valetudo projects:
+Valetudo can be found on https://github.com/Hypfer/Valetudo. This is the only version of Valetudo we officially support.
 
-### Valetudo
-The original Valetudo, found on https://github.com/Hypfer/Valetudo. For this one, both the MQTT and REST methods are supported. No further tools are necessary.
-
-### Valetudo RE
-A popular fork, found on https://github.com/rand256/valetudo. If you want to use this repository with Valetudo RE, you will have to set up [valetudo-mapper](https://github.com/rand256/valetudo-mapper) and set `publishMapData` to `true` in that `/app/config.json`. You will have to use the MQTT configuration for this repository.
+It is recommended to use at least Valetudo 0.6. Older versions of Valetudo are only supported in "Legacy Mode", which will likely be removed in the future.
 
 ## Install
 
@@ -29,7 +25,7 @@ resources:
     url: /community_plugin/lovelace-valetudo-map-card/valetudo-map-card.js
 ```
 ### Home Assistant
-You will need to follow either the instructions for MQTT or for REST. Following the MQTT instructions is strongly recommended.
+You will need to follow either the instructions for MQTT or for REST. Following the MQTT instructions is strongly recommended as REST is NOT officially supported.
 
 #### MQTT
 
@@ -44,8 +40,6 @@ sensor:
     name: xiaomi_map
     value_template: 'OK'
 ```
-
-Note: If you are using Valetudo RE with valetudo-mapper, use `valetudo/rockrobo/map_data_parsed` as `json_attributes_topic` instead.
 
 #### Valetudo REST API
 
