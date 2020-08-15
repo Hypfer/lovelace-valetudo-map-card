@@ -113,6 +113,8 @@ recorder:
 | path_color | string | '--valetudo-map-path-color', '--primary-text-color' | Path color
 | path_opacity | number | 1 | Path opacity
 | path_width | number | 1 | Path line width
+| segment_colors | array | '#19A1A1', '#7AC037', '#DF5618', '#F7C841' | Segment colors
+| segment_opacity | number | 0.75 | Segment opacity
 | show_floor | boolean | true | Draw the floor on the map
 | show_dock | boolean | true | Draw the charging dock on the map
 | show_vacuum | boolean | true | Draw the vacuum on the map
@@ -121,6 +123,18 @@ recorder:
 | show_no_go_areas | boolean | true | Draw no go areas on the map
 | show_virtual_walls | boolean | true | Draw virtual walls on the map
 | show_path | boolean | true | Draw the path the vacuum took
+| show_no_go_border | boolean | true | Draw a border around no go areas
+| show_predicted_path | boolean | true | Draw the predicted path for the vacuum
+| show_goto_target | boolean | true | Draw the go to target
+| show_segments | boolean | true | Draw the floor segments on the map
+| show_status | boolean | true | Show the status of vacuum_entity
+| show_battery_level | boolean | true | Show the battery level of vacuum_entity
+| show_start_button | boolean | true | Show the start button for vacuum_entity
+| show_pause_button | boolean | true | Show the pause button for vacuum_entity
+| show_stop_button | boolean | true | Show the stop button for vacuum_entity
+| show_home_button | boolean | true | Show the home button for vacuum_entity
+| goto_target_icon | string | mdi:pin | The icon to use for the go to target
+| goto_target_color | string | 'blue' | The color to use for the go to target icon
 | dock_icon | string | mdi:flash | The icon to use for the charging dock
 | dock_color | string | 'green' | The color to use for the charging dock icon
 | vacuum_icon | string | mdi:robot-vacuum | The icon to use for the vacuum
@@ -130,8 +144,18 @@ recorder:
 | rotate | number | 0 | Value to rotate the map by (default is in deg, but a value like `2rad` is valid too)
 | crop | Object | {top: 0, bottom: 0, left: 0, right: 0} | Crop the map
 | min_height | string | 0 | The minimum height of the card the map is displayed in, regardless of the map's size itself. Suffix with 'w' if you want it to be times the width (ex: 0.5625w is equivalent to a picture card's 16x9 aspect_ratio)
+| custom_buttons | array | [] | An array of custom buttons. Options detailed below.
 
 Colors can be any valid CSS value in the card config, like name (red), hex code (#FF0000), rgb(255,255,255), rgba(255,255,255,0.8)...
+
+## Custom Buttons
+Custom buttons can be added to this card when vacuum_entity is set. Each custom button supports the following options:
+
+| Name | Type | Default | Description
+| ---- | ---- | ------- | -----------
+| service | sting | **Required** | The service to call when this button is pressed
+| service_data | Object | {} | Optional service data that will be passed to the service
+| icon | string | mdi:radiobox-blank | The icon that will represent the custom button
 
 ## Tips & Tricks
 ### Displaying as overlay
@@ -148,3 +172,6 @@ elements:
 ```
 
 Then use map_scale and crop to make it fit.
+
+## License
+Lovelace Valetudo Map Card is licensed under the MIT license. It includes some code from [the Valetudo project](https://github.com/Hypfer/Valetudo), which is available under the Apache 2 license. This third-party code is clearly marked as such.
