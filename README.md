@@ -45,7 +45,7 @@ If you are using development version of Valetudo, then you will need to install 
 You can install it manually or by adding a repository to [HACS](https://hacs.xyz/).
 
 In this case the sensor should look like this:
-```
+```yaml
 sensor:
   - platform: mqtt
     state_topic: "valetudo/rockrobo/state"
