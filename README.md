@@ -41,6 +41,22 @@ sensor:
     value_template: 'OK'
 ```
 
+If you are using development version of Valetudo, then you will need to install the [custom_filters](https://github.com/zvldz/ha_custom_filters) component.
+You can install it manually or by adding a repository to [HACS](https://hacs.xyz/).
+
+In this case the sensor should look like this:
+```yaml
+sensor:
+  - platform: mqtt
+    state_topic: "valetudo/rockrobo/state"
+    json_attributes_topic: "valetudo/rockrobo/map_data"
+    json_attributes_template: "{% if 'class' in value[1:10] %} {{ value }} {% else %} {{ value | decode_valetudo_map }} {% endif %}"
+    name: xiaomi_map
+    value_template: 'OK'
+```    
+
+This is a temporary solution and may be changed in future
+
 #### Valetudo REST API
 
 Deprecated alternative `configuration.yaml`, using authentication via REST (unsupported):
