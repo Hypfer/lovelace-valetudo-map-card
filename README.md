@@ -55,6 +55,8 @@ sensor:
     value_template: 'OK'
 ```    
 
+This is a temporary solution and may be changed in future
+
 #### Valetudo REST API
 
 Deprecated alternative `configuration.yaml`, using authentication via REST (unsupported):
