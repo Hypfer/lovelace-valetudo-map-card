@@ -169,7 +169,7 @@ Custom buttons can be added to this card when vacuum_entity is set. Each custom 
 
 | Name | Type | Default | Description
 | ---- | ---- | ------- | -----------
-| service | sting | **Required** | The service to call when this button is pressed
+| service | string | **Required** | The service to call when this button is pressed
 | service_data | Object | {} | Optional service data that will be passed to the service
 | icon | string | mdi:radiobox-blank | The icon that will represent the custom button
 
