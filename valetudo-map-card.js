@@ -266,8 +266,8 @@ class ValetudoMapCard extends HTMLElement {
       objectTopOffset = mapData.attributes.image.position.top * this._config.map_scale;
     } else {
       let floorLayer = this.getLayers(mapData.attributes, 'floor', 1)[0];
-      mapLeftOffset = (floorLayer.dimensions.x.min) - 1;
-      mapTopOffset = (floorLayer.dimensions.y.min) - 1;
+      mapLeftOffset = ((floorLayer.dimensions.x.min) - 1) * this._config.map_scale;
+      mapTopOffset = ((floorLayer.dimensions.y.min) - 1) * this._config.map_scale;
     };
 
     // Create all objects
