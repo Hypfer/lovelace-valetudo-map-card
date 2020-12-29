@@ -896,6 +896,11 @@ class ValetudoMapCard extends HTMLElement {
             const customButtonRipple = document.createElement('paper-ripple');
             customButtonIcon.icon = custom_button["icon"] || 'mdi:radiobox-blank';
             customButton.appendChild(customButtonIcon);
+            if (custom_button.text) {
+                const customButtonText = document.createElement('span');
+                customButtonText.textContent = custom_button.text;
+                customButton.appendChild(customButtonText);
+            };
             customButton.appendChild(customButtonRipple);
             customButton.addEventListener('click', (event) => {
               const args = custom_button["service"].split('.');
