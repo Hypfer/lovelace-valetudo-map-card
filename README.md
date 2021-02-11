@@ -41,7 +41,7 @@ sensor:
     value_template: 'OK'
 ```
 
-If you are using development version of Valetudo, then you will need to install the [custom_filters](https://github.com/zvldz/ha_custom_filters) component.
+If you are using Valetudo 2021.01.1 or later, then you will need to install the [custom_filters](https://github.com/zvldz/ha_custom_filters) component.
 You can install it manually or by adding a repository to [HACS](https://hacs.xyz/).
 
 In this case the sensor should look like this:
