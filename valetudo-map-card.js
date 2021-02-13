@@ -290,7 +290,7 @@ class ValetudoMapCard extends HTMLElement {
       chargerHTML.style.left = `${Math.floor(chargerInfo[0] / widthScale) - objectLeftOffset - mapLeftOffset - (12 * this._config.icon_scale)}px`;
       chargerHTML.style.top = `${Math.floor(chargerInfo[1] / heightScale) - objectTopOffset - mapTopOffset - (12 * this._config.icon_scale)}px`;
       chargerHTML.style.color = chargerColor;
-      chargerHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale})`;
+      chargerHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale}) rotate(-${this._config.rotate})`;
     };
     chargerContainer.style.zIndex = 2;
     chargerContainer.appendChild(chargerHTML);
