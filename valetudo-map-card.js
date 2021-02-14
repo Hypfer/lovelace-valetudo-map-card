@@ -232,6 +232,21 @@ class ValetudoMapCard extends HTMLElement {
     };
   };
 
+  getActiveZones(attributes, legacyMode) {
+    if (legacyMode) {
+      let active_zones = [];
+      if (attributes.currently_cleaned_zones) {
+        for (let item of attributes.currently_cleaned_zones) {
+          active_zones.push({"points": item.flat()});
+        };
+      };
+
+      return active_zones;
+    } else {
+      return this.getEntities(attributes, 'active_zone');
+    };
+  };
+
   getNoGoAreas(attributes, legacyMode) {
     if (legacyMode) {
       let no_go_areas = [];
@@ -408,14 +423,15 @@ class ValetudoMapCard extends HTMLElement {
       mapCtx.globalAlpha = 1;
     };
 
-    if (mapData.attributes.currently_cleaned_zones && this._config.show_currently_cleaned_zones) {
+    let activeZones = this.getActiveZones(mapData.attributes, mapLegacyMode);
+    if (activeZones && this._config.show_currently_cleaned_zones) {
       mapCtx.globalAlpha = this._config.currently_cleaned_zone_opacity;
 
       mapCtx.strokeStyle = currentlyCleanedZoneColor;
       mapCtx.lineWidth = 1;
       mapCtx.fillStyle = currentlyCleanedZoneColor;
       mapCtx.beginPath();
-      for (let item of mapData.attributes.currently_cleaned_zones) {
+      for (let item of activeZones) {
         let x1 = Math.floor(item[0] / widthScale) - objectLeftOffset - mapLeftOffset;
         let y1 = Math.floor(item[1] / heightScale) - objectTopOffset - mapTopOffset;
         let x2 = Math.floor(item[2] / widthScale) - objectLeftOffset - mapLeftOffset;
