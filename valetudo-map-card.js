@@ -425,28 +425,30 @@ class ValetudoMapCard extends HTMLElement {
 
     let activeZones = this.getActiveZones(mapData.attributes, mapLegacyMode);
     if (activeZones && this._config.show_currently_cleaned_zones) {
-      mapCtx.globalAlpha = this._config.currently_cleaned_zone_opacity;
-
       mapCtx.strokeStyle = currentlyCleanedZoneColor;
       mapCtx.lineWidth = 1;
       mapCtx.fillStyle = currentlyCleanedZoneColor;
-      mapCtx.beginPath();
       for (let item of activeZones) {
-        let x1 = Math.floor(item[0] / widthScale) - objectLeftOffset - mapLeftOffset;
-        let y1 = Math.floor(item[1] / heightScale) - objectTopOffset - mapTopOffset;
-        let x2 = Math.floor(item[2] / widthScale) - objectLeftOffset - mapLeftOffset;
-        let y2 = Math.floor(item[3] / heightScale) - objectTopOffset - mapTopOffset;
-        if (this.isOutsideBounds(x1, y1, drawnMapCanvas, this._config)) continue;
-        if (this.isOutsideBounds(x2, y2, drawnMapCanvas, this._config)) continue;
-        mapCtx.fillRect(x1, y1, x2 - x1, y2 - y1);
+        mapCtx.globalAlpha = this._config.currently_cleaned_zone_opacity;
+        mapCtx.beginPath();
+        let points = item['points'];
+        for (let i = 0; i < points.length; i+=2) {
+          let x = Math.floor(points[i] / widthScale) - objectLeftOffset - mapLeftOffset;
+          let y = Math.floor(points[i + 1] / heightScale) - objectTopOffset - mapTopOffset;
+          if (i == 0) {
+            mapCtx.moveTo(x, y);
+          } else {
+            mapCtx.lineTo(x, y);
+          }
+          if (this.isOutsideBounds(x, y, drawnMapCanvas, this._config)) continue;
+        };
+        mapCtx.fill();
       };
-
       mapCtx.globalAlpha = 1.0;
     };
 
     let noGoAreas = this.getNoGoAreas(mapData.attributes, mapLegacyMode);
     if (noGoAreas && this._config.show_no_go_areas) {
-
       mapCtx.strokeStyle = noGoAreaColor;
       mapCtx.lineWidth = 2;
       mapCtx.fillStyle = noGoAreaColor;
