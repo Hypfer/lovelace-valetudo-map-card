@@ -426,7 +426,7 @@ class ValetudoMapCard extends HTMLElement {
     let activeZones = this.getActiveZones(mapData.attributes, mapLegacyMode);
     if (activeZones && this._config.show_currently_cleaned_zones) {
       mapCtx.strokeStyle = currentlyCleanedZoneColor;
-      mapCtx.lineWidth = 1;
+      mapCtx.lineWidth = 2;
       mapCtx.fillStyle = currentlyCleanedZoneColor;
       for (let item of activeZones) {
         mapCtx.globalAlpha = this._config.currently_cleaned_zone_opacity;
@@ -443,6 +443,12 @@ class ValetudoMapCard extends HTMLElement {
           if (this.isOutsideBounds(x, y, drawnMapCanvas, this._config)) continue;
         };
         mapCtx.fill();
+
+        if (this._config.show_currently_cleaned_zones_border) {
+          mapCtx.closePath();
+          mapCtx.globalAlpha = 1.0;
+          mapCtx.stroke();
+        }
       };
       mapCtx.globalAlpha = 1.0;
     };
@@ -583,6 +589,7 @@ class ValetudoMapCard extends HTMLElement {
     if (this._config.show_no_go_areas === undefined) this._config.show_no_go_areas = true;
     if (this._config.show_virtual_walls === undefined) this._config.show_virtual_walls = true;
     if (this._config.show_path === undefined) this._config.show_path = true;
+    if (this._config.show_currently_cleaned_zones_border === undefined) this._config.show_currently_cleaned_zones_border = true;
     if (this._config.show_no_go_area_border === undefined) this._config.show_no_go_area_border = true;
     if (this._config.show_predicted_path === undefined) this._config.show_predicted_path = true;
     if (this._config.show_goto_target === undefined) this._config.show_goto_target = true;

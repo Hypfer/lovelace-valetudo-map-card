@@ -139,6 +139,7 @@ recorder:
 | show_no_go_areas | boolean | true | Draw no go areas on the map
 | show_virtual_walls | boolean | true | Draw virtual walls on the map
 | show_path | boolean | true | Draw the path the vacuum took
+| show_currently_cleaned_zones_border | boolean | true | Draw a border around the currently cleaned zones
 | show_no_go_border | boolean | true | Draw a border around no go areas
 | show_predicted_path | boolean | true | Draw the predicted path for the vacuum
 | show_goto_target | boolean | true | Draw the go to target
