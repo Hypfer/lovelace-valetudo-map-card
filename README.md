@@ -5,7 +5,9 @@ Draws the map from a Xiaomi vacuum cleaner, that is rooted and flashed with [Val
 ## Valetudo
 Valetudo can be found on https://github.com/Hypfer/Valetudo. This is the only version of Valetudo we officially support.
 
-It is recommended to use at least Valetudo 0.6. Older versions of Valetudo are only supported in "Legacy Mode", which will likely be removed in the future.
+This card requires at least Valetudo 2021.2.0.
+
+If you want to use an older Valetudo version, check out the legacy branch of this project.
 
 ## Install
 
@@ -25,61 +27,11 @@ resources:
     url: /community_plugin/lovelace-valetudo-map-card/valetudo-map-card.js
 ```
 ### Home Assistant
-You will need to follow either the instructions for MQTT or for REST. Following the MQTT instructions is strongly recommended as REST is NOT officially supported.
-
-#### MQTT
 
 `configuration.yaml`: Valetudo officially supports MQTT, with the preferred example configuration as follows. You will need to have MQTT configured in [Home Assistant](https://www.home-assistant.io/docs/mqtt/broker) and [Valetudo](https://hypfer.github.io/Valetudo/pages/integrations/home-assistant-integration.html).
 
-Unfortunately Home Assistant does not support authentication via MQTT. See below for a deprecated alternative example configuration using Valetudo's REST API (unsupported) if you prefer not to use MQTT or require authentication.
-```yaml
-sensor:
-  - platform: mqtt
-    state_topic: "valetudo/rockrobo/state"
-    json_attributes_topic: "valetudo/rockrobo/map_data"
-    name: xiaomi_map
-    value_template: 'OK'
-```
-
-If you are using Valetudo 2021.01.1 or later, then you will need to install the [custom_filters](https://github.com/zvldz/ha_custom_filters) component.
-You can install it manually or by adding a repository to [HACS](https://hacs.xyz/).
-
-In this case the sensor should look like this:
-```yaml
-sensor:
-  - platform: mqtt
-    state_topic: "valetudo/rockrobo/state"
-    json_attributes_topic: "valetudo/rockrobo/map_data"
-    json_attributes_template: "{% if 'class' in value[1:10] %} {{ value }} {% else %} {{ value | decode_valetudo_map }} {% endif %}"
-    name: xiaomi_map
-    value_template: 'OK'
-```    
-
-This is a temporary solution and may be changed in future
-
-#### Valetudo REST API
-
-Deprecated alternative `configuration.yaml`, using authentication via REST (unsupported):
-```yaml
-sensor:
-  - platform: rest
-    resource: http://ip_of_your_vacuum/api/map/latest
-    name: xiaomi_map
-    json_attributes:
-      - image
-      - path
-      - charger
-      - robot
-      - virtual_walls
-      - no_go_areas
-    value_template: 'OK'
-    scan_interval: 5
-    authentication: basic
-    username: !secret xiaomi_map_username
-    password: !secret xiaomi_map_password
-```
-
-`authentication`, `username` and `password` configuration variables are required if using Valetudo Password Authentication (undocumented). Otherwise, omit.
+When using the latest (2021.2.0++) version of Valetudo, you should see a new `camera.mqtt` entity which actually contains the map data.
+Simply configure this card to use it and everything should be fine :)
 
 ### Lovelace custom card
 
@@ -87,7 +39,7 @@ Even when installing via HACS, the new card will **not** appear automatically in
 
 ```yaml
 type: 'custom:valetudo-map-card'
-entity: sensor.xiaomi_map
+entity: camera.xiaomi_map
 rotate: 0
 crop:
   top: 0
@@ -97,22 +49,12 @@ crop:
 min_height: 0
 ```
 
-Be sure to use the same entity name that you used for the sensor above.
-
-It's also highly recommended to exclude the sensor from the recorder component in `configuration.yaml` to keep the database small:
-```yaml
-recorder:
-  exclude:
-    entities:
-      - sensor.xiaomi_map
-```
-
 ## Options
 | Name | Type | Default | Description
 | ---- | ---- | ------- | -----------
 | type | string | **Required** | `custom:valetudo-map-card`
 | title | string | Vacuum | Title to show in the card header
-| entity | string | | Sensor to get state from
+| entity | string | | Camera entity to get state from
 | vacuum_entity | string | | Vacuum to show buttons to control for
 | background_color | string | | Background color of the card
 | floor_color | string | '--valetudo-map-floor-color', '--secondary-background-color' | Floor color
