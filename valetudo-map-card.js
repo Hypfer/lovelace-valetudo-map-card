@@ -3,11 +3,8 @@ class ValetudoMapCard extends HTMLElement {
     super();
     this.drawingMap = false;
     this.drawingControls = false;
-    this.lastUpdatedMap = "";
-    this.lastDrawnTheme = null;
     this.lastUpdatedControls = "";
     this.attachShadow({ mode: 'open' });
-    this.lastValidRobotPosition = [];
     this.lastMapPoll = new Date(0);
     this.isPollingMap = false;
     this.lastRobotState = "docked";
@@ -767,9 +764,6 @@ class ValetudoMapCard extends HTMLElement {
 
         this.drawMap(this.mapContainer, attributes, mapHeight, mapWidth, floorColor, wallColor, currentlyCleanedZoneColor, noGoAreaColor, virtualWallColor, pathColor, chargerColor, vacuumColor, gotoTargetColor);
 
-        // Done drawing map
-        this.lastUpdatedMap = mapEntity.last_updated;
-        this.lastDrawnTheme = hass.selectedTheme;
         this.drawingMap = false;
       }
     }

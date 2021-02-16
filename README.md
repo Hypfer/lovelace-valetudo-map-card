@@ -5,7 +5,9 @@ Draws the map from a Xiaomi vacuum cleaner, that is rooted and flashed with [Val
 ## Valetudo
 Valetudo can be found on https://github.com/Hypfer/Valetudo. This is the only version of Valetudo we officially support.
 
-It is recommended to use at least Valetudo 0.6. Older versions of Valetudo are only supported in "Legacy Mode", which will likely be removed in the future.
+This card requires at least Valetudo 2021.2.0.
+
+If you want to use an older Valetudo version, check out the legacy branch of this project.
 
 ## Install
 
