@@ -39,7 +39,7 @@ Even when installing via HACS, the new card will **not** appear automatically in
 
 ```yaml
 type: 'custom:valetudo-map-card'
-entity: camera.xiaomi_map
+entity: camera.map
 rotate: 0
 crop:
   top: 0
@@ -126,7 +126,7 @@ type: picture-elements
 image: https://online.visual-paradigm.com/repository/images/e5728e49-09ce-4c95-b83c-482deee24386.png
 elements:
   - type: 'custom:valetudo-map-card'
-    entity: sensor.xiaomi_map
+    entity: camera.map
     show_floor: false
     background_color: transparent
 ```
