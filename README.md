@@ -7,7 +7,7 @@ Valetudo can be found on https://github.com/Hypfer/Valetudo. This is the only ve
 
 This card requires at least Valetudo 2021.2.0.
 
-If you want to use an older Valetudo version, check out the legacy branch of this project.
+If you want to use an older Valetudo version, check out the legacy branch of this project. In HACS, you can choose "Reinstall" and use version v2020.
 
 ## Install
 
