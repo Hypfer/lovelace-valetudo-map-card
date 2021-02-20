@@ -8,7 +8,7 @@ class ValetudoMapCard extends HTMLElement {
     this.lastMapPoll = new Date(0);
     this.isPollingMap = false;
     this.lastRobotState = "docked";
-    this.pollInterval = POLL_INTERVAL_STATE_MAP["docked"];
+    this.pollInterval = POLL_INTERVAL_STATE_MAP["cleaning"];
 
 
     this.cardContainer = document.createElement('ha-card');
