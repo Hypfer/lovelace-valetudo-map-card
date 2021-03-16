@@ -199,9 +199,31 @@ class ValetudoMapCard extends HTMLElement {
     let mapLeftOffset = 0;
     let mapTopOffset = 0;
 
-    let floorLayer = this.getLayers(attributes, 'floor', 1)[0];
-    mapLeftOffset = ((floorLayer.dimensions.x.min) - 1) * this._config.map_scale;
-    mapTopOffset = ((floorLayer.dimensions.y.min) - 1) * this._config.map_scale;
+    let boundingBox = {
+      minX: attributes.size.x / attributes.pixelSize,
+      minY: attributes.size.y / attributes.pixelSize,
+      maxX: 0,
+      maxY: 0
+    }
+
+    attributes.layers.forEach(l => {
+      if(l.dimensions.x.min < boundingBox.minX) {
+        boundingBox.minX = l.dimensions.x.min;
+      }
+      if(l.dimensions.y.min < boundingBox.minY) {
+        boundingBox.minY = l.dimensions.y.min;
+      }
+      if(l.dimensions.x.max > boundingBox.maxX) {
+        boundingBox.maxX = l.dimensions.x.max;
+      }
+      if(l.dimensions.y.max > boundingBox.maxY) {
+        boundingBox.maxY = l.dimensions.y.max;
+      }
+    })
+
+
+    mapLeftOffset = ((boundingBox.minX) - 1) * this._config.map_scale;
+    mapTopOffset = ((boundingBox.minY) - 1) * this._config.map_scale;
 
 
     // Create all objects
@@ -702,9 +724,32 @@ class ValetudoMapCard extends HTMLElement {
       // Calculate map height and width
       let width;
       let height;
-      let floorLayer = this.getLayers(attributes, 'floor', 1)[0];
-      width = (floorLayer.dimensions.x.max - floorLayer.dimensions.x.min) + 2;
-      height = (floorLayer.dimensions.y.max - floorLayer.dimensions.y.min) + 2;
+
+      let boundingBox = {
+        minX: attributes.size.x / attributes.pixelSize,
+        minY: attributes.size.y / attributes.pixelSize,
+        maxX: 0,
+        maxY: 0
+      };
+
+      attributes.layers.forEach(l => {
+        if(l.dimensions.x.min < boundingBox.minX) {
+          boundingBox.minX = l.dimensions.x.min;
+        }
+        if(l.dimensions.y.min < boundingBox.minY) {
+          boundingBox.minY = l.dimensions.y.min;
+        }
+        if(l.dimensions.x.max > boundingBox.maxX) {
+          boundingBox.maxX = l.dimensions.x.max;
+        }
+        if(l.dimensions.y.max > boundingBox.maxY) {
+          boundingBox.maxY = l.dimensions.y.max;
+        }
+      })
+
+
+      width = (boundingBox.maxX - boundingBox.minX) + 2;
+      height = (boundingBox.maxY - boundingBox.minY) + 2;
 
 
       const mapWidth = width - this._config.crop.right;
