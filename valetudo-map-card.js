@@ -1,6 +1,7 @@
 class ValetudoMapCard extends HTMLElement {
   constructor() {
     super();
+
     this.drawingMap = false;
     this.drawingControls = false;
     this.lastUpdatedControls = "";
@@ -9,7 +10,6 @@ class ValetudoMapCard extends HTMLElement {
     this.isPollingMap = false;
     this.lastRobotState = "docked";
     this.pollInterval = POLL_INTERVAL_STATE_MAP["cleaning"];
-
 
     this.cardContainer = document.createElement('ha-card');
     this.cardContainer.id = 'lovelaceValetudoHaCard';
@@ -186,7 +186,7 @@ class ValetudoMapCard extends HTMLElement {
     return this.getEntities(attributes, 'no_go_area');
   };
 
-  drawMap(mapContainer, attributes, mapHeight, mapWidth, floorColor, wallColor, currentlyCleanedZoneColor, noGoAreaColor, virtualWallColor, pathColor, chargerColor, vacuumColor, gotoTargetColor) {
+  drawMap(mapContainer, attributes, mapHeight, mapWidth, boundingBox, floorColor, wallColor, currentlyCleanedZoneColor, noGoAreaColor, virtualWallColor, pathColor, chargerColor, vacuumColor, gotoTargetColor) {
     // Points to pixels
     let pixelSize = 50;
     pixelSize = attributes.pixelSize;
@@ -198,29 +198,6 @@ class ValetudoMapCard extends HTMLElement {
     let objectTopOffset = 0;
     let mapLeftOffset = 0;
     let mapTopOffset = 0;
-
-    let boundingBox = {
-      minX: attributes.size.x / attributes.pixelSize,
-      minY: attributes.size.y / attributes.pixelSize,
-      maxX: 0,
-      maxY: 0
-    }
-
-    attributes.layers.forEach(l => {
-      if(l.dimensions.x.min < boundingBox.minX) {
-        boundingBox.minX = l.dimensions.x.min;
-      }
-      if(l.dimensions.y.min < boundingBox.minY) {
-        boundingBox.minY = l.dimensions.y.min;
-      }
-      if(l.dimensions.x.max > boundingBox.maxX) {
-        boundingBox.maxX = l.dimensions.x.max;
-      }
-      if(l.dimensions.y.max > boundingBox.maxY) {
-        boundingBox.maxY = l.dimensions.y.max;
-      }
-    })
-
 
     mapLeftOffset = ((boundingBox.minX) - 1) * this._config.map_scale;
     mapTopOffset = ((boundingBox.minY) - 1) * this._config.map_scale;
@@ -747,10 +724,8 @@ class ValetudoMapCard extends HTMLElement {
         }
       })
 
-
       width = (boundingBox.maxX - boundingBox.minX) + 2;
       height = (boundingBox.maxY - boundingBox.minY) + 2;
-
 
       const mapWidth = width - this._config.crop.right;
       const mapHeight = height - this._config.crop.bottom;
@@ -807,7 +782,7 @@ class ValetudoMapCard extends HTMLElement {
         // Start drawing map
         this.drawingMap = true;
 
-        this.drawMap(this.mapContainer, attributes, mapHeight, mapWidth, floorColor, wallColor, currentlyCleanedZoneColor, noGoAreaColor, virtualWallColor, pathColor, chargerColor, vacuumColor, gotoTargetColor);
+        this.drawMap(this.mapContainer, attributes, mapHeight, mapWidth, boundingBox, floorColor, wallColor, currentlyCleanedZoneColor, noGoAreaColor, virtualWallColor, pathColor, chargerColor, vacuumColor, gotoTargetColor);
 
         this.drawingMap = false;
       }
