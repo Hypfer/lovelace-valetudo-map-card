@@ -30,7 +30,7 @@ resources:
 
 `configuration.yaml`: Valetudo officially supports MQTT, with the preferred example configuration as follows. You will need to have MQTT configured in [Home Assistant](https://www.home-assistant.io/docs/mqtt/broker) and [Valetudo](https://hypfer.github.io/Valetudo/pages/integrations/home-assistant-integration.html).
 
-When using the latest (2021.2.0++) version of Valetudo, you should see a new `camera.mqtt` entity which actually contains the map data.
+When using the latest (2021.2.0++) version of Valetudo, you should see a new `camera.map` entity which actually contains the map data.
 Simply configure this card to use it and everything should be fine :)
 
 ### Lovelace custom card
