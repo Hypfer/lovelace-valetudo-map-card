@@ -528,7 +528,7 @@ class ValetudoMapCard extends HTMLElement {
     if (this._config.show_pause_button === undefined) this._config.show_pause_button = true;
     if (this._config.show_stop_button === undefined) this._config.show_stop_button = true;
     if (this._config.show_home_button === undefined) this._config.show_home_button = true;
-    if (this._config.show_locate_button === undefined) this._config.show_locate_button = false;
+    if (this._config.show_locate_button === undefined) this._config.show_locate_button = true;
 
     // Width settings
     if (this._config.virtual_wall_width === undefined) this._config.virtual_wall_width = 1;
