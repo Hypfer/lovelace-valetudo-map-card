@@ -528,6 +528,7 @@ class ValetudoMapCard extends HTMLElement {
     if (this._config.show_pause_button === undefined) this._config.show_pause_button = true;
     if (this._config.show_stop_button === undefined) this._config.show_stop_button = true;
     if (this._config.show_home_button === undefined) this._config.show_home_button = true;
+    if (this._config.show_locate_button === undefined) this._config.show_locate_button = true;
 
     // Width settings
     if (this._config.virtual_wall_width === undefined) this._config.virtual_wall_width = 1;
@@ -903,6 +904,19 @@ class ValetudoMapCard extends HTMLElement {
             this._hass.callService('vacuum', 'return_to_base', { entity_id: this._config.vacuum_entity }).then();
           });
           this.controlFlexBox.appendChild(homeButton);
+        }
+
+        if (this._config.show_locate_button) {
+          const locateButton = document.createElement('paper-button');
+          const locateIcon = document.createElement('ha-icon');
+          const locateRipple = document.createElement('paper-ripple');
+          locateIcon.icon = 'hass:map-marker';
+          locateButton.appendChild(locateIcon);
+          locateButton.appendChild(locateRipple);
+          locateButton.addEventListener('click', (event) => {
+            this._hass.callService('vacuum', 'locate', { entity_id: this._config.vacuum_entity }).then();
+          });
+          this.controlFlexBox.appendChild(locateButton);
         }
 
         this.customControlFlexBox = document.createElement('div');
