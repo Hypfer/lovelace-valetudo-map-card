@@ -92,6 +92,7 @@ min_height: 0
 | show_pause_button | boolean | true | Show the pause button for vacuum_entity
 | show_stop_button | boolean | true | Show the stop button for vacuum_entity
 | show_home_button | boolean | true | Show the home button for vacuum_entity
+| show_locate_button | boolean | true | Show the locate button for vacuum_entity
 | goto_target_icon | string | mdi:pin | The icon to use for the go to target
 | goto_target_color | string | 'blue' | The color to use for the go to target icon
 | dock_icon | string | mdi:flash | The icon to use for the charging dock
