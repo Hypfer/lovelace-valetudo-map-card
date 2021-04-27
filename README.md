@@ -30,7 +30,7 @@ resources:
 
 `configuration.yaml`: Valetudo officially supports MQTT, with the preferred example configuration as follows. You will need to have MQTT configured in [Home Assistant](https://www.home-assistant.io/docs/mqtt/broker) and [Valetudo](https://hypfer.github.io/Valetudo/pages/integrations/home-assistant-integration.html).
 
-When using the latest (2021.2.0++) version of Valetudo, you should see a new `camera.map` entity which actually contains the map data.
+When using the latest (2021.2.0++) version of Valetudo, you should see a new `camera.map_data` (or `camera.map` before 2021.4.0) entity which actually contains the map data.
 Simply configure this card to use it and everything should be fine :)
 
 ### Lovelace custom card
@@ -39,7 +39,8 @@ Even when installing via HACS, the new card will **not** appear automatically in
 
 ```yaml
 type: 'custom:valetudo-map-card'
-entity: camera.map
+entity: camera.map_data
+vacuum_entity: vacuum.valetudo_robot
 rotate: 0
 crop:
   top: 0
@@ -127,7 +128,7 @@ type: picture-elements
 image: https://online.visual-paradigm.com/repository/images/e5728e49-09ce-4c95-b83c-482deee24386.png
 elements:
   - type: 'custom:valetudo-map-card'
-    entity: camera.map
+    entity: camera.map_data
     show_floor: false
     background_color: transparent
 ```
