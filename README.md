@@ -103,6 +103,7 @@ min_height: 0
 | map_scale | number | 1 | Scale the map by this value
 | icon_scale | number | 1 | Scale the icons (vacuum & dock) by this value
 | rotate | number | 0 | Value to rotate the map by (default is in deg, but a value like `2rad` is valid too)
+| left_padding | number | 0 | Value that moves the map `number` pixels from left to right 
 | crop | Object | {top: 0, bottom: 0, left: 0, right: 0} | Crop the map
 | min_height | string | 0 | The minimum height of the card the map is displayed in, regardless of the map's size itself. Suffix with 'w' if you want it to be times the width (ex: 0.5625w is equivalent to a picture card's 16x9 aspect_ratio)
 | custom_buttons | array | [] | An array of custom buttons. Options detailed below.
