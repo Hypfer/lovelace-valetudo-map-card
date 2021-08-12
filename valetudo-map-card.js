@@ -635,7 +635,7 @@ class ValetudoMapCard extends HTMLElement {
     if(this.isPollingMap === false ) {
       this.isPollingMap = true;
 
-      const response = await fetch(url);
+      const response = await this._hass.fetchWithAuth(url);
       let mapData;
 
       if(!response.ok) {
