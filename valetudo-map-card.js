@@ -156,26 +156,14 @@ class ValetudoMapCard extends HTMLElement {
 
   getVirtualWallPoints(attributes) {
     return this.getEntities(attributes, 'virtual_wall');
-
   };
 
   getPathPoints(attributes) {
-    let layer = this.getEntities(attributes, 'path', 1)[0];
-    if (layer === undefined) {
-      return null;
-    }
-
-    return layer.points;
+    return this.getEntities(attributes, 'path');
   };
 
   getPredictedPathPoints(attributes) {
-    let layer = this.getEntities(attributes, 'predicted_path', 1)[0];
-    if (layer === undefined) {
-      return null;
-    }
-
-    return layer.points;
-
+    return this.getEntities(attributes, 'predicted_path');
   };
 
   getActiveZones(attributes) {
@@ -431,31 +419,31 @@ class ValetudoMapCard extends HTMLElement {
       mapCtx.globalAlpha = 1;
     }
 
+    const pathCtx = pathCanvas.getContext("2d");
+    pathCtx.globalAlpha = this._config.path_opacity;
+    pathCtx.strokeStyle = pathColor;
+    pathCtx.lineWidth = this._config.path_width;
+
     let pathPoints = this.getPathPoints(attributes);
-    if (pathPoints) {
-      const pathCtx = pathCanvas.getContext("2d");
-      pathCtx.globalAlpha = this._config.path_opacity;
-
-      pathCtx.strokeStyle = pathColor;
-      pathCtx.lineWidth = this._config.path_width;
-
-      let x = 0;
-      let y = 0;
-      let first = true;
-      pathCtx.beginPath();
-      for (let i = 0; i < pathPoints.length; i+=2) {
-        x = Math.floor((pathPoints[i]) / widthScale) - objectLeftOffset - mapLeftOffset;
-        y = Math.floor((pathPoints[i + 1]) / heightScale) - objectTopOffset - mapTopOffset;
-        if (this.isOutsideBounds(x, y, drawnMapCanvas, this._config)) continue;
-        if (first) {
-          pathCtx.moveTo(x, y);
-          first = false;
-        } else {
-          pathCtx.lineTo(x, y);
+    if (Array.isArray(pathPoints) && pathPoints.length > 0 && (this._config.show_path && this._config.path_width > 0)) {
+      for (let item of pathPoints) {
+        let x = 0;
+        let y = 0;
+        let first = true;
+        pathCtx.beginPath();
+        for (let i = 0; i < item.points.length; i+=2) {
+          x = Math.floor((item.points[i]) / widthScale) - objectLeftOffset - mapLeftOffset;
+          y = Math.floor((item.points[i + 1]) / heightScale) - objectTopOffset - mapTopOffset;
+          if (this.isOutsideBounds(x, y, drawnMapCanvas, this._config)) continue;
+          if (first) {
+            pathCtx.moveTo(x, y);
+            first = false;
+          } else {
+            pathCtx.lineTo(x, y);
+          }
         }
+        pathCtx.stroke();
       }
-
-      if (this._config.show_path && this._config.path_width > 0) pathCtx.stroke();
 
       // Update vacuum angle
       vacuumHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale}) rotate(${robotInfo[2]}deg)`;
@@ -464,31 +452,26 @@ class ValetudoMapCard extends HTMLElement {
     }
 
     let predictedPathPoints = this.getPredictedPathPoints(attributes);
-    if (predictedPathPoints) {
-      const pathCtx = pathCanvas.getContext("2d");
-      pathCtx.globalAlpha = this._config.path_opacity;
-
+    if (Array.isArray(predictedPathPoints) && predictedPathPoints.length > 0 && (this._config.show_predicted_path && this._config.path_width > 0)) {
       pathCtx.setLineDash([5,3]);
-      pathCtx.strokeStyle = pathColor;
-      pathCtx.lineWidth = this._config.path_width;
-
-      let x = 0;
-      let y = 0;
-      let first = true;
-      pathCtx.beginPath();
-      for (let i = 0; i < predictedPathPoints.length; i+=2) {
-        x = Math.floor((predictedPathPoints[i]) / widthScale) - objectLeftOffset - mapLeftOffset;
-        y = Math.floor((predictedPathPoints[i + 1]) / heightScale) - objectTopOffset - mapTopOffset;
-        if (this.isOutsideBounds(x, y, drawnMapCanvas, this._config)) continue;
-        if (first) {
-          pathCtx.moveTo(x, y);
-          first = false;
-        } else {
-          pathCtx.lineTo(x, y);
+      for (let item of predictedPathPoints) {
+        let x = 0;
+        let y = 0;
+        let first = true;
+        pathCtx.beginPath();
+        for (let i = 0; i < item.points.length; i+=2) {
+          x = Math.floor((item.points[i]) / widthScale) - objectLeftOffset - mapLeftOffset;
+          y = Math.floor((item.points[i + 1]) / heightScale) - objectTopOffset - mapTopOffset;
+          if (this.isOutsideBounds(x, y, drawnMapCanvas, this._config)) continue;
+          if (first) {
+            pathCtx.moveTo(x, y);
+            first = false;
+          } else {
+            pathCtx.lineTo(x, y);
+          }
         }
+        pathCtx.stroke();
       }
-
-      if (this._config.show_path && this._config.path_width > 0 && this._config.show_predicted_path) pathCtx.stroke();
 
       pathCtx.globalAlpha = 1;
     }
