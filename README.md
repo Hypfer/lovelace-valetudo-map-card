@@ -66,6 +66,8 @@ min_height: 0
 | currently_cleaned_zone_opacity | number | 0.5 | Opacity of the currently cleaned zones
 | no_go_area_color | string | '--valetudo-no-go-area-color', '--accent-color' | No go area color
 | no_go_area_opacity | number | 0.5 | Opacity of the no go areas
+| no_mop_area_color | string | '--valetudo-no-mop-area-color', '--secondary-text-color' | No mop area color
+| no_mop_area_opacity | number | 0.5 | Opacity of the no mop areas
 | virtual_wall_color | string | '--valetudo-virtual-wall-color', '--accent-color' | Virtual wall color
 | virtual_wall_opacity | number | 1 | Virtual wall opacity
 | virtual_wall_width | number | 1 | Virtual wall line width
@@ -80,10 +82,12 @@ min_height: 0
 | show_walls | boolean | true | Draw walls on the map
 | show_currently_cleaned_zones | boolean | true | Show zones selected for zoned cleanup on the map
 | show_no_go_areas | boolean | true | Draw no go areas on the map
+| show_no_mop_areas | boolean | true | Draw no mop areas on the map
 | show_virtual_walls | boolean | true | Draw virtual walls on the map
 | show_path | boolean | true | Draw the path the vacuum took
 | show_currently_cleaned_zones_border | boolean | true | Draw a border around the currently cleaned zones
 | show_no_go_border | boolean | true | Draw a border around no go areas
+| show_no_mop_border | boolean | true | Draw a border around no mop areas
 | show_predicted_path | boolean | true | Draw the predicted path for the vacuum
 | show_goto_target | boolean | true | Draw the go to target
 | show_segments | boolean | true | Draw the floor segments on the map
