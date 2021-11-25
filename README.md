@@ -66,7 +66,7 @@ min_height: 0
 | currently_cleaned_zone_opacity | number | 0.5 | Opacity of the currently cleaned zones
 | no_go_area_color | string | '--valetudo-no-go-area-color', '--accent-color' | No go area color
 | no_go_area_opacity | number | 0.5 | Opacity of the no go areas
-| no_mop_area_color | string | '--valetudo-no-mop-area-color', '--accent-color' | No mop area color
+| no_mop_area_color | string | '--valetudo-no-mop-area-color', '--secondary-text-color' | No mop area color
 | no_mop_area_opacity | number | 0.5 | Opacity of the no mop areas
 | virtual_wall_color | string | '--valetudo-virtual-wall-color', '--accent-color' | Virtual wall color
 | virtual_wall_opacity | number | 1 | Virtual wall opacity

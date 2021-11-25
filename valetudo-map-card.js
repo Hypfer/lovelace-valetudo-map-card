@@ -800,7 +800,7 @@ class ValetudoMapCard extends HTMLElement {
       const wallColor = this.calculateColor(homeAssistant, this._config.wall_color, '--valetudo-map-wall-color', '--accent-color');
       const currentlyCleanedZoneColor = this.calculateColor(homeAssistant, this._config.currently_cleaned_zone_color, '--valetudo-currently_cleaned_zone_color', '--secondary-text-color');
       const noGoAreaColor = this.calculateColor(homeAssistant, this._config.no_go_area_color, '--valetudo-no-go-area-color', '--accent-color');
-      const noMopAreaColor = this.calculateColor(homeAssistant, this._config.no_mop_area_color, '--valetudo-no-mop-area-color', '--accent-color');
+      const noMopAreaColor = this.calculateColor(homeAssistant, this._config.no_mop_area_color, '--valetudo-no-mop-area-color', '--secondary-text-color');
       const virtualWallColor = this.calculateColor(homeAssistant, this._config.virtual_wall_color, '--valetudo-virtual-wall-color', '--accent-color');
       const pathColor = this.calculateColor(homeAssistant, this._config.path_color, '--valetudo-map-path-color', '--primary-text-color');
       const chargerColor = this.calculateColor(homeAssistant, this._config.dock_color, 'green');
