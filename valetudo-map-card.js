@@ -693,6 +693,25 @@ class ValetudoMapCard extends HTMLElement {
     if (attributes.__class === 'ValetudoMap') {
       canDrawMap = true;
     }
+    
+    if (attributes.metaData?.version === 2 && Array.isArray(attributes.layers)) {
+      attributes.layers.forEach(layer => {
+        if(layer.pixels.length === 0 && layer.compressedPixels.length !== 0) {
+          for (let i = 0; i < layer.compressedPixels.length; i = i + 3) {
+            const xStart = layer.compressedPixels[i];
+            const y = layer.compressedPixels[i+1]
+            const count = layer.compressedPixels[i+2]
+
+            for(let j = 0; j < count; j++) {
+              layer.pixels.push(
+                  xStart + j,
+                  y
+              );
+            }
+          }
+        }
+      })
+    }
 
     if (!infoEntity || infoEntity['state'] === 'unavailable' || !infoEntity.attributes) {
       canDrawControls = false;
