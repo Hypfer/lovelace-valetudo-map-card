@@ -45,6 +45,22 @@ class ValetudoMapCard extends HTMLElement {
     this.cardContainer.appendChild(this.controlContainerStyle);
   };
 
+  getMapEntityName(vacuum_name) {
+    return "camera." + vacuum_name + "_map_data";
+  }
+
+  getVacuumEntityName(vacuum_name) {
+    return "vacuum." + vacuum_name;
+  }
+
+  getMapEntity(vacuum_name) {
+    return this._hass.states[this.getMapEntityName(vacuum_name)];
+  }
+
+  getVacuumEntity(vacuum_name) {
+    return this._hass.states[this.getVacuumEntityName(vacuum_name)];
+  }
+
   shouldDrawMap() {
     return !this.drawingMap;
   };
@@ -526,7 +542,10 @@ class ValetudoMapCard extends HTMLElement {
     // Title settings
     if (this._config.title === undefined) this._config.title = "Vacuum";
 
-    // Show settings
+    // Core show settings
+    if (this._config.show_map === undefined) this._config.show_map = true;
+
+    // Map show settings
     if (this._config.show_floor === undefined) this._config.show_floor = true;
     if (this._config.show_dock === undefined) this._config.show_dock = true;
     if (this._config.show_vacuum === undefined) this._config.show_vacuum = true;
@@ -542,6 +561,8 @@ class ValetudoMapCard extends HTMLElement {
     if (this._config.show_predicted_path === undefined) this._config.show_predicted_path = true;
     if (this._config.show_goto_target === undefined) this._config.show_goto_target = true;
     if (this._config.show_segments === undefined) this._config.show_segments = true;
+
+    // Info show settings
     if (this._config.show_status === undefined) this._config.show_status = true;
     if (this._config.show_battery_level === undefined) this._config.show_battery_level = true;
 
@@ -619,23 +640,17 @@ class ValetudoMapCard extends HTMLElement {
 
     this._hass = hass;
 
-    let mapEntity = this._hass.states[this._config.entity];
-    let vacuumEntity;
+    let mapEntity = this.getMapEntity(this._config.vacuum);
+    let vacuumEntity = this.getVacuumEntity(this._config.vacuum);
     let shouldForcePoll = false;
 
     let attributes = mapEntity ? mapEntity.attributes : undefined;
 
-    if(this._config.vacuum_entity && this._hass.states[this._config.vacuum_entity]) {
-      vacuumEntity = this._hass.states[this._config.vacuum_entity];
-
-
-      if (vacuumEntity.state !== this.lastRobotState) {
-        this.pollInterval = POLL_INTERVAL_STATE_MAP[vacuumEntity.state] || 10000;
-        shouldForcePoll = true;
-        this.lastRobotState = vacuumEntity.state;
-      }
+    if (vacuumEntity && vacuumEntity.state !== this.lastRobotState) {
+      this.pollInterval = POLL_INTERVAL_STATE_MAP[vacuumEntity.state] || 10000;
+      shouldForcePoll = true;
+      this.lastRobotState = vacuumEntity.state;
     }
-
 
     if (mapEntity && mapEntity['state'] !== 'unavailable' && attributes && attributes["entity_picture"]) {
       if (new Date().getTime() - this.pollInterval > this.lastMapPoll.getTime() || shouldForcePoll) {
@@ -685,7 +700,7 @@ class ValetudoMapCard extends HTMLElement {
 
   handleDrawing(hass, mapEntity, attributes) {
     const config = this._config;
-    let infoEntity = this._hass.states[this._config.vacuum_entity]
+    let infoEntity = this.getVacuumEntity(this._config.vacuum);
 
     let canDrawMap = false;
     let canDrawControls = true;
@@ -719,24 +734,27 @@ class ValetudoMapCard extends HTMLElement {
       this.lastUpdatedControls = ""
     }
 
-    if (!canDrawMap && this._config.entity) {
+    if (!canDrawMap || !this._config.show_map) {
       // Remove the map
       this.mapContainer.style.display = 'none';
-
-      // Show the warning
-      this.entityWarning1.textContent = `Entity not available: ${this._config.entity}`;
-      this.entityWarning1.style.display = 'block';
     } else {
-      this.entityWarning1.style.display = 'none';
       this.mapContainer.style.display = 'block';
     }
 
-    if (!canDrawControls && this._config.vacuum_entity) {
+    if (!canDrawMap && this._config.show_map) {
+      // Show the warning
+      this.entityWarning1.textContent = `Entity not available: ${this.getMapEntityName(this._config.vacuum)}`;
+      this.entityWarning1.style.display = 'block';
+    } else {
+      this.entityWarning1.style.display = 'none';
+    }
+
+    if (!canDrawControls) {
       // Remove the controls
       this.controlContainer.style.display = 'none';
 
       // Show the warning
-      this.entityWarning2.textContent = `Entity not available: ${this._config.vacuum_entity}`;
+      this.entityWarning2.textContent = `Entity not available: ${this.getVacuumEntityName(this._config.vacuum)}`;
       this.entityWarning2.style.display = 'block';
     } else {
       this.entityWarning2.style.display = 'none';
@@ -826,7 +844,7 @@ class ValetudoMapCard extends HTMLElement {
       const vacuumColor = this.calculateColor(homeAssistant, this._config.vacuum_color, '--primary-text-color');
       const gotoTargetColor = this.calculateColor(homeAssistant, this._config.goto_target_color, 'blue');
 
-      if (this.shouldDrawMap()) {
+      if (this.shouldDrawMap() && this._config.show_map) {
         // Start drawing map
         this.drawingMap = true;
 
@@ -857,7 +875,7 @@ class ValetudoMapCard extends HTMLElement {
         }
       `
 
-      let infoEntity = this._hass.states[this._config.vacuum_entity]
+      let infoEntity = this.getVacuumEntity(this._config.vacuum);
       if (this.shouldDrawControls(infoEntity)) {
         // Start drawing controls
         this.drawingControls = true;
@@ -909,7 +927,7 @@ class ValetudoMapCard extends HTMLElement {
           startButton.appendChild(startIcon);
           startButton.appendChild(startRipple);
           startButton.addEventListener('click', (event) => {
-            this._hass.callService('vacuum', 'start', { entity_id: this._config.vacuum_entity }).then();
+            this._hass.callService('vacuum', 'start', { entity_id: this.getVacuumEntityName(this._config.vacuum) }).then();
           });
           this.controlFlexBox.appendChild(startButton);
         }
@@ -922,7 +940,7 @@ class ValetudoMapCard extends HTMLElement {
           pauseButton.appendChild(pauseIcon);
           pauseButton.appendChild(pauseRipple);
           pauseButton.addEventListener('click', (event) => {
-            this._hass.callService('vacuum', 'pause', { entity_id: this._config.vacuum_entity }).then();
+            this._hass.callService('vacuum', 'pause', { entity_id: this.getVacuumEntityName(this._config.vacuum) }).then();
           });
           this.controlFlexBox.appendChild(pauseButton);
         }
@@ -935,7 +953,7 @@ class ValetudoMapCard extends HTMLElement {
           stopButton.appendChild(stopIcon);
           stopButton.appendChild(stopRipple);
           stopButton.addEventListener('click', (event) => {
-            this._hass.callService('vacuum', 'stop', { entity_id: this._config.vacuum_entity }).then();
+            this._hass.callService('vacuum', 'stop', { entity_id: this.getVacuumEntityName(this._config.vacuum) }).then();
           });
           this.controlFlexBox.appendChild(stopButton);
         }
@@ -948,7 +966,7 @@ class ValetudoMapCard extends HTMLElement {
           homeButton.appendChild(homeIcon);
           homeButton.appendChild(homeRipple);
           homeButton.addEventListener('click', (event) => {
-            this._hass.callService('vacuum', 'return_to_base', { entity_id: this._config.vacuum_entity }).then();
+            this._hass.callService('vacuum', 'return_to_base', { entity_id: this.getVacuumEntityName(this._config.vacuum) }).then();
           });
           this.controlFlexBox.appendChild(homeButton);
         }
@@ -961,7 +979,7 @@ class ValetudoMapCard extends HTMLElement {
           locateButton.appendChild(locateIcon);
           locateButton.appendChild(locateRipple);
           locateButton.addEventListener('click', (event) => {
-            this._hass.callService('vacuum', 'locate', { entity_id: this._config.vacuum_entity }).then();
+            this._hass.callService('vacuum', 'locate', { entity_id: this.getVacuumEntityName(this._config.vacuum) }).then();
           });
           this.controlFlexBox.appendChild(locateButton);
         }

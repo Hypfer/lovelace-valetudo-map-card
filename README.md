@@ -5,9 +5,9 @@ Draws the map from a Xiaomi vacuum cleaner, that is rooted and flashed with [Val
 ## Valetudo
 Valetudo can be found on https://github.com/Hypfer/Valetudo. This is the only version of Valetudo we officially support.
 
-This card requires at least Valetudo 2021.2.0.
+This card requires at least Valetudo 2022.01.0.
 
-If you want to use an older Valetudo version, check out the legacy branch of this project. In HACS, you can choose "Reinstall" and use version v2020.
+If you want to use an older Valetudo version, check out the legacy or 2021.2.0 branch of this project. In HACS, you can choose "Reinstall" and use version v2020 or 2021-12-05.
 
 ## Install
 
@@ -30,8 +30,7 @@ resources:
 
 `configuration.yaml`: Valetudo officially supports MQTT, with the preferred example configuration as follows. You will need to have MQTT configured in [Home Assistant](https://www.home-assistant.io/docs/mqtt/broker) and [Valetudo](https://hypfer.github.io/Valetudo/pages/integrations/home-assistant-integration.html).
 
-When using the latest (2021.2.0++) version of Valetudo, you should see a new `camera.map_data` (or `camera.map` before 2021.4.0) entity which actually contains the map data.
-Simply configure this card to use it and everything should be fine :)
+A new MQTT entity named something like `vacuum.valetudo_fairyouthfulmandrill` should appear.
 
 ### Lovelace custom card
 
@@ -39,24 +38,18 @@ Even when installing via HACS, the new card will **not** appear automatically in
 
 ```yaml
 type: 'custom:valetudo-map-card'
-entity: camera.map_data
-vacuum_entity: vacuum.valetudo_robot
-rotate: 0
-crop:
-  top: 0
-  bottom: 0
-  left: 0
-  right: 0
-min_height: 0
+vacuum: 'valetudo_fairyouthfulmandrill'
 ```
+
+The name of vacuum is based on the MQTT entity, with the `vacuum.` prefix removed. It will probably have another name for you, but will likely start with `valetudo_`.
 
 ## Options
 | Name | Type | Default | Description
 | ---- | ---- | ------- | -----------
 | type | string | **Required** | `custom:valetudo-map-card`
+| vacuum | string | **Required** | Name of the vacuum in MQTT (without vacuum. prefix)
 | title | string | Vacuum | Title to show in the card header
-| entity | string | | Camera entity to get state from
-| vacuum_entity | string | | Vacuum to show buttons to control for
+| show_map | boolean | true | Show the map
 | background_color | string | | Background color of the card
 | floor_color | string | '--valetudo-map-floor-color', '--secondary-background-color' | Floor color
 | floor_opacity | number | 1 | Floor opacity
