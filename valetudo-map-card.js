@@ -894,6 +894,8 @@ class ValetudoMapCard extends HTMLElement {
           status = infoEntity.attributes.valetudo_state;
         } else if (infoEntity && infoEntity.attributes && infoEntity.attributes.status) {
           status = infoEntity.attributes.status;
+        } else if (infoEntity && infoEntity.state) {
+          status = infoEntity.state;
         }
 
         if (status && this._config.show_status) {
