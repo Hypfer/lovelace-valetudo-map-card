@@ -86,6 +86,7 @@ The name of vacuum is based on the MQTT entity, with the `vacuum.` prefix remove
 | show_segments | boolean | true | Draw the floor segments on the map
 | show_status | boolean | true | Show the status of vacuum_entity
 | show_battery_level | boolean | true | Show the battery level of vacuum_entity
+| show_fan_speed | boolean | true | Show the fan speed of vacuum_entity
 | show_start_button | boolean | true | Show the start button for vacuum_entity
 | show_pause_button | boolean | true | Show the pause button for vacuum_entity
 | show_stop_button | boolean | true | Show the stop button for vacuum_entity
