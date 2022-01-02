@@ -565,6 +565,7 @@ class ValetudoMapCard extends HTMLElement {
     // Info show settings
     if (this._config.show_status === undefined) this._config.show_status = true;
     if (this._config.show_battery_level === undefined) this._config.show_battery_level = true;
+    if (this._config.show_fan_speed === undefined) this._config.show_fan_speed = true;
 
     // Show button settings
     if (this._config.show_start_button === undefined) this._config.show_start_button = true;
@@ -900,6 +901,42 @@ class ValetudoMapCard extends HTMLElement {
           batteryData.appendChild(batteryIcon);
           batteryData.appendChild(batteryText);
           this.infoBox.appendChild(batteryData);
+        }
+        
+        if (infoEntity && infoEntity.attributes && infoEntity.attributes.fan_speed && infoEntity.attributes.fan_speed_list && this._config.show_fan_speed) {
+          const fanSpeedMenuButton = document.createElement('paper-menu-button');
+          fanSpeedMenuButton.slot = "dropdown-trigger";
+          fanSpeedMenuButton.addEventListener('click', (event) => { event.stopPropagation() });
+
+          const fanSpeedListbox = document.createElement('paper-listbox');
+          fanSpeedListbox.slot = "dropdown-content";
+          fanSpeedListbox.setAttribute("selected", infoEntity.attributes.fan_speed);
+          fanSpeedListbox.setAttribute("attr-for-selected", "value");
+          fanSpeedListbox.addEventListener('click', (event) => {
+            let requestData = { entity_id: this.getVacuumEntityName(this._config.vacuum), fan_speed: event.target.getAttribute("value")};
+            this._hass.callService('vacuum', 'set_fan_speed', requestData).then();
+          });
+          infoEntity.attributes.fan_speed_list.forEach(speed => {
+            let speedItem = document.createElement('paper-item');
+            speedItem.setAttribute("value", speed);
+            speedItem.innerHTML = speed[0].toUpperCase() + speed.substring(1);
+            fanSpeedListbox.appendChild(speedItem);
+          })
+
+          const fanSpeedButton = document.createElement('paper-button');
+          fanSpeedButton.slot = "dropdown-trigger";
+          fanSpeedButton.style.display = "flex"
+          fanSpeedButton.style.alignItems = "center"
+          const fanSpeedIcon = document.createElement('ha-icon');
+          const fanSpeedText = document.createElement('span');
+          fanSpeedIcon.icon = "mdi:fan";
+          fanSpeedText.innerHTML = " " + infoEntity.attributes.fan_speed[0].toUpperCase() + infoEntity.attributes.fan_speed.substring(1);
+          fanSpeedButton.appendChild(fanSpeedIcon);
+          fanSpeedButton.appendChild(fanSpeedText);
+          
+          fanSpeedMenuButton.appendChild(fanSpeedButton);
+          fanSpeedMenuButton.appendChild(fanSpeedListbox);
+          this.infoBox.appendChild(fanSpeedMenuButton);
         }
 
         this.controlFlexBox = document.createElement('div');
