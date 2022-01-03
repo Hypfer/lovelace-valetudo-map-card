@@ -9,6 +9,7 @@ class ValetudoMapCard extends HTMLElement {
     this.lastMapPoll = new Date(0);
     this.isPollingMap = false;
     this.lastRobotState = "docked";
+    this.lastWaterGradeState = "off";
     this.pollInterval = POLL_INTERVAL_STATE_MAP["cleaning"];
 
     this.cardContainer = document.createElement('ha-card');
@@ -53,12 +54,20 @@ class ValetudoMapCard extends HTMLElement {
     return "vacuum." + vacuum_name;
   }
 
+  getVacuumWaterGradeEntityName(vacuum_name) {
+    return "select." + vacuum_name + "_water_grade";
+  }
+
   getMapEntity(vacuum_name) {
     return this._hass.states[this.getMapEntityName(vacuum_name)];
   }
 
   getVacuumEntity(vacuum_name) {
     return this._hass.states[this.getVacuumEntityName(vacuum_name)];
+  }
+
+  getVacuumWaterGradeEntity(vacuum_name) {
+    return this._hass.states[this.getVacuumWaterGradeEntityName(vacuum_name)];
   }
 
   shouldDrawMap() {
@@ -566,6 +575,7 @@ class ValetudoMapCard extends HTMLElement {
     if (this._config.show_status === undefined) this._config.show_status = true;
     if (this._config.show_battery_level === undefined) this._config.show_battery_level = true;
     if (this._config.show_fan_speed === undefined) this._config.show_fan_speed = true;
+    if (this._config.show_water_grade === undefined) this._config.show_water_grade = true;
 
     // Show button settings
     if (this._config.show_start_button === undefined) this._config.show_start_button = true;
@@ -643,6 +653,7 @@ class ValetudoMapCard extends HTMLElement {
 
     let mapEntity = this.getMapEntity(this._config.vacuum);
     let vacuumEntity = this.getVacuumEntity(this._config.vacuum);
+    let waterGradeEntity = this.getVacuumWaterGradeEntity(this._config.vacuum);
     let shouldForcePoll = false;
 
     let attributes = mapEntity ? mapEntity.attributes : undefined;
@@ -653,11 +664,20 @@ class ValetudoMapCard extends HTMLElement {
       this.lastRobotState = vacuumEntity.state;
     }
 
+    if (waterGradeEntity && waterGradeEntity.state !== this.lastWaterGradeState && this._config.show_water_grade) {
+      shouldForcePoll = true;
+      this.lastWaterGradeState = waterGradeEntity.state;
+      // Reset last-updated to redraw elements
+      this.lastUpdatedControls = ""
+    }
+
     if (mapEntity && mapEntity['state'] !== 'unavailable' && attributes && attributes["entity_picture"]) {
       if (new Date().getTime() - this.pollInterval > this.lastMapPoll.getTime() || shouldForcePoll) {
         this.loadImageAndExtractMapData(attributes["entity_picture"]).then(mapData => {
           if (mapData !== null) {
             this.handleDrawing(hass, mapEntity, mapData);
+          } else {
+            this.handleDrawing(hass, mapEntity,{});
           }
         }).catch(e => {
           this.handleDrawing(hass, mapEntity,{});
@@ -902,7 +922,7 @@ class ValetudoMapCard extends HTMLElement {
           batteryData.appendChild(batteryText);
           this.infoBox.appendChild(batteryData);
         }
-        
+
         if (infoEntity && infoEntity.attributes && infoEntity.attributes.fan_speed && infoEntity.attributes.fan_speed_list && this._config.show_fan_speed) {
           const fanSpeedMenuButton = document.createElement('paper-menu-button');
           fanSpeedMenuButton.slot = "dropdown-trigger";
@@ -937,6 +957,43 @@ class ValetudoMapCard extends HTMLElement {
           fanSpeedMenuButton.appendChild(fanSpeedButton);
           fanSpeedMenuButton.appendChild(fanSpeedListbox);
           this.infoBox.appendChild(fanSpeedMenuButton);
+        }
+
+        let waterEntity = this.getVacuumWaterGradeEntity(this._config.vacuum);
+        if(waterEntity && waterEntity.attributes && waterEntity.attributes.options && waterEntity.state && this._config.show_water_grade) {
+          const waterGradeMenuButton = document.createElement('paper-menu-button');
+          waterGradeMenuButton.slot = "dropdown-trigger";
+          waterGradeMenuButton.addEventListener('click', (event) => { event.stopPropagation() });
+
+          const waterGradeListbox = document.createElement('paper-listbox');
+          waterGradeListbox.slot = "dropdown-content";
+          waterGradeListbox.setAttribute("selected", waterEntity.state);
+          waterGradeListbox.setAttribute("attr-for-selected", "value");
+          waterGradeListbox.addEventListener('click', (event) => {
+            let requestData = { entity_id: this.getVacuumWaterGradeEntityName(this._config.vacuum), option: event.target.getAttribute("value")};
+            this._hass.callService('select', 'select_option', requestData).then();
+          });
+          waterEntity.attributes.options.forEach(waterGradeOption => {
+            let waterGradeItem = document.createElement('paper-item');
+            waterGradeItem.setAttribute("value", waterGradeOption);
+            waterGradeItem.innerHTML = waterGradeOption[0].toUpperCase() + waterGradeOption.substring(1);
+            waterGradeListbox.appendChild(waterGradeItem);
+          })
+
+          const waterGradeButton = document.createElement('paper-button');
+          waterGradeButton.slot = "dropdown-trigger";
+          waterGradeButton.style.display = "flex"
+          waterGradeButton.style.alignItems = "center"
+          const waterGradeIcon = document.createElement('ha-icon');
+          const waterGradeText = document.createElement('span');
+          waterGradeIcon.icon = "mdi:water-pump";
+          waterGradeText.innerHTML = " " + waterEntity.state[0].toUpperCase() + waterEntity.state.substring(1);
+          waterGradeButton.appendChild(waterGradeIcon);
+          waterGradeButton.appendChild(waterGradeText);
+          
+          waterGradeMenuButton.appendChild(waterGradeButton);
+          waterGradeMenuButton.appendChild(waterGradeListbox);
+          this.infoBox.appendChild(waterGradeMenuButton);
         }
 
         this.controlFlexBox = document.createElement('div');
