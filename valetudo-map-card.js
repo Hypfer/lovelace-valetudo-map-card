@@ -713,14 +713,6 @@ class ValetudoMapCard extends HTMLElement {
         }
       }
 
-      case 'paused': {
-        if(buttonName == "start" || buttonName == "home") {
-          return true;
-        } else {
-          return false;
-        }
-      }
-
       case 'returning': {
         if(buttonName == "start" || buttonName == "pause") {
           return true;
@@ -731,6 +723,7 @@ class ValetudoMapCard extends HTMLElement {
 
       case 'idle':
       case 'docked':
+      case 'paused':
       default: {
         if(buttonName == "start" || buttonName == "home") {
           return true;
@@ -738,6 +731,7 @@ class ValetudoMapCard extends HTMLElement {
           return false;
         }
       }
+        
     }
   }
 
