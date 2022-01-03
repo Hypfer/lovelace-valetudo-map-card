@@ -690,6 +690,45 @@ class ValetudoMapCard extends HTMLElement {
     }
   };
 
+  getSelectDropdownHtml(currentValue, dropdownOptions, serviceDomain, serviceName, serviceRequestEntityName, serviceRequestPropertyName, iconName) {
+    let menuButton = document.createElement('paper-menu-button');
+    menuButton.slot = "dropdown-trigger";
+    menuButton.addEventListener('click', (event) => { event.stopPropagation() });
+
+    let listbox = document.createElement('paper-listbox');
+    listbox.slot = "dropdown-content";
+    listbox.setAttribute("selected", currentValue);
+    listbox.setAttribute("attr-for-selected", "value");
+    listbox.addEventListener('click', (event) => {
+      let requestData = {};
+      requestData['entity_id'] = serviceRequestEntityName;
+      requestData[serviceRequestPropertyName] = event.target.getAttribute("value");
+      this._hass.callService(serviceDomain, serviceName, requestData).then();
+    });
+    dropdownOptions.forEach(option => {
+      let paperItem = document.createElement('paper-item');
+      paperItem.setAttribute("value", option);
+      paperItem.innerHTML = option[0].toUpperCase() + option.substring(1);
+      listbox.appendChild(paperItem);
+    })
+
+    let paperButton = document.createElement('paper-button');
+    paperButton.slot = "dropdown-trigger";
+    paperButton.style.display = "flex"
+    paperButton.style.alignItems = "center"
+    let haIcon = document.createElement('ha-icon');
+    let spanText = document.createElement('span');
+    haIcon.icon = iconName;
+    spanText.innerHTML = " " + currentValue[0].toUpperCase() + currentValue.substring(1);
+    paperButton.appendChild(haIcon);
+    paperButton.appendChild(spanText);
+    
+    menuButton.appendChild(paperButton);
+    menuButton.appendChild(listbox);
+
+    return menuButton;
+  }
+
   async loadImageAndExtractMapData(url) {
     if(this.isPollingMap === false ) {
       this.isPollingMap = true;
@@ -923,77 +962,17 @@ class ValetudoMapCard extends HTMLElement {
           this.infoBox.appendChild(batteryData);
         }
 
-        if (infoEntity && infoEntity.attributes && infoEntity.attributes.fan_speed && infoEntity.attributes.fan_speed_list && this._config.show_fan_speed) {
-          const fanSpeedMenuButton = document.createElement('paper-menu-button');
-          fanSpeedMenuButton.slot = "dropdown-trigger";
-          fanSpeedMenuButton.addEventListener('click', (event) => { event.stopPropagation() });
-
-          const fanSpeedListbox = document.createElement('paper-listbox');
-          fanSpeedListbox.slot = "dropdown-content";
-          fanSpeedListbox.setAttribute("selected", infoEntity.attributes.fan_speed);
-          fanSpeedListbox.setAttribute("attr-for-selected", "value");
-          fanSpeedListbox.addEventListener('click', (event) => {
-            let requestData = { entity_id: this.getVacuumEntityName(this._config.vacuum), fan_speed: event.target.getAttribute("value")};
-            this._hass.callService('vacuum', 'set_fan_speed', requestData).then();
-          });
-          infoEntity.attributes.fan_speed_list.forEach(speed => {
-            let speedItem = document.createElement('paper-item');
-            speedItem.setAttribute("value", speed);
-            speedItem.innerHTML = speed[0].toUpperCase() + speed.substring(1);
-            fanSpeedListbox.appendChild(speedItem);
-          })
-
-          const fanSpeedButton = document.createElement('paper-button');
-          fanSpeedButton.slot = "dropdown-trigger";
-          fanSpeedButton.style.display = "flex"
-          fanSpeedButton.style.alignItems = "center"
-          const fanSpeedIcon = document.createElement('ha-icon');
-          const fanSpeedText = document.createElement('span');
-          fanSpeedIcon.icon = "mdi:fan";
-          fanSpeedText.innerHTML = " " + infoEntity.attributes.fan_speed[0].toUpperCase() + infoEntity.attributes.fan_speed.substring(1);
-          fanSpeedButton.appendChild(fanSpeedIcon);
-          fanSpeedButton.appendChild(fanSpeedText);
-          
-          fanSpeedMenuButton.appendChild(fanSpeedButton);
-          fanSpeedMenuButton.appendChild(fanSpeedListbox);
-          this.infoBox.appendChild(fanSpeedMenuButton);
+        if (this._config.show_fan_speed && infoEntity && infoEntity.attributes && infoEntity.attributes.fan_speed && infoEntity.attributes.fan_speed_list) {
+          let fanSpeedEntityName = this.getVacuumEntityName(this._config.vacuum);
+          let fanSpeedElement = this.getSelectDropdownHtml(infoEntity.attributes.fan_speed, infoEntity.attributes.fan_speed_list, "vacuum", "set_fan_speed", fanSpeedEntityName, "fan_speed", "mdi:fan");
+          this.infoBox.appendChild(fanSpeedElement);
         }
 
         let waterEntity = this.getVacuumWaterGradeEntity(this._config.vacuum);
-        if(waterEntity && waterEntity.attributes && waterEntity.attributes.options && waterEntity.state && this._config.show_water_grade) {
-          const waterGradeMenuButton = document.createElement('paper-menu-button');
-          waterGradeMenuButton.slot = "dropdown-trigger";
-          waterGradeMenuButton.addEventListener('click', (event) => { event.stopPropagation() });
-
-          const waterGradeListbox = document.createElement('paper-listbox');
-          waterGradeListbox.slot = "dropdown-content";
-          waterGradeListbox.setAttribute("selected", waterEntity.state);
-          waterGradeListbox.setAttribute("attr-for-selected", "value");
-          waterGradeListbox.addEventListener('click', (event) => {
-            let requestData = { entity_id: this.getVacuumWaterGradeEntityName(this._config.vacuum), option: event.target.getAttribute("value")};
-            this._hass.callService('select', 'select_option', requestData).then();
-          });
-          waterEntity.attributes.options.forEach(waterGradeOption => {
-            let waterGradeItem = document.createElement('paper-item');
-            waterGradeItem.setAttribute("value", waterGradeOption);
-            waterGradeItem.innerHTML = waterGradeOption[0].toUpperCase() + waterGradeOption.substring(1);
-            waterGradeListbox.appendChild(waterGradeItem);
-          })
-
-          const waterGradeButton = document.createElement('paper-button');
-          waterGradeButton.slot = "dropdown-trigger";
-          waterGradeButton.style.display = "flex"
-          waterGradeButton.style.alignItems = "center"
-          const waterGradeIcon = document.createElement('ha-icon');
-          const waterGradeText = document.createElement('span');
-          waterGradeIcon.icon = "mdi:water-pump";
-          waterGradeText.innerHTML = " " + waterEntity.state[0].toUpperCase() + waterEntity.state.substring(1);
-          waterGradeButton.appendChild(waterGradeIcon);
-          waterGradeButton.appendChild(waterGradeText);
-          
-          waterGradeMenuButton.appendChild(waterGradeButton);
-          waterGradeMenuButton.appendChild(waterGradeListbox);
-          this.infoBox.appendChild(waterGradeMenuButton);
+        if(this._config.show_water_grade && waterEntity && waterEntity.attributes && waterEntity.attributes.options && waterEntity.state) {
+          let waterGradeEntityName = this.getVacuumWaterGradeEntityName(this._config.vacuum);
+          let waterGradeElement = this.getSelectDropdownHtml(waterEntity.state, waterEntity.attributes.options, "select", "select_option", waterGradeEntityName, "option", "mdi:water-pump");
+          this.infoBox.appendChild(waterGradeElement);
         }
 
         this.controlFlexBox = document.createElement('div');
