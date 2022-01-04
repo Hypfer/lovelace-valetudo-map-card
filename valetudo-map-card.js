@@ -721,8 +721,15 @@ class ValetudoMapCard extends HTMLElement {
         }
       }
 
+      case 'docked': {
+        if(buttonName == "start") {
+          return true;
+        } else {
+          return false;
+        }
+      }
+
       case 'idle':
-      case 'docked':
       case 'paused':
       default: {
         if(buttonName == "start" || buttonName == "home") {
