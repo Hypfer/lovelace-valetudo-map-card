@@ -697,6 +697,51 @@ class ValetudoMapCard extends HTMLElement {
       return null;
     }
   }
+  
+    shouldDisplayButton(buttonName, vacuumState) {
+    switch(vacuumState) {
+      case 'on':
+      case 'auto':
+      case 'spot':
+      case 'edge':
+      case 'single_room':
+      case 'cleaning': {
+        if(buttonName == "pause" || buttonName == "stop" || buttonName == "home") {
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      case 'returning': {
+        if(buttonName == "start" || buttonName == "pause") {
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      case 'docked': {
+        if(buttonName == "start") {
+          return true;
+        } else {
+          return false;
+        }
+      }
+
+      case 'idle':
+      case 'paused':
+      default: {
+        if(buttonName == "start" || buttonName == "home") {
+          return true;
+        } else {
+          return false;
+        }
+      }
+        
+    }
+  }
+
 
   handleDrawing(hass, mapEntity, attributes) {
     const config = this._config;
@@ -906,7 +951,7 @@ class ValetudoMapCard extends HTMLElement {
         this.controlFlexBox.classList.add('flex-box');
 
         // Create controls
-        if (this._config.show_start_button) {
+        if (this._config.show_start_button && this.shouldDisplayButton("start", infoEntity.state)) {
           const startButton = document.createElement('paper-button');
           const startIcon = document.createElement('ha-icon');
           const startRipple = document.createElement('paper-ripple');
@@ -919,7 +964,7 @@ class ValetudoMapCard extends HTMLElement {
           this.controlFlexBox.appendChild(startButton);
         }
 
-        if (this._config.show_pause_button) {
+        if (this._config.show_pause_button  && this.shouldDisplayButton("pause", infoEntity.state)) {
           const pauseButton = document.createElement('paper-button');
           const pauseIcon = document.createElement('ha-icon');
           const pauseRipple = document.createElement('paper-ripple');
@@ -932,7 +977,7 @@ class ValetudoMapCard extends HTMLElement {
           this.controlFlexBox.appendChild(pauseButton);
         }
 
-        if (this._config.show_stop_button) {
+        if (this._config.show_stop_button && this.shouldDisplayButton("stop", infoEntity.state)) {
           const stopButton = document.createElement('paper-button');
           const stopIcon = document.createElement('ha-icon');
           const stopRipple = document.createElement('paper-ripple');
@@ -945,7 +990,7 @@ class ValetudoMapCard extends HTMLElement {
           this.controlFlexBox.appendChild(stopButton);
         }
 
-        if (this._config.show_home_button) {
+        if (this._config.show_home_button && this.shouldDisplayButton("home", infoEntity.state)) {
           const homeButton = document.createElement('paper-button');
           const homeIcon = document.createElement('ha-icon');
           const homeRipple = document.createElement('paper-ripple');
