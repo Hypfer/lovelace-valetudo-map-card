@@ -550,7 +550,7 @@ class ValetudoMapCard extends HTMLElement {
 
   clearContainer(container) {
     while (container.firstChild) {
-     container.firstChild.remove();
+      container.firstChild.remove();
     }
   }
 
@@ -708,7 +708,6 @@ class ValetudoMapCard extends HTMLElement {
     if (this._config.crop.bottom === undefined) this._config.crop.bottom = 0;
     if (this._config.crop.left === undefined) this._config.crop.left = 0;
     if (this._config.crop.right === undefined) this._config.crop.right = 0;
-    if (this._config.min_height === undefined) this._config.min_height = 0;
 
     /* End more default stuff */
 
@@ -1419,6 +1418,9 @@ const DEFAULT_CARD_CONFIG = {
     "#DF5618",
     "#F7C841",
   ],
+
+  // Crop settings
+  min_height: 0
 };
 
 
