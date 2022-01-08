@@ -27,10 +27,12 @@ class ValetudoMapCard extends HTMLElement {
 
     this.entityWarning1 = document.createElement('hui-warning');
     this.entityWarning1.id = 'lovelaceValetudoWarning1HaCard';
+    this.entityWarning1.style.display = 'none';
     this.cardContainer.appendChild(this.entityWarning1);
 
     this.entityWarning2 = document.createElement('hui-warning');
     this.entityWarning2.id = 'lovelaceValetudoWarning2HaCard';
+    this.entityWarning2.style.display = 'none';
     this.cardContainer.appendChild(this.entityWarning2);
 
     this.mapContainer = document.createElement('div');
@@ -198,12 +200,12 @@ class ValetudoMapCard extends HTMLElement {
   getNoGoAreas(attributes) {
     return this.getEntities(attributes, 'no_go_area');
   };
-  
+
   getNoMopAreas(attributes) {
     return this.getEntities(attributes, 'no_mop_area');
   };
 
-  drawMap(mapContainer, attributes, mapHeight, mapWidth, boundingBox, floorColor, wallColor, currentlyCleanedZoneColor, noGoAreaColor, noMopAreaColor, virtualWallColor, pathColor, chargerColor, vacuumColor, gotoTargetColor) {
+  drawMap(attributes, mapHeight, mapWidth, boundingBox) {
     // Points to pixels
     let pixelSize = 50;
     pixelSize = attributes.pixelSize;
@@ -219,6 +221,18 @@ class ValetudoMapCard extends HTMLElement {
     mapLeftOffset = ((boundingBox.minX) - 1) * this._config.map_scale;
     mapTopOffset = ((boundingBox.minY) - 1) * this._config.map_scale;
 
+    // Calculate colours
+    const homeAssistant = document.getElementsByTagName('home-assistant')[0];
+    const floorColor = this.calculateColor(homeAssistant, this._config.floor_color, '--valetudo-map-floor-color', '--secondary-background-color');
+    const wallColor = this.calculateColor(homeAssistant, this._config.wall_color, '--valetudo-map-wall-color', '--accent-color');
+    const currentlyCleanedZoneColor = this.calculateColor(homeAssistant, this._config.currently_cleaned_zone_color, '--valetudo-currently_cleaned_zone_color', '--secondary-text-color');
+    const noGoAreaColor = this.calculateColor(homeAssistant, this._config.no_go_area_color, '--valetudo-no-go-area-color', '--accent-color');
+    const noMopAreaColor = this.calculateColor(homeAssistant, this._config.no_mop_area_color, '--valetudo-no-mop-area-color', '--secondary-text-color');
+    const virtualWallColor = this.calculateColor(homeAssistant, this._config.virtual_wall_color, '--valetudo-virtual-wall-color', '--accent-color');
+    const pathColor = this.calculateColor(homeAssistant, this._config.path_color, '--valetudo-map-path-color', '--primary-text-color');
+    const chargerColor = this.calculateColor(homeAssistant, this._config.dock_color, 'green');
+    const vacuumColor = this.calculateColor(homeAssistant, this._config.vacuum_color, '--primary-text-color');
+    const gotoTargetColor = this.calculateColor(homeAssistant, this._config.goto_target_color, 'blue');
 
     // Create all objects
     const containerContainer = document.createElement('div');
@@ -241,7 +255,7 @@ class ValetudoMapCard extends HTMLElement {
       chargerHTML.style.top = `${Math.floor(chargerInfo[1] / heightScale) - objectTopOffset - mapTopOffset - (12 * this._config.icon_scale)}px`;
       chargerHTML.style.color = chargerColor;
       chargerHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale}) rotate(-${this._config.rotate})`;
-    };
+    }
     chargerContainer.style.zIndex = 2;
     chargerContainer.appendChild(chargerHTML);
 
@@ -425,7 +439,7 @@ class ValetudoMapCard extends HTMLElement {
       }
       mapCtx.globalAlpha = 1.0;
     }
-    
+
     let noMopAreas = this.getNoMopAreas(attributes);
     if (noMopAreas && this._config.show_no_mop_areas) {
       mapCtx.strokeStyle = noMopAreaColor;
@@ -539,79 +553,172 @@ class ValetudoMapCard extends HTMLElement {
     }
 
     // Put our newly generated map in there
-    while (mapContainer.firstChild) {
-      mapContainer.firstChild.remove();
-    }
-    mapContainer.appendChild(containerContainer);
+    this.clearContainer(this.mapContainer);
+    this.mapContainer.appendChild(containerContainer);
   };
 
+  clearContainer(container) {
+    while (container.firstChild) {
+      container.firstChild.remove();
+    }
+  }
+
+  drawControls(infoEntity) {
+   // Start drawing controls
+   this.drawingControls = true;
+
+   this.infoBox = document.createElement('div');
+   this.infoBox.classList.add('flex-box');
+
+   if (infoEntity && infoEntity.state && this._config.show_status) {
+     const statusInfo = document.createElement('p');
+     statusInfo.innerHTML = infoEntity.state[0].toUpperCase() + infoEntity.state.substring(1);
+     this.infoBox.appendChild(statusInfo)
+   }
+
+   if (infoEntity && infoEntity.attributes && infoEntity.attributes.battery_icon && infoEntity.attributes.battery_level && this._config.show_battery_level) {
+     const batteryData = document.createElement('div');
+     batteryData.style.display = "flex"
+     batteryData.style.alignItems = "center"
+     const batteryIcon = document.createElement('ha-icon');
+     const batteryText = document.createElement('span');
+     batteryIcon.icon = infoEntity.attributes.battery_icon
+     batteryText.innerHTML = " " + infoEntity.attributes.battery_level + " %"
+     batteryData.appendChild(batteryIcon);
+     batteryData.appendChild(batteryText);
+     this.infoBox.appendChild(batteryData);
+   }
+
+   if (this._config.show_fan_speed && infoEntity && infoEntity.attributes && infoEntity.attributes.fan_speed && infoEntity.attributes.fan_speed_list) {
+     let fanSpeedEntityName = this.getVacuumEntityName(this._config.vacuum);
+     let fanSpeedElement = this.getSelectDropdownHtml(infoEntity.attributes.fan_speed, infoEntity.attributes.fan_speed_list, "vacuum", "set_fan_speed", fanSpeedEntityName, "fan_speed", "mdi:fan");
+     this.infoBox.appendChild(fanSpeedElement);
+   }
+
+   let waterEntity = this.getVacuumWaterGradeEntity(this._config.vacuum);
+   if(this._config.show_water_grade && waterEntity && waterEntity.attributes && waterEntity.attributes.options && waterEntity.state) {
+     let waterGradeEntityName = this.getVacuumWaterGradeEntityName(this._config.vacuum);
+     let waterGradeElement = this.getSelectDropdownHtml(waterEntity.state, waterEntity.attributes.options, "select", "select_option", waterGradeEntityName, "option", "mdi:water-pump");
+     this.infoBox.appendChild(waterGradeElement);
+   }
+
+   this.controlFlexBox = document.createElement('div');
+   this.controlFlexBox.classList.add('flex-box');
+
+   // Create controls
+   if (this._config.show_start_button && this.shouldDisplayButton("start", infoEntity.state)) {
+     const startButton = document.createElement('paper-button');
+     const startIcon = document.createElement('ha-icon');
+     const startRipple = document.createElement('paper-ripple');
+     startIcon.icon = 'mdi:play';
+     startButton.appendChild(startIcon);
+     startButton.appendChild(startRipple);
+     startButton.addEventListener('click', (event) => {
+       this._hass.callService('vacuum', 'start', { entity_id: this.getVacuumEntityName(this._config.vacuum) }).then();
+     });
+     this.controlFlexBox.appendChild(startButton);
+   }
+
+   if (this._config.show_pause_button  && this.shouldDisplayButton("pause", infoEntity.state)) {
+     const pauseButton = document.createElement('paper-button');
+     const pauseIcon = document.createElement('ha-icon');
+     const pauseRipple = document.createElement('paper-ripple');
+     pauseIcon.icon = 'mdi:pause';
+     pauseButton.appendChild(pauseIcon);
+     pauseButton.appendChild(pauseRipple);
+     pauseButton.addEventListener('click', (event) => {
+       this._hass.callService('vacuum', 'pause', { entity_id: this.getVacuumEntityName(this._config.vacuum) }).then();
+     });
+     this.controlFlexBox.appendChild(pauseButton);
+   }
+
+   if (this._config.show_stop_button && this.shouldDisplayButton("stop", infoEntity.state)) {
+     const stopButton = document.createElement('paper-button');
+     const stopIcon = document.createElement('ha-icon');
+     const stopRipple = document.createElement('paper-ripple');
+     stopIcon.icon = 'mdi:stop';
+     stopButton.appendChild(stopIcon);
+     stopButton.appendChild(stopRipple);
+     stopButton.addEventListener('click', (event) => {
+       this._hass.callService('vacuum', 'stop', { entity_id: this.getVacuumEntityName(this._config.vacuum) }).then();
+     });
+     this.controlFlexBox.appendChild(stopButton);
+   }
+
+   if (this._config.show_home_button && this.shouldDisplayButton("home", infoEntity.state)) {
+     const homeButton = document.createElement('paper-button');
+     const homeIcon = document.createElement('ha-icon');
+     const homeRipple = document.createElement('paper-ripple');
+     homeIcon.icon = 'hass:home-map-marker';
+     homeButton.appendChild(homeIcon);
+     homeButton.appendChild(homeRipple);
+     homeButton.addEventListener('click', (event) => {
+       this._hass.callService('vacuum', 'return_to_base', { entity_id: this.getVacuumEntityName(this._config.vacuum) }).then();
+     });
+     this.controlFlexBox.appendChild(homeButton);
+   }
+
+   if (this._config.show_locate_button) {
+     const locateButton = document.createElement('paper-button');
+     const locateIcon = document.createElement('ha-icon');
+     const locateRipple = document.createElement('paper-ripple');
+     locateIcon.icon = 'hass:map-marker';
+     locateButton.appendChild(locateIcon);
+     locateButton.appendChild(locateRipple);
+     locateButton.addEventListener('click', (event) => {
+       this._hass.callService('vacuum', 'locate', { entity_id: this.getVacuumEntityName(this._config.vacuum) }).then();
+     });
+     this.controlFlexBox.appendChild(locateButton);
+   }
+
+   this.customControlFlexBox = document.createElement('div');
+   this.customControlFlexBox.classList.add('flex-box');
+
+   for (let i = 0; i < this._config.custom_buttons.length; i++) {
+     let custom_button = this._config.custom_buttons[i];
+     if (custom_button === Object(custom_button) && custom_button.service && custom_button.service.includes('.')) {
+       const customButton = document.createElement('paper-button');
+       const customButtonIcon = document.createElement('ha-icon');
+       const customButtonRipple = document.createElement('paper-ripple');
+       customButtonIcon.icon = custom_button["icon"] || 'mdi:radiobox-blank';
+       customButton.appendChild(customButtonIcon);
+       if (custom_button.text) {
+         const customButtonText = document.createElement('span');
+         customButtonText.textContent = custom_button.text;
+         customButton.appendChild(customButtonText);
+       }
+       customButton.appendChild(customButtonRipple);
+       customButton.addEventListener('click', (event) => {
+         const args = custom_button["service"].split('.');
+         if (custom_button.service_data) {
+           this._hass.callService(args[0], args[1], custom_button.service_data).then();
+         } else {
+           this._hass.callService(args[0], args[1]).then();
+         }
+       });
+       this.customControlFlexBox.appendChild(customButton);
+     }
+   }
+
+   // Replace existing controls
+   this.clearContainer(this.controlContainer);
+   this.controlContainer.append(this.infoBox);
+   this.controlContainer.append(this.controlFlexBox);
+   this.controlContainer.append(this.customControlFlexBox);
+
+   // Done drawing controls
+   this.lastUpdatedControls = infoEntity.last_updated;
+   this.drawingControls = false;
+  }
+
   setConfig(config) {
-    this._config = Object.assign({}, config);
+    this._config = Object.assign(
+        {},
+        DEFAULT_CARD_CONFIG,
+        config
+    );
 
-    // Title settings
-    if (this._config.title === undefined) this._config.title = "Vacuum";
-
-    // Core show settings
-    if (this._config.show_map === undefined) this._config.show_map = true;
-
-    // Map show settings
-    if (this._config.show_floor === undefined) this._config.show_floor = true;
-    if (this._config.show_dock === undefined) this._config.show_dock = true;
-    if (this._config.show_vacuum === undefined) this._config.show_vacuum = true;
-    if (this._config.show_walls === undefined) this._config.show_walls = true;
-    if (this._config.show_currently_cleaned_zones === undefined) this._config.show_currently_cleaned_zones = true;
-    if (this._config.show_no_go_areas === undefined) this._config.show_no_go_areas = true;
-    if (this._config.show_no_mop_areas === undefined) this._config.show_no_mop_areas = true;
-    if (this._config.show_virtual_walls === undefined) this._config.show_virtual_walls = true;
-    if (this._config.show_path === undefined) this._config.show_path = true;
-    if (this._config.show_currently_cleaned_zones_border === undefined) this._config.show_currently_cleaned_zones_border = true;
-    if (this._config.show_no_go_area_border === undefined) this._config.show_no_go_area_border = true;
-    if (this._config.show_no_mop_area_border === undefined) this._config.show_no_mop_area_border = true;
-    if (this._config.show_predicted_path === undefined) this._config.show_predicted_path = true;
-    if (this._config.show_goto_target === undefined) this._config.show_goto_target = true;
-    if (this._config.show_segments === undefined) this._config.show_segments = true;
-
-    // Info show settings
-    if (this._config.show_status === undefined) this._config.show_status = true;
-    if (this._config.show_battery_level === undefined) this._config.show_battery_level = true;
-    if (this._config.show_fan_speed === undefined) this._config.show_fan_speed = true;
-    if (this._config.show_water_grade === undefined) this._config.show_water_grade = true;
-
-    // Show button settings
-    if (this._config.show_start_button === undefined) this._config.show_start_button = true;
-    if (this._config.show_pause_button === undefined) this._config.show_pause_button = true;
-    if (this._config.show_stop_button === undefined) this._config.show_stop_button = true;
-    if (this._config.show_home_button === undefined) this._config.show_home_button = true;
-    if (this._config.show_locate_button === undefined) this._config.show_locate_button = true;
-
-    // Width settings
-    if (this._config.virtual_wall_width === undefined) this._config.virtual_wall_width = 1;
-    if (this._config.path_width === undefined) this._config.path_width = 1;
-
-    // Padding settings
-    if (this._config.left_padding === undefined) this._config.left_padding = 0;
-    
-    // Scale settings
-    if (this._config.map_scale === undefined) this._config.map_scale = 1;
-    if (this._config.icon_scale === undefined) this._config.icon_scale = 1;
-
-    // Opacity settings
-    if (this._config.floor_opacity === undefined) this._config.floor_opacity = 1;
-    if (this._config.segment_opacity === undefined) this._config.segment_opacity = 0.75;
-    if (this._config.wall_opacity === undefined) this._config.wall_opacity = 1;
-    if (this._config.currently_cleaned_zone_opacity === undefined) this._config.currently_cleaned_zone_opacity = 0.5;
-    if (this._config.no_go_area_opacity === undefined) this._config.no_go_area_opacity = 0.5;
-    if (this._config.no_mop_area_opacity === undefined) this._config.no_mop_area_opacity = 0.5;
-    if (this._config.virtual_wall_opacity === undefined) this._config.virtual_wall_opacity = 1;
-    if (this._config.path_opacity === undefined) this._config.path_opacity = 1;
-
-    // Color segment settings
-    if (this._config.segment_colors === undefined) this._config.segment_colors = [
-      "#19A1A1",
-      "#7AC037",
-      "#DF5618",
-      "#F7C841",
-    ];
+    /* More default stuff */
 
     // Rotation settings
     if (this._config.rotate === undefined) this._config.rotate = 0;
@@ -623,22 +730,16 @@ class ValetudoMapCard extends HTMLElement {
     if (this._config.crop.bottom === undefined) this._config.crop.bottom = 0;
     if (this._config.crop.left === undefined) this._config.crop.left = 0;
     if (this._config.crop.right === undefined) this._config.crop.right = 0;
-    if (this._config.min_height === undefined) this._config.min_height = 0;
+
+    /* End more default stuff */
+
 
     // Set card title and hide the header completely if the title is set to an empty value
-    if (!this._config.title) {
-      this.cardHeader.style.display = 'none';
-    } else {
-      this.cardHeader.style.display = 'block';
-    }
+    this.cardHeader.style.display = !this._config.title ? 'none' : 'block';
     this.cardTitle.textContent = this._config.title;
 
     // Set container card background color
-    if (this._config.background_color) {
-      this.cardContainer.style.background = this._config.background_color;
-    } else {
-      this.cardContainer.style.background = null;
-    }
+    this.cardContainer.style.background = this._config.background_color ?? null;
 
     if (!Array.isArray(this._config.custom_buttons)) {
       this._config.custom_buttons = [];
@@ -671,7 +772,7 @@ class ValetudoMapCard extends HTMLElement {
       this.lastUpdatedControls = ""
     }
 
-    if (mapEntity && mapEntity['state'] !== 'unavailable' && attributes && attributes["entity_picture"]) {
+    if (mapEntity && mapEntity['state'] !== 'unavailable' && attributes?.["entity_picture"]) {
       if (new Date().getTime() - this.pollInterval > this.lastMapPoll.getTime() || shouldForcePoll) {
         this.loadImageAndExtractMapData(attributes["entity_picture"]).then(mapData => {
           if (mapData !== null) {
@@ -687,6 +788,13 @@ class ValetudoMapCard extends HTMLElement {
           this.lastMapPoll = new Date();
         });
       }
+    } else {
+      this.clearContainer(this.mapContainer);
+      this.clearContainer(this.controlContainer);
+
+      this.entityWarning1.textContent = `Entity not available: ${this.getMapEntityName(this._config.vacuum)}`;
+      this.entityWarning1.style.display = 'block';
+      this.entityWarning2.style.display = 'none';
     }
   };
 
@@ -751,6 +859,8 @@ class ValetudoMapCard extends HTMLElement {
       mapData = pako.inflate(chunks[0].data, { to: 'string' });
       mapData = JSON.parse(mapData);
 
+      mapData = this.preprocessMapData(mapData);
+
       this.isPollingMap = false;
       return mapData;
     } else {
@@ -758,19 +868,9 @@ class ValetudoMapCard extends HTMLElement {
     }
   }
 
-  handleDrawing(hass, mapEntity, attributes) {
-    const config = this._config;
-    let infoEntity = this.getVacuumEntity(this._config.vacuum);
-
-    let canDrawMap = false;
-    let canDrawControls = true;
-
-    if (attributes.__class === 'ValetudoMap') {
-      canDrawMap = true;
-    }
-    
-    if (attributes.metaData?.version === 2 && Array.isArray(attributes.layers)) {
-      attributes.layers.forEach(layer => {
+  preprocessMapData(mapData) {
+    if (mapData.metaData?.version === 2 && Array.isArray(mapData.layers)) {
+      mapData.layers.forEach(layer => {
         if(layer.pixels.length === 0 && layer.compressedPixels.length !== 0) {
           for (let i = 0; i < layer.compressedPixels.length; i = i + 3) {
             const xStart = layer.compressedPixels[i];
@@ -788,18 +888,56 @@ class ValetudoMapCard extends HTMLElement {
       })
     }
 
+    return mapData;
+  }
+
+  shouldDisplayButton(buttonName, vacuumState) {
+    switch(vacuumState) {
+      case 'on':
+      case 'auto':
+      case 'spot':
+      case 'edge':
+      case 'single_room':
+      case 'cleaning': {
+        return buttonName === "pause" || buttonName === "stop" || buttonName === "home";
+      }
+
+      case 'returning': {
+        return buttonName === "start" || buttonName === "pause";
+      }
+
+      case 'docked': {
+        return buttonName === "start";
+      }
+
+      case 'idle':
+      case 'paused':
+      default: {
+        return buttonName === "start" || buttonName === "home";
+      }
+    }
+  }
+
+
+  handleDrawing(hass, mapEntity, attributes) {
+    const config = this._config;
+    let infoEntity = this.getVacuumEntity(this._config.vacuum);
+
+    let canDrawMap = false;
+    let canDrawControls = true;
+
+    if (attributes.__class === 'ValetudoMap') {
+      canDrawMap = true;
+    }
+
     if (!infoEntity || infoEntity['state'] === 'unavailable' || !infoEntity.attributes) {
       canDrawControls = false;
-      // Reset last-updated to redraw as soon as element becomes availables
+      // Reset last-updated to redraw as soon as element becomes available
       this.lastUpdatedControls = ""
     }
 
-    if (!canDrawMap || !this._config.show_map) {
-      // Remove the map
-      this.mapContainer.style.display = 'none';
-    } else {
-      this.mapContainer.style.display = 'block';
-    }
+    // Remove the map
+    this.mapContainer.style.display = (!canDrawMap || !this._config.show_map) ? 'none' : 'block';
 
     if (!canDrawMap && this._config.show_map) {
       // Show the warning
@@ -891,24 +1029,17 @@ class ValetudoMapCard extends HTMLElement {
           height: 100%;
         }
       `
-      // Calculate colours
-      const homeAssistant = document.getElementsByTagName('home-assistant')[0];
-      const floorColor = this.calculateColor(homeAssistant, this._config.floor_color, '--valetudo-map-floor-color', '--secondary-background-color');
-      const wallColor = this.calculateColor(homeAssistant, this._config.wall_color, '--valetudo-map-wall-color', '--accent-color');
-      const currentlyCleanedZoneColor = this.calculateColor(homeAssistant, this._config.currently_cleaned_zone_color, '--valetudo-currently_cleaned_zone_color', '--secondary-text-color');
-      const noGoAreaColor = this.calculateColor(homeAssistant, this._config.no_go_area_color, '--valetudo-no-go-area-color', '--accent-color');
-      const noMopAreaColor = this.calculateColor(homeAssistant, this._config.no_mop_area_color, '--valetudo-no-mop-area-color', '--secondary-text-color');
-      const virtualWallColor = this.calculateColor(homeAssistant, this._config.virtual_wall_color, '--valetudo-virtual-wall-color', '--accent-color');
-      const pathColor = this.calculateColor(homeAssistant, this._config.path_color, '--valetudo-map-path-color', '--primary-text-color');
-      const chargerColor = this.calculateColor(homeAssistant, this._config.dock_color, 'green');
-      const vacuumColor = this.calculateColor(homeAssistant, this._config.vacuum_color, '--primary-text-color');
-      const gotoTargetColor = this.calculateColor(homeAssistant, this._config.goto_target_color, 'blue');
 
       if (this.shouldDrawMap() && this._config.show_map) {
         // Start drawing map
         this.drawingMap = true;
 
-        this.drawMap(this.mapContainer, attributes, mapHeight, mapWidth, boundingBox, floorColor, wallColor, currentlyCleanedZoneColor, noGoAreaColor, noMopAreaColor, virtualWallColor, pathColor, chargerColor, vacuumColor, gotoTargetColor);
+        this.drawMap(
+            attributes,
+            mapHeight,
+            mapWidth,
+            boundingBox
+        );
 
         this.drawingMap = false;
       }
@@ -937,153 +1068,7 @@ class ValetudoMapCard extends HTMLElement {
 
       let infoEntity = this.getVacuumEntity(this._config.vacuum);
       if (this.shouldDrawControls(infoEntity)) {
-        // Start drawing controls
-        this.drawingControls = true;
-
-        this.infoBox = document.createElement('div');
-        this.infoBox.classList.add('flex-box');
-
-        if (infoEntity && infoEntity.state && this._config.show_status) {
-          const statusInfo = document.createElement('p');
-          statusInfo.innerHTML = infoEntity.state[0].toUpperCase() + infoEntity.state.substring(1);
-          this.infoBox.appendChild(statusInfo)
-        }
-
-        if (infoEntity && infoEntity.attributes && infoEntity.attributes.battery_icon && infoEntity.attributes.battery_level && this._config.show_battery_level) {
-          const batteryData = document.createElement('div');
-          batteryData.style.display = "flex"
-          batteryData.style.alignItems = "center"
-          const batteryIcon = document.createElement('ha-icon');
-          const batteryText = document.createElement('span');
-          batteryIcon.icon = infoEntity.attributes.battery_icon
-          batteryText.innerHTML = " " + infoEntity.attributes.battery_level + " %"
-          batteryData.appendChild(batteryIcon);
-          batteryData.appendChild(batteryText);
-          this.infoBox.appendChild(batteryData);
-        }
-
-        if (this._config.show_fan_speed && infoEntity && infoEntity.attributes && infoEntity.attributes.fan_speed && infoEntity.attributes.fan_speed_list) {
-          let fanSpeedEntityName = this.getVacuumEntityName(this._config.vacuum);
-          let fanSpeedElement = this.getSelectDropdownHtml(infoEntity.attributes.fan_speed, infoEntity.attributes.fan_speed_list, "vacuum", "set_fan_speed", fanSpeedEntityName, "fan_speed", "mdi:fan");
-          this.infoBox.appendChild(fanSpeedElement);
-        }
-
-        let waterEntity = this.getVacuumWaterGradeEntity(this._config.vacuum);
-        if(this._config.show_water_grade && waterEntity && waterEntity.attributes && waterEntity.attributes.options && waterEntity.state) {
-          let waterGradeEntityName = this.getVacuumWaterGradeEntityName(this._config.vacuum);
-          let waterGradeElement = this.getSelectDropdownHtml(waterEntity.state, waterEntity.attributes.options, "select", "select_option", waterGradeEntityName, "option", "mdi:water-pump");
-          this.infoBox.appendChild(waterGradeElement);
-        }
-
-        this.controlFlexBox = document.createElement('div');
-        this.controlFlexBox.classList.add('flex-box');
-
-        // Create controls
-        if (this._config.show_start_button) {
-          const startButton = document.createElement('paper-button');
-          const startIcon = document.createElement('ha-icon');
-          const startRipple = document.createElement('paper-ripple');
-          startIcon.icon = 'mdi:play';
-          startButton.appendChild(startIcon);
-          startButton.appendChild(startRipple);
-          startButton.addEventListener('click', (event) => {
-            this._hass.callService('vacuum', 'start', { entity_id: this.getVacuumEntityName(this._config.vacuum) }).then();
-          });
-          this.controlFlexBox.appendChild(startButton);
-        }
-
-        if (this._config.show_pause_button) {
-          const pauseButton = document.createElement('paper-button');
-          const pauseIcon = document.createElement('ha-icon');
-          const pauseRipple = document.createElement('paper-ripple');
-          pauseIcon.icon = 'mdi:pause';
-          pauseButton.appendChild(pauseIcon);
-          pauseButton.appendChild(pauseRipple);
-          pauseButton.addEventListener('click', (event) => {
-            this._hass.callService('vacuum', 'pause', { entity_id: this.getVacuumEntityName(this._config.vacuum) }).then();
-          });
-          this.controlFlexBox.appendChild(pauseButton);
-        }
-
-        if (this._config.show_stop_button) {
-          const stopButton = document.createElement('paper-button');
-          const stopIcon = document.createElement('ha-icon');
-          const stopRipple = document.createElement('paper-ripple');
-          stopIcon.icon = 'mdi:stop';
-          stopButton.appendChild(stopIcon);
-          stopButton.appendChild(stopRipple);
-          stopButton.addEventListener('click', (event) => {
-            this._hass.callService('vacuum', 'stop', { entity_id: this.getVacuumEntityName(this._config.vacuum) }).then();
-          });
-          this.controlFlexBox.appendChild(stopButton);
-        }
-
-        if (this._config.show_home_button) {
-          const homeButton = document.createElement('paper-button');
-          const homeIcon = document.createElement('ha-icon');
-          const homeRipple = document.createElement('paper-ripple');
-          homeIcon.icon = 'hass:home-map-marker';
-          homeButton.appendChild(homeIcon);
-          homeButton.appendChild(homeRipple);
-          homeButton.addEventListener('click', (event) => {
-            this._hass.callService('vacuum', 'return_to_base', { entity_id: this.getVacuumEntityName(this._config.vacuum) }).then();
-          });
-          this.controlFlexBox.appendChild(homeButton);
-        }
-
-        if (this._config.show_locate_button) {
-          const locateButton = document.createElement('paper-button');
-          const locateIcon = document.createElement('ha-icon');
-          const locateRipple = document.createElement('paper-ripple');
-          locateIcon.icon = 'hass:map-marker';
-          locateButton.appendChild(locateIcon);
-          locateButton.appendChild(locateRipple);
-          locateButton.addEventListener('click', (event) => {
-            this._hass.callService('vacuum', 'locate', { entity_id: this.getVacuumEntityName(this._config.vacuum) }).then();
-          });
-          this.controlFlexBox.appendChild(locateButton);
-        }
-
-        this.customControlFlexBox = document.createElement('div');
-        this.customControlFlexBox.classList.add('flex-box');
-
-        for (let i = 0; i < this._config.custom_buttons.length; i++) {
-          let custom_button = this._config.custom_buttons[i];
-          if (custom_button === Object(custom_button) && custom_button.service && custom_button.service.includes('.')) {
-            const customButton = document.createElement('paper-button');
-            const customButtonIcon = document.createElement('ha-icon');
-            const customButtonRipple = document.createElement('paper-ripple');
-            customButtonIcon.icon = custom_button["icon"] || 'mdi:radiobox-blank';
-            customButton.appendChild(customButtonIcon);
-            if (custom_button.text) {
-              const customButtonText = document.createElement('span');
-              customButtonText.textContent = custom_button.text;
-              customButton.appendChild(customButtonText);
-            }
-            customButton.appendChild(customButtonRipple);
-            customButton.addEventListener('click', (event) => {
-              const args = custom_button["service"].split('.');
-              if (custom_button.service_data) {
-                this._hass.callService(args[0], args[1], custom_button.service_data).then();
-              } else {
-                this._hass.callService(args[0], args[1]).then();
-              }
-            });
-            this.customControlFlexBox.appendChild(customButton);
-          }
-        }
-
-        // Replace existing controls
-        while (this.controlContainer.firstChild) {
-          this.controlContainer.firstChild.remove();
-        }
-        this.controlContainer.append(this.infoBox);
-        this.controlContainer.append(this.controlFlexBox);
-        this.controlContainer.append(this.customControlFlexBox);
-
-        // Done drawing controls
-        this.lastUpdatedControls = infoEntity.last_updated;
-        this.drawingControls = false;
+        this.drawControls(infoEntity);
       }
     }
   }
@@ -1440,6 +1425,76 @@ const POLL_INTERVAL_STATE_MAP = {
   "docked": 2*60*1000,
   "error": 2*60*1000
 }
+
+const DEFAULT_CARD_CONFIG = {
+  // Title settings
+  title: "Vacuum",
+
+  // Core show settings
+  show_map: true,
+
+  // Map show settings
+  show_floor: true,
+  show_dock: true,
+  show_vacuum: true,
+  show_walls: true,
+  show_currently_cleaned_zones: true,
+  show_no_go_areas: true,
+  show_no_mop_areas: true,
+  show_virtual_walls: true,
+  show_path: true,
+  show_currently_cleaned_zones_border: true,
+  show_no_go_area_border: true,
+  show_no_mop_area_border: true,
+  show_predicted_path: true,
+  show_goto_target: true,
+  show_segments: true,
+
+  // Info show settings
+  show_status: true,
+  show_battery_level: true,
+  show_fan_speed: true,
+  show_water_grade: true,
+
+  // Show button settings
+  show_start_button: true,
+  show_pause_button: true,
+  show_stop_button: true,
+  show_home_button: true,
+  show_locate_button: true,
+
+  // Width settings
+  virtual_wall_width: 1,
+  path_width: 1,
+
+  // Padding settings
+  left_padding: 0,
+
+  // Scale settings
+  map_scale: 1,
+  icon_scale: 1,
+
+  // Opacity settings
+  floor_opacity: 1,
+  segment_opacity: 0.75,
+  wall_opacity: 1,
+  currently_cleaned_zone_opacity: 0.5,
+  no_go_area_opacity: 0.5,
+  no_mop_area_opacity: 0.5,
+  virtual_wall_opacity: 1,
+  path_opacity: 1,
+
+  // Color segment settings
+  segment_colors: [
+    "#19A1A1",
+    "#7AC037",
+    "#DF5618",
+    "#F7C841",
+  ],
+
+  // Crop settings
+  min_height: 0
+};
 
 
 /**

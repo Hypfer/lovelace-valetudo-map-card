@@ -30,7 +30,11 @@ resources:
 
 `configuration.yaml`: Valetudo officially supports MQTT, with the preferred example configuration as follows. You will need to have MQTT configured in [Home Assistant](https://www.home-assistant.io/docs/mqtt/broker) and [Valetudo](https://hypfer.github.io/Valetudo/pages/integrations/home-assistant-integration.html).
 
-A new MQTT entity named something like `vacuum.valetudo_fairyouthfulmandrill` should appear.
+Then, in Home Assistant, go to `Configuration` -> `Devices and Services` -> `MQTT` and choose the entities. Then filter the entities on `vacuum.`, you will see a result like the following:
+
+![An example showing a single device named vacuum.valetudo_openidenticalwasp](https://user-images.githubusercontent.com/1885159/148192473-7e171869-5b52-4925-a326-25025c6f549b.png)
+
+In this case, the vacuum name is `valetudo_openidenticalwasp`. Obviously, the name for your vacuum will be different, but it should also be lowercase and starting with `valetudo_`.
 
 ### Lovelace custom card
 
@@ -38,10 +42,10 @@ Even when installing via HACS, the new card will **not** appear automatically in
 
 ```yaml
 type: 'custom:valetudo-map-card'
-vacuum: 'valetudo_fairyouthfulmandrill'
+vacuum: 'valetudo_openidenticalwasp'
 ```
 
-The name of vacuum is based on the MQTT entity, with the `vacuum.` prefix removed. It will probably have another name for you, but will likely start with `valetudo_`.
+Replace `valetudo_openidenticalwasp` with the vacuum name you looked up in the previous section.
 
 ## Options
 | Name | Type | Default | Description
