@@ -5,7 +5,7 @@ contact_links:
     about: Did you read the README?
   - name: How to clear cache
     url: https://github.com/TheLastProject/lovelace-valetudo-map-card/issues/85#issuecomment-790248620
-    about: "Have you cleared your cache? Several times? Like, 20+ times? I'm serious. Do that first."
+    about: "Have you restarted Home Assistant? If that didn't work, have you cleared your cache? Several times? Like, 20+ times? I'm serious. Do that first."
   - name: Map card release notes
     url: https://github.com/TheLastProject/lovelace-valetudo-map-card/releases
     about: Did something break after updating? Did you read the release notes?
