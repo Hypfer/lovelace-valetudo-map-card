@@ -13,7 +13,7 @@ If you want to use an older Valetudo version, check out the legacy or 2021.2.0 b
 
 It is highly recommended to use [HACS](https://hacs.xyz/) for managing custom extensions of Home Assistant. It automatically manages the registration of additional resources required by custom cards and makes it easy to keep them up-to-date.
 
-To install HACS follow their [installation instructions](https://hacs.xyz/docs/installation/prerequisites). There is no need to manually add this repository to HACS, just wait for the **Valetudo Map Card** to appear in the **Frontend** Page of the HACS interface in your Home Assistant instance.
+To install HACS follow their [installation instructions](https://hacs.xyz/docs/installation/prerequisites). Then, open HACS, go to Frontend and click "Explore & Download Repositories" and search for "Valetudo Map Card". Select it and choose "Download".
 
 ## Configuration
 
