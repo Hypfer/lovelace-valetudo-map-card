@@ -1,53 +1,58 @@
 # Lovelace Valetudo Map Card
 
-Draws the map from a Xiaomi vacuum cleaner, that is rooted and flashed with [Valetudo](https://github.com/Hypfer/Valetudo), in a [Home Assistant](https://www.home-assistant.io/) Lovelace card.
+Draws the map from a vacuum cleaner, that is rooted and flashed with [Valetudo](https://github.com/Hypfer/Valetudo), in a [Home Assistant](https://www.home-assistant.io/) Lovelace card.
 
 ## Valetudo
+
 Valetudo can be found on https://github.com/Hypfer/Valetudo. This is the only version of Valetudo we officially support.
 
-This card requires at least Valetudo 2022.01.0.
+This card requires at least Valetudo 2022.01.0. If you want to use an older Valetudo version, check out the legacy or 2021.2.0 branch of this project. In HACS, you can choose "Reinstall" and use version v2020 or 2021-12-05.
 
-If you want to use an older Valetudo version, check out the legacy or 2021.2.0 branch of this project. In HACS, you can choose "Reinstall" and use version v2020 or 2021-12-05.
+## MQTT
 
-## Install
+This card makes use of [Valetudo's MQTT support](https://valetudo.cloud/pages/integrations/mqtt.html). MQTT has to be configured in [Home Assistant](https://www.home-assistant.io/docs/mqtt/broker) and [Valetudo](https://hypfer.github.io/Valetudo/pages/integrations/home-assistant-integration.html).
 
-It is highly recommended to use [HACS](https://hacs.xyz/) for managing custom extensions of Home Assistant. It automatically manages the registration of additional resources required by custom cards and makes it easy to keep them up-to-date.
+## Installation
 
-To install HACS follow their [installation instructions](https://hacs.xyz/docs/installation/prerequisites). Then, open HACS, go to Frontend and click "Explore & Download Repositories" and search for "Valetudo Map Card". Select it and choose "Download".
+It is highly recommended to use [HACS](https://hacs.xyz/) for managing custom extensions of Home Assistant. If Lovelace is set to `storage` mode, HACS automatically manages the registration of additional resources required by custom cards and allows to keep them up-to-date.
+
+1. Make sure Lovelace is set to `storage` mode. Navigate to [**Settings** -> **System** -> **Repairs** -> **⋮** -> **System information**](https://my.home-assistant.io/redirect/system_health/) and verify that it says `storage` under *Dashboards* -> *Mode*. If it says `auto-gen`, you can switch to `storage` mode by starting to edit the main dashboard (where it asks you to "take over control", which is a prose way to say "activate storage mode").
+
+2. Follow the HACS [installation instructions](https://hacs.xyz/docs/installation/prerequisites). Then, open HACS, go to Frontend and click "Explore & Download Repositories" and search for "Valetudo Map Card". Select it and choose "Download".
 
 ## Configuration
 
-When using HACS there is no need to manually make Home Assistant aware of custom javascript resources of this custom card. If you do need to check this manually, it is visible in the **Configuration** -> **Lovelace Dashboards** -> **Resources** tab.
+### Dashboard resources
 
-On older versions you may need to add this to the lovelace configuration yaml manually.  
-`lovelace.yaml`: Add custom Lovelace configuration in Home Assistant to enable valetudo-map-card JavaScript. Go to your HA overview, then right top "Configure UI", then right top again on the 3 dots and "Raw config editor".
-```yaml
-resources:
-  - type: js
-    url: /community_plugin/lovelace-valetudo-map-card/valetudo-map-card.js
+When using HACS, there is no need to manually make Home Assistant aware of custom JavaScript resources of this custom card. Navigate to [**Settings** -> **Lovelace Dashboards** -> **Resources**](https://my.home-assistant.io/redirect/lovelace_resources/) in the web UI to verify the registration was succesfull. If no entry ending in `/valetudo-map-card.js` is present, it failed for some reason.
+
+To manually register the resource, either click **Add Resource** via the web UI and add the URL `/local/community/lovelace-valetudo-map-card/valetudo-map-card.js`, or add the following `data.item` to the `.storage/lovelace_resources` JSON file:
+
+```json
+{
+  "url": "/local/community/lovelace-valetudo-map-card/valetudo-map-card.js",
+  "type": "module",
+  "id": "27308708ba994e5396c017d9e7d0a54c"
+}
 ```
-### Home Assistant
-
-`configuration.yaml`: Valetudo officially supports MQTT, with the preferred example configuration as follows. You will need to have MQTT configured in [Home Assistant](https://www.home-assistant.io/docs/mqtt/broker) and [Valetudo](https://hypfer.github.io/Valetudo/pages/integrations/home-assistant-integration.html).
-
-Then, in Home Assistant, go to `Configuration` -> `Devices and Services` -> `MQTT` and choose the entities. Then filter the entities on `vacuum.`, you will see a result like the following:
-
-![An example showing a single device named vacuum.valetudo_openidenticalwasp](https://user-images.githubusercontent.com/1885159/148192473-7e171869-5b52-4925-a326-25025c6f549b.png)
-
-In this case, the vacuum name is `valetudo_openidenticalwasp`. Obviously, the name for your vacuum will be different, but it should also be lowercase and starting with `valetudo_`.
 
 ### Lovelace custom card
 
-Even when installing via HACS, the new card will **not** appear automatically in the list of card previews when hitting the "+" button on the UI. Instead, choose the "Manual" option and provide the following yaml content:
+The new card will **not** appear automatically in the list of card previews when hitting the <kbd>+</kbd> button on the UI. Instead, Lovelace must be set to `storage` mode (see [installation](#installation) instructions above) and provided the following custom YAML card configuration (at minimum; for further configuration [options](#options), see below):
 
 ```yaml
 type: 'custom:valetudo-map-card'
 vacuum: 'valetudo_openidenticalwasp'
 ```
 
-Replace `valetudo_openidenticalwasp` with the vacuum name you looked up in the previous section.
+Replace `valetudo_openidenticalwasp` with the actual name of your vacuum device. To look that name up, navigate to [**Settings** -> **Devices and Services** -> **Entities**](https://my.home-assistant.io/redirect/entities/) and then filter for `vacuum.`, you will see a result like the following:
+
+![An example showing a single device named vacuum.valetudo_openidenticalwasp](https://user-images.githubusercontent.com/1885159/148192473-7e171869-5b52-4925-a326-25025c6f549b.png)
+
+In this case, the vacuum name is `valetudo_openidenticalwasp`. Obviously, the name for your vacuum will be different, but it should also be lowercase and starting with `valetudo_`.
 
 ## Options
+
 | Name | Type | Default | Description
 | ---- | ---- | ------- | -----------
 | type | string | **Required** | `custom:valetudo-map-card`
@@ -112,6 +117,7 @@ Replace `valetudo_openidenticalwasp` with the vacuum name you looked up in the p
 Colors can be any valid CSS value in the card config, like name (red), hex code (#FF0000), rgb(255,255,255), rgba(255,255,255,0.8)...
 
 ## Custom Buttons
+
 Custom buttons can be added to this card when vacuum_entity is set. Each custom button supports the following options:
 
 | Name | Type | Default | Description
@@ -122,7 +128,9 @@ Custom buttons can be added to this card when vacuum_entity is set. Each custom 
 | text | string | "" | Optional text to display next to the icon
 
 ## Tips & Tricks
+
 ### Displaying as overlay
+
 When combining this card with Home Assistant's `picture-elements`, you could use this to show your vacuum's position on top of your house. Make sure to set both `show_floor: false` and `background_color: transparent` in this card:
 
 ```
@@ -138,4 +146,5 @@ elements:
 Then use map_scale and crop to make it fit.
 
 ## License
+
 Lovelace Valetudo Map Card is licensed under the MIT license. It includes some code from [the Valetudo project](https://github.com/Hypfer/Valetudo), which is available under the Apache 2 license. This third-party code is clearly marked as such.
