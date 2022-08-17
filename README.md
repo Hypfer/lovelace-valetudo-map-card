@@ -24,17 +24,9 @@ It is highly recommended to use [HACS](https://hacs.xyz/) for managing custom ex
 
 ### Dashboard resources
 
-When using HACS, there is no need to manually make Home Assistant aware of custom JavaScript resources of this custom card. Navigate to [**Settings** -> **Lovelace Dashboards** -> **Resources**](https://my.home-assistant.io/redirect/lovelace_resources/) in the web UI to verify the registration was succesfull. If no entry ending in `/valetudo-map-card.js` is present, it failed for some reason.
+When using HACS, there should be need to manually make Home Assistant aware of custom JavaScript resources of this custom card. Navigate to [**Settings** -> **Lovelace Dashboards** -> **Resources**](https://my.home-assistant.io/redirect/lovelace_resources/) in the web UI to verify the registration was succesfull. If no entry ending in `/valetudo-map-card.js` is present, it failed for some reason.
 
-To manually register the resource, either click **Add Resource** via the web UI and add the URL `/local/community/lovelace-valetudo-map-card/valetudo-map-card.js`, or add the following `data.item` to the `.storage/lovelace_resources` JSON file:
-
-```json
-{
-  "url": "/local/community/lovelace-valetudo-map-card/valetudo-map-card.js",
-  "type": "module",
-  "id": "27308708ba994e5396c017d9e7d0a54c"
-}
-```
+To manually register the resource, click **Add Resource** via the web UI and add the URL `/local/community/lovelace-valetudo-map-card/valetudo-map-card.js`.
 
 ### Lovelace custom card
 
