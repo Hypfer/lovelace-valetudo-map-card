@@ -2,19 +2,10 @@
 
 Draws the map from a vacuum cleaner, that is rooted and flashed with [Valetudo](https://github.com/Hypfer/Valetudo), in a [Home Assistant](https://www.home-assistant.io/) Lovelace card.
 
-## Valetudo
-
-Valetudo can be found on https://github.com/Hypfer/Valetudo. This is the only version of Valetudo we officially support.
-
-This card requires at least Valetudo 2022.01.0. If you want to use an older Valetudo version, check out the legacy or 2021.2.0 branch of this project. In HACS, you can choose "Reinstall" and use version v2020 or 2021-12-05.
-
-## MQTT
-
-This card makes use of [Valetudo's MQTT support](https://valetudo.cloud/pages/integrations/mqtt.html). MQTT has to be configured in [Home Assistant](https://www.home-assistant.io/docs/mqtt/broker) and [Valetudo](https://hypfer.github.io/Valetudo/pages/integrations/home-assistant-integration.html).
-
 ## Installation
 
-It is highly recommended to use [HACS](https://hacs.xyz/) for managing custom extensions of Home Assistant. If Lovelace is set to `storage` mode, HACS automatically manages the registration of additional resources required by custom cards and allows to keep them up-to-date.
+It is highly recommended to use [HACS](https://hacs.xyz/) for managing custom extensions of Home Assistant.
+If Lovelace is set to `storage` mode, HACS automatically manages the registration of additional resources required by custom cards and allows to keep them up-to-date.
 
 1. Make sure Lovelace is set to `storage` mode. Navigate to [**Settings** -> **System** -> **Repairs** -> **⋮** -> **System information**](https://my.home-assistant.io/redirect/system_health/) and verify that it says `storage` under *Dashboards* -> *Mode*. If it says `auto-gen`, you can switch to `storage` mode by starting to edit the main dashboard (where it asks you to "take over control", which is a prose way to say "activate storage mode").
 
@@ -22,104 +13,40 @@ It is highly recommended to use [HACS](https://hacs.xyz/) for managing custom ex
 
 ## Configuration
 
+### MQTT
+
+This card makes use of [Valetudo's MQTT support](https://valetudo.cloud/pages/integrations/mqtt.html).
+MQTT has to be configured in [Home Assistant](https://www.home-assistant.io/docs/mqtt/broker) and [Valetudo](https://hypfer.github.io/Valetudo/pages/integrations/home-assistant-integration.html).
+
 ### Dashboard resources
 
 When using HACS, there should be no need to manually make Home Assistant aware of custom JavaScript resources of this custom card. Navigate to [**Settings** -> **Lovelace Dashboards** -> **Resources**](https://my.home-assistant.io/redirect/lovelace_resources/) in the web UI to verify the registration was successful. If no entry ending in `/valetudo-map-card.js` is present, it failed for some reason.
 
 To manually register the resource, click **Add Resource** via the web UI and add the URL `/local/community/lovelace-valetudo-map-card/valetudo-map-card.js`.
 
-### Lovelace custom card
+### Custom card
 
-The new card will **not** appear automatically in the list of card previews when hitting the <kbd>+</kbd> button on the UI. Instead, Lovelace must be set to `storage` mode (see [installation](#installation) instructions above) and provided the following custom YAML card configuration (at minimum; for further configuration [options](#options), see below):
+To get the card up and running, head over to https://hass.valetudo.cloud for a short walkthrough.
 
-```yaml
-type: 'custom:valetudo-map-card'
-vacuum: 'valetudo_openidenticalwasp'
+Note that Lovelace must be set to `storage` mode (see [installation](#installation) instructions above) for it to work.
+
+## Usage examples
+
+### Displaying with the vacuum entity
+
+![image](https://user-images.githubusercontent.com/974410/198376172-db7a5441-0f5f-429c-8022-fc43d28446b9.png)
+
+For easy control of the vacuum, consider using a vertical-stack with an entities card like so:
+
 ```
-
-Replace `valetudo_openidenticalwasp` with the actual name of your vacuum device. To look that name up, navigate to [**Settings** -> **Devices and Services** -> **Entities**](https://my.home-assistant.io/redirect/entities/) and then filter for `vacuum.`, you will see a result like the following:
-
-![An example showing a single device named vacuum.valetudo_openidenticalwasp](https://user-images.githubusercontent.com/1885159/148192473-7e171869-5b52-4925-a326-25025c6f549b.png)
-
-In this case, the vacuum name is `valetudo_openidenticalwasp`. Obviously, the name for your vacuum will be different, but it should also be lowercase and starting with `valetudo_`.
-
-## Options
-
-| Name | Type | Default | Description
-| ---- | ---- | ------- | -----------
-| type | string | **Required** | `custom:valetudo-map-card`
-| vacuum | string | **Required** | Name of the vacuum in MQTT (without vacuum. prefix)
-| title | string | Vacuum | Title to show in the card header
-| show_map | boolean | true | Show the map
-| background_color | string | | Background color of the card
-| floor_color | string | '--valetudo-map-floor-color', '--secondary-background-color' | Floor color
-| floor_opacity | number | 1 | Floor opacity
-| wall_color | string | '--valetudo-map-wall-color', '--accent-color' | Wall
-| wall_opacity | number | 1 | Wall opacity
-| currently_cleaned_zone_color | string | '--valetudo-currently_cleaned_zone_color', '--secondary-text-color' | Color of zones selected for cleanup
-| currently_cleaned_zone_opacity | number | 0.5 | Opacity of the currently cleaned zones
-| no_go_area_color | string | '--valetudo-no-go-area-color', '--accent-color' | No go area color
-| no_go_area_opacity | number | 0.5 | Opacity of the no go areas
-| no_mop_area_color | string | '--valetudo-no-mop-area-color', '--secondary-text-color' | No mop area color
-| no_mop_area_opacity | number | 0.5 | Opacity of the no mop areas
-| virtual_wall_color | string | '--valetudo-virtual-wall-color', '--accent-color' | Virtual wall color
-| virtual_wall_opacity | number | 1 | Virtual wall opacity
-| virtual_wall_width | number | 1 | Virtual wall line width
-| path_color | string | '--valetudo-map-path-color', '--primary-text-color' | Path color
-| path_opacity | number | 1 | Path opacity
-| path_width | number | 1 | Path line width
-| segment_colors | array | '#19A1A1', '#7AC037', '#DF5618', '#F7C841' | Segment colors
-| segment_opacity | number | 0.75 | Segment opacity
-| show_floor | boolean | true | Draw the floor on the map
-| show_dock | boolean | true | Draw the charging dock on the map
-| show_vacuum | boolean | true | Draw the vacuum on the map
-| show_walls | boolean | true | Draw walls on the map
-| show_currently_cleaned_zones | boolean | true | Show zones selected for zoned cleanup on the map
-| show_no_go_areas | boolean | true | Draw no go areas on the map
-| show_no_mop_areas | boolean | true | Draw no mop areas on the map
-| show_virtual_walls | boolean | true | Draw virtual walls on the map
-| show_path | boolean | true | Draw the path the vacuum took
-| show_currently_cleaned_zones_border | boolean | true | Draw a border around the currently cleaned zones
-| show_no_go_border | boolean | true | Draw a border around no go areas
-| show_no_mop_border | boolean | true | Draw a border around no mop areas
-| show_predicted_path | boolean | true | Draw the predicted path for the vacuum
-| show_goto_target | boolean | true | Draw the go to target
-| show_segments | boolean | true | Draw the floor segments on the map
-| show_status | boolean | true | Show the status of vacuum_entity
-| show_battery_level | boolean | true | Show the battery level of vacuum_entity
-| show_start_button | boolean | true | Show the start button for vacuum_entity
-| show_pause_button | boolean | true | Show the pause button for vacuum_entity
-| show_stop_button | boolean | true | Show the stop button for vacuum_entity
-| show_home_button | boolean | true | Show the home button for vacuum_entity
-| show_locate_button | boolean | true | Show the locate button for vacuum_entity
-| goto_target_icon | string | mdi:pin | The icon to use for the go to target
-| goto_target_color | string | 'blue' | The color to use for the go to target icon
-| dock_icon | string | mdi:flash | The icon to use for the charging dock
-| dock_color | string | 'green' | The color to use for the charging dock icon
-| vacuum_icon | string | mdi:robot-vacuum | The icon to use for the vacuum
-| vacuum_color | string | '--primary-text-color' | The color to use for the vacuum icon
-| map_scale | number | 1 | Scale the map by this value
-| icon_scale | number | 1 | Scale the icons (vacuum & dock) by this value
-| rotate | number | 0 | Value to rotate the map by (default is in deg, but a value like `2rad` is valid too)
-| left_padding | number | 0 | Value that moves the map `number` pixels from left to right 
-| crop | Object | {top: 0, bottom: 0, left: 0, right: 0} | Crop the map
-| min_height | string | 0 | The minimum height of the card the map is displayed in, regardless of the map's size itself. Suffix with 'w' if you want it to be times the width (ex: 0.5625w is equivalent to a picture card's 16x9 aspect_ratio)
-| custom_buttons | array | [] | An array of custom buttons. Options detailed below.
-
-Colors can be any valid CSS value in the card config, like name (red), hex code (#FF0000), rgb(255,255,255), rgba(255,255,255,0.8)...
-
-## Custom Buttons
-
-Custom buttons can be added to this card when vacuum_entity is set. Each custom button supports the following options:
-
-| Name | Type | Default | Description
-| ---- | ---- | ------- | -----------
-| service | string | **Required** | The service to call when this button is pressed
-| service_data | Object | {} | Optional service data that will be passed to the service
-| icon | string | mdi:radiobox-blank | The icon that will represent the custom button
-| text | string | "" | Optional text to display next to the icon
-
-## Tips & Tricks
+type: vertical-stack
+cards:
+  - vacuum: valetudo_thirstyserpentinestingray
+    type: custom:valetudo-map-card
+  - entities:
+      - vacuum.valetudo_thirstyserpentinestingray
+    type: entities
+```
 
 ### Displaying as overlay
 
@@ -137,6 +64,82 @@ elements:
 
 Then use map_scale and crop to make it fit.
 
+## Options
+
+| Name                                | Type    | Default                                                             | Description                                                                                                                                                                                                         
+|-------------------------------------|---------|---------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| type                                | string  | **Required**                                                        | `custom:valetudo-map-card`                                                                                                                                                                                          
+| vacuum                              | string  | **Required**                                                        | Name of the vacuum in MQTT (without vacuum. prefix)                                                                                                                                                                 
+| title                               | string  | Vacuum                                                              | Title to show in the card header                                                                                                                                                                                    
+| show_map                            | boolean | true                                                                | Show the map                                                                                                                                                                                                        
+| background_color                    | string  |                                                                     | Background color of the card                                                                                                                                                                                        
+| floor_color                         | string  | '--valetudo-map-floor-color', '--secondary-background-color'        | Floor color                                                                                                                                                                                                         
+| floor_opacity                       | number  | 1                                                                   | Floor opacity                                                                                                                                                                                                       
+| wall_color                          | string  | '--valetudo-map-wall-color', '--accent-color'                       | Wall                                                                                                                                                                                                                
+| wall_opacity                        | number  | 1                                                                   | Wall opacity                                                                                                                                                                                                        
+| currently_cleaned_zone_color        | string  | '--valetudo-currently_cleaned_zone_color', '--secondary-text-color' | Color of zones selected for cleanup                                                                                                                                                                                 
+| currently_cleaned_zone_opacity      | number  | 0.5                                                                 | Opacity of the currently cleaned zones                                                                                                                                                                              
+| no_go_area_color                    | string  | '--valetudo-no-go-area-color', '--accent-color'                     | No go area color                                                                                                                                                                                                    
+| no_go_area_opacity                  | number  | 0.5                                                                 | Opacity of the no go areas                                                                                                                                                                                          
+| no_mop_area_color                   | string  | '--valetudo-no-mop-area-color', '--secondary-text-color'            | No mop area color                                                                                                                                                                                                   
+| no_mop_area_opacity                 | number  | 0.5                                                                 | Opacity of the no mop areas                                                                                                                                                                                         
+| virtual_wall_color                  | string  | '--valetudo-virtual-wall-color', '--accent-color'                   | Virtual wall color                                                                                                                                                                                                  
+| virtual_wall_opacity                | number  | 1                                                                   | Virtual wall opacity                                                                                                                                                                                                
+| virtual_wall_width                  | number  | 1                                                                   | Virtual wall line width                                                                                                                                                                                             
+| path_color                          | string  | '--valetudo-map-path-color', '--primary-text-color'                 | Path color                                                                                                                                                                                                          
+| path_opacity                        | number  | 1                                                                   | Path opacity                                                                                                                                                                                                        
+| path_width                          | number  | 1                                                                   | Path line width                                                                                                                                                                                                     
+| segment_colors                      | array   | '#19A1A1', '#7AC037', '#DF5618', '#F7C841'                          | Segment colors                                                                                                                                                                                                      
+| segment_opacity                     | number  | 0.75                                                                | Segment opacity                                                                                                                                                                                                     
+| show_floor                          | boolean | true                                                                | Draw the floor on the map                                                                                                                                                                                           
+| show_dock                           | boolean | true                                                                | Draw the charging dock on the map                                                                                                                                                                                   
+| show_vacuum                         | boolean | true                                                                | Draw the vacuum on the map                                                                                                                                                                                          
+| show_walls                          | boolean | true                                                                | Draw walls on the map                                                                                                                                                                                               
+| show_currently_cleaned_zones        | boolean | true                                                                | Show zones selected for zoned cleanup on the map                                                                                                                                                                    
+| show_no_go_areas                    | boolean | true                                                                | Draw no go areas on the map                                                                                                                                                                                         
+| show_no_mop_areas                   | boolean | true                                                                | Draw no mop areas on the map                                                                                                                                                                                        
+| show_virtual_walls                  | boolean | true                                                                | Draw virtual walls on the map                                                                                                                                                                                       
+| show_path                           | boolean | true                                                                | Draw the path the vacuum took                                                                                                                                                                                       
+| show_currently_cleaned_zones_border | boolean | true                                                                | Draw a border around the currently cleaned zones                                                                                                                                                                    
+| show_no_go_border                   | boolean | true                                                                | Draw a border around no go areas                                                                                                                                                                                    
+| show_no_mop_border                  | boolean | true                                                                | Draw a border around no mop areas                                                                                                                                                                                   
+| show_predicted_path                 | boolean | true                                                                | Draw the predicted path for the vacuum                                                                                                                                                                              
+| show_goto_target                    | boolean | true                                                                | Draw the go to target                                                                                                                                                                                               
+| show_segments                       | boolean | true                                                                | Draw the floor segments on the map                                                                                                                                                                                  
+| show_status                         | boolean | true                                                                | Show the status of vacuum_entity                                                                                                                                                                                    
+| show_battery_level                  | boolean | true                                                                | Show the battery level of vacuum_entity                                                                                                                                                                             
+| show_start_button                   | boolean | true                                                                | Show the start button for vacuum_entity                                                                                                                                                                             
+| show_pause_button                   | boolean | true                                                                | Show the pause button for vacuum_entity                                                                                                                                                                             
+| show_stop_button                    | boolean | true                                                                | Show the stop button for vacuum_entity                                                                                                                                                                              
+| show_home_button                    | boolean | true                                                                | Show the home button for vacuum_entity                                                                                                                                                                              
+| show_locate_button                  | boolean | true                                                                | Show the locate button for vacuum_entity                                                                                                                                                                            
+| goto_target_icon                    | string  | mdi:pin                                                             | The icon to use for the go to target                                                                                                                                                                                
+| goto_target_color                   | string  | 'blue'                                                              | The color to use for the go to target icon                                                                                                                                                                          
+| dock_icon                           | string  | mdi:flash                                                           | The icon to use for the charging dock                                                                                                                                                                               
+| dock_color                          | string  | 'green'                                                             | The color to use for the charging dock icon                                                                                                                                                                         
+| vacuum_icon                         | string  | mdi:robot-vacuum                                                    | The icon to use for the vacuum                                                                                                                                                                                      
+| vacuum_color                        | string  | '--primary-text-color'                                              | The color to use for the vacuum icon                                                                                                                                                                                
+| map_scale                           | number  | 1                                                                   | Scale the map by this value                                                                                                                                                                                         
+| icon_scale                          | number  | 1                                                                   | Scale the icons (vacuum & dock) by this value                                                                                                                                                                       
+| rotate                              | number  | 0                                                                   | Value to rotate the map by (default is in deg, but a value like `2rad` is valid too)                                                                                                                                
+| left_padding                        | number  | 0                                                                   | Value that moves the map `number` pixels from left to right                                                                                                                                                         
+| crop                                | Object  | {top: 0, bottom: 0, left: 0, right: 0}                              | Crop the map                                                                                                                                                                                                        
+| min_height                          | string  | 0                                                                   | The minimum height of the card the map is displayed in, regardless of the map's size itself. Suffix with 'w' if you want it to be times the width (ex: 0.5625w is equivalent to a picture card's 16x9 aspect_ratio) 
+| custom_buttons                      | array   | []                                                                  | An array of custom buttons. Options detailed below.                                                                                                                                                                 
+
+Colors can be any valid CSS value in the card config, like name (red), hex code (#FF0000), rgb(255,255,255), rgba(255,255,255,0.8)...
+
+## Custom Buttons
+
+Custom buttons can be added to this card when vacuum_entity is set. Each custom button supports the following options:
+
+| Name         | Type   | Default            | Description                                              
+|--------------|--------|--------------------|----------------------------------------------------------
+| service      | string | **Required**       | The service to call when this button is pressed          
+| service_data | Object | {}                 | Optional service data that will be passed to the service 
+| icon         | string | mdi:radiobox-blank | The icon that will represent the custom button           
+| text         | string | ""                 | Optional text to display next to the icon                
+
 ## License
 
-Lovelace Valetudo Map Card is licensed under the MIT license. It includes some code from [the Valetudo project](https://github.com/Hypfer/Valetudo), which is available under the Apache 2 license. This third-party code is clearly marked as such.
+Lovelace Valetudo Map Card is licensed under the MIT license.

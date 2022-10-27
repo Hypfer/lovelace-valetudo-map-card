@@ -1,13 +1,13 @@
 blank_issues_enabled: true
 contact_links:
   - name: Read the README
-    url: https://github.com/TheLastProject/lovelace-valetudo-map-card#readme
+    url: https://github.com/Hypfer/lovelace-valetudo-map-card#readme
     about: Did you read the README?
   - name: How to clear cache
-    url: https://github.com/TheLastProject/lovelace-valetudo-map-card/issues/85#issuecomment-790248620
+    url: https://github.com/Hypfer/lovelace-valetudo-map-card/issues/85#issuecomment-790248620
     about: "Have you restarted Home Assistant? If that didn't work, have you cleared your cache? Several times? Like, 20+ times? I'm serious. Do that first."
   - name: Map card release notes
-    url: https://github.com/TheLastProject/lovelace-valetudo-map-card/releases
+    url: https://github.com/Hypfer/lovelace-valetudo-map-card/releases
     about: Did something break after updating? Did you read the release notes?
   - name: Valetudo release notes
     url: https://github.com/Hypfer/Valetudo/releases
