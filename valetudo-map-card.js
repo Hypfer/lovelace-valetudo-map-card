@@ -940,6 +940,7 @@ class ValetudoMapCard extends HTMLElement {
           padding-bottom: ${containerMinHeightPadding}px;
           padding-left: ${this._config.left_padding}px;
           overflow: hidden;
+          overflow-x: auto;
         }
         #lovelaceValetudoCard {
           position: relative;
