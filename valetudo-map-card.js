@@ -47,6 +47,10 @@ class ValetudoMapCard extends HTMLElement {
     this.cardContainer.appendChild(this.controlContainerStyle);
   };
 
+  static getStubConfig() {
+    return { vacuum: "valetudo_REPLACEME" };
+  }
+
   getMapEntityName(vacuum_name) {
     return "camera." + vacuum_name + "_map_data";
   }
@@ -1008,6 +1012,14 @@ class ValetudoMapCard extends HTMLElement {
 }
 
 customElements.define('valetudo-map-card', ValetudoMapCard);
+
+window.customCards = window.customCards || [];
+window.customCards.push({
+  type: "valetudo-map-card",
+  name: "Valetudo Map Card",
+  preview: false,
+  description: "Display the Map data of your Valetudo-enabled robot",
+});
 
 /**
  * This class (FourColorTheoremSolver) is taken from https://github.com/Hypfer/Valetudo/blob/890120c76930bb8941459a7e0d1baa0af8577d83/client/zone/js-modules/map-color-finder.js under the Apache 2 license.
