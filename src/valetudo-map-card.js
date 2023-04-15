@@ -3,6 +3,13 @@ import * as pako from "pako";
 import {extractZtxtPngChunks} from "./lib/pngUtils";
 import {DEFAULT_CARD_CONFIG, POLL_INTERVAL_STATE_MAP} from "./res/consts";
 import {preprocessMap} from "./ts-lib/mapUtils";
+import packageJson from "../package.json";
+
+console.info(
+    `%c   Valetudo-Map-Card   \n%c   Version ${packageJson.version}   `,
+    "color: #0076FF; font-weight: bold; background: #121212",
+    "color: #52AEFF; font-weight: bold; background: #1e1e1e"
+);
 
 class ValetudoMapCard extends HTMLElement {
     constructor() {
@@ -18,7 +25,7 @@ class ValetudoMapCard extends HTMLElement {
         this.pollInterval = POLL_INTERVAL_STATE_MAP["cleaning"];
 
         this.cardContainer = document.createElement("ha-card");
-        this.cardContainer.id = "lovelaceValetudoHaCard";
+        this.cardContainer.id = "valetudoMapCard";
         this.cardContainerStyle = document.createElement("style");
         this.shadowRoot.appendChild(this.cardContainer);
         this.shadowRoot.appendChild(this.cardContainerStyle);
@@ -31,23 +38,23 @@ class ValetudoMapCard extends HTMLElement {
         this.cardContainer.appendChild(this.cardHeader);
 
         this.entityWarning1 = document.createElement("hui-warning");
-        this.entityWarning1.id = "lovelaceValetudoWarning1HaCard";
+        this.entityWarning1.id = "valetudoMapCardWarning1";
         this.entityWarning1.style.display = "none";
         this.cardContainer.appendChild(this.entityWarning1);
 
         this.entityWarning2 = document.createElement("hui-warning");
-        this.entityWarning2.id = "lovelaceValetudoWarning2HaCard";
+        this.entityWarning2.id = "valetudoMapCardWarning2";
         this.entityWarning2.style.display = "none";
         this.cardContainer.appendChild(this.entityWarning2);
 
         this.mapContainer = document.createElement("div");
-        this.mapContainer.id = "lovelaceValetudoMapCard";
+        this.mapContainer.id = "valetudoMapCardMapContainer";
         this.mapContainerStyle = document.createElement("style");
         this.cardContainer.appendChild(this.mapContainer);
         this.cardContainer.appendChild(this.mapContainerStyle);
 
         this.controlContainer = document.createElement("div");
-        this.controlContainer.id = "lovelaceValetudoControlCard";
+        this.controlContainer.id = "valetudoMapCardControlsContainer";
         this.controlContainerStyle = document.createElement("style");
         this.cardContainer.appendChild(this.controlContainer);
         this.cardContainer.appendChild(this.controlContainerStyle);

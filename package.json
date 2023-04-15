@@ -1,6 +1,6 @@
 {
   "name": "lovelace-valetudo-map-card",
-  "version": "2022.08.0",
+  "version": "2023.04.0",
   "description": "Draws the map from a vacuum cleaner, that is rooted and flashed with [Valetudo](https://github.com/Hypfer/Valetudo), in a [Home Assistant](https://www.home-assistant.io/) Lovelace card.",
   "main": "src/valetudo-map-card.js",
   "scripts": {
@@ -35,8 +35,8 @@
     "rollup-plugin-terser": "7.0.2",
     "rollup-plugin-typescript2": "0.33.0",
     "typescript": "4.8.2",
-
-    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-json": "4.1.0",
+    "babel-plugin-inline-json-import": "0.3.2",
     
     "pako": "2.0.4"
   }

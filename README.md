@@ -1,32 +1,24 @@
-# Lovelace Valetudo Map Card
+# Valetudo Map Card
 
-Draws the map from a vacuum cleaner, that is rooted and flashed with [Valetudo](https://github.com/Hypfer/Valetudo), in a [Home Assistant](https://www.home-assistant.io/) Lovelace card.
+Display the map from a valetudo-enabled robot in a home assistant dashboard card.
 
 ## Installation
 
 It is highly recommended to use [HACS](https://hacs.xyz/) for managing custom extensions of Home Assistant.
-If Lovelace is set to `storage` mode, HACS automatically manages the registration of additional resources required by custom cards and allows to keep them up-to-date.
 
-1. Make sure Lovelace is set to `storage` mode. Navigate to [**Settings** -> **System** -> **Repairs** -> **⋮** -> **System information**](https://my.home-assistant.io/redirect/system_health/) and verify that it says `storage` under *Dashboards* -> *Mode*. If it says `auto-gen`, you can switch to `storage` mode by starting to edit the main dashboard (where it asks you to "take over control", which is a prose way to say "activate storage mode").
-
-2. Follow the HACS [installation instructions](https://hacs.xyz/docs/installation/prerequisites). Then, open HACS, go to Frontend and click "Explore & Download Repositories" and search for "Valetudo Map Card". Select it and choose "Download".
+Follow the HACS [installation instructions](https://hacs.xyz/docs/installation/prerequisites).
+Then, open HACS, go to Frontend and click "Explore & Download Repositories" and search for "Valetudo Map Card". Select it and choose "Download".
 
 ## Configuration
 
 ### MQTT
 
 This card makes use of [Valetudo's MQTT support](https://valetudo.cloud/pages/integrations/mqtt.html).
-MQTT has to be configured in [Home Assistant](https://www.home-assistant.io/docs/mqtt/broker) and [Valetudo](https://hypfer.github.io/Valetudo/pages/integrations/home-assistant-integration.html).
-
-### Dashboard resources
-
-When using HACS, there should be no need to manually make Home Assistant aware of custom JavaScript resources of this custom card. Navigate to [**Settings** -> **Lovelace Dashboards** -> **Resources**](https://my.home-assistant.io/redirect/lovelace_resources/) in the web UI to verify the registration was successful. If no entry ending in `/valetudo-map-card.js` is present, it failed for some reason.
-
-To manually register the resource, click **Add Resource** via the web UI and add the URL `/local/community/lovelace-valetudo-map-card/valetudo-map-card.js`.
+MQTT has to be configured in [Home Assistant](https://www.home-assistant.io/docs/mqtt/broker) and [Valetudo](https://valetudo.cloud/Valetudo/pages/integrations/home-assistant-integration.html).
 
 ### Custom card
 
-To get the card up and running, head over to https://hass.valetudo.cloud for a short walkthrough.
+To get the card up and running, head over to [https://hass.valetudo.cloud](https://hass.valetudo.cloud) for a short walkthrough.
 
 Note that Lovelace must be set to `storage` mode (see [installation](#installation) instructions above) for it to work.
 

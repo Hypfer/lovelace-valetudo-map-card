@@ -12,6 +12,9 @@ const plugins = [
     json(),
     babel({
         exclude: "node_modules/**",
+        plugins: [
+            ["inline-json-import", {}]
+        ]
     }),
     terser(),
 ];
