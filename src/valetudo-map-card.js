@@ -211,9 +211,7 @@ class ValetudoMapCard extends HTMLElement {
     }
 
     drawMap(attributes, mapHeight, mapWidth, boundingBox) {
-    // Points to pixels
-        let pixelSize = 50;
-        pixelSize = attributes.pixelSize;
+        const pixelSize = attributes.pixelSize;
 
         const widthScale = pixelSize / this._config.map_scale;
         const heightScale = pixelSize / this._config.map_scale;
@@ -680,31 +678,36 @@ class ValetudoMapCard extends HTMLElement {
         this.customControlFlexBox = document.createElement("div");
         this.customControlFlexBox.classList.add("flex-box");
 
-        for (let i = 0; i < this._config.custom_buttons.length; i++) {
-            let custom_button = this._config.custom_buttons[i];
-            if (custom_button === Object(custom_button) && custom_button.service && custom_button.service.includes(".")) {
+
+        this._config.custom_buttons.forEach(buttonConfig => {
+            if (buttonConfig === Object(buttonConfig) && buttonConfig.service) {
                 const customButton = document.createElement("paper-button");
                 const customButtonIcon = document.createElement("ha-icon");
                 const customButtonRipple = document.createElement("paper-ripple");
-                customButtonIcon.icon = custom_button["icon"] || "mdi:radiobox-blank";
+
+                customButtonIcon.icon = buttonConfig["icon"] || "mdi:radiobox-blank";
                 customButton.appendChild(customButtonIcon);
-                if (custom_button.text) {
+
+                if (buttonConfig.text) {
                     const customButtonText = document.createElement("span");
-                    customButtonText.textContent = custom_button.text;
+                    customButtonText.textContent = buttonConfig.text;
                     customButton.appendChild(customButtonText);
                 }
+
                 customButton.appendChild(customButtonRipple);
+
                 customButton.addEventListener("click", (event) => {
-                    const args = custom_button["service"].split(".");
-                    if (custom_button.service_data) {
-                        this._hass.callService(args[0], args[1], custom_button.service_data).then();
+                    const args = buttonConfig["service"].split(".");
+                    if (buttonConfig.service_data) {
+                        this._hass.callService(args[0], args[1], buttonConfig.service_data).then();
                     } else {
                         this._hass.callService(args[0], args[1]).then();
                     }
                 });
+
                 this.customControlFlexBox.appendChild(customButton);
             }
-        }
+        });
 
         // Replace existing controls
         this.clearContainer(this.controlContainer);
@@ -1010,6 +1013,7 @@ class ValetudoMapCard extends HTMLElement {
         .flex-box {
           display: flex;
           justify-content: space-evenly;
+          flex-wrap: wrap;
         }
         paper-button {
           cursor: pointer;
