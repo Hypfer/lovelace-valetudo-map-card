@@ -49,7 +49,7 @@ type: picture-elements
 image: https://online.visual-paradigm.com/repository/images/e5728e49-09ce-4c95-b83c-482deee24386.png
 elements:
   - type: 'custom:valetudo-map-card'
-    entity: camera.map_data
+    vacuum: valetudo_thirstyserpentinestingray
     show_floor: false
     background_color: transparent
 ```
