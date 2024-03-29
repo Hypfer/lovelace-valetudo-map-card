@@ -28,8 +28,6 @@ MQTT has to be configured in [Home Assistant](https://www.home-assistant.io/docs
 
 To get the card up and running, head over to [https://hass.valetudo.cloud](https://hass.valetudo.cloud) for a short walkthrough.
 
-Note that Lovelace must be set to `storage` mode (see [installation](#installation) instructions above) for it to work.
-
 ## Usage examples
 
 ### Displaying with the vacuum entity
