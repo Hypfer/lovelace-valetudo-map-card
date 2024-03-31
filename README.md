@@ -22,7 +22,7 @@ Then, open HACS, go to Frontend and click "Explore & Download Repositories" and 
 ### MQTT
 
 This card makes use of [Valetudo's MQTT support](https://valetudo.cloud/pages/integrations/mqtt.html).
-MQTT has to be configured in [Home Assistant](https://www.home-assistant.io/docs/mqtt/broker) and [Valetudo](https://valetudo.cloud/Valetudo/pages/integrations/home-assistant-integration.html).
+MQTT has to be configured in [Home Assistant](https://www.home-assistant.io/docs/mqtt/broker) and [Valetudo](https://valetudo.cloud/pages/integrations/home-assistant-integration.html).
 
 ### Custom card
 
