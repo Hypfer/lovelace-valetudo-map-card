@@ -7,6 +7,14 @@ Display the map from a valetudo-enabled robot in a home assistant dashboard card
 It is highly recommended to use [HACS](https://hacs.xyz/) for managing custom extensions of Home Assistant.
 
 Follow the HACS [installation instructions](https://hacs.xyz/docs/installation/prerequisites).
+
+It is necessary to "take control" over the dashboards before downloading the "Valetudo Map Card".
+1. Go to the Overview dashboard
+2. Click on the pencil-icon on the top right
+3. In the dialog click on the three dots on the top right
+4. In the context menu click on "take control"
+5. In the next dialog click on "take control" again
+   
 Then, open HACS, go to Frontend and click "Explore & Download Repositories" and search for "Valetudo Map Card". Select it and choose "Download".
 
 ## Configuration
@@ -19,8 +27,6 @@ MQTT has to be configured in [Home Assistant](https://www.home-assistant.io/docs
 ### Custom card
 
 To get the card up and running, head over to [https://hass.valetudo.cloud](https://hass.valetudo.cloud) for a short walkthrough.
-
-Note that Lovelace must be set to `storage` mode (see [installation](#installation) instructions above) for it to work.
 
 ## Usage examples
 
