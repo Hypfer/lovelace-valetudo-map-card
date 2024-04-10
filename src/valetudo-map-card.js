@@ -1048,12 +1048,15 @@ class ValetudoMapCard extends HTMLElement {
     }
 }
 
-customElements.define("valetudo-map-card", ValetudoMapCard);
+let componentName = "valetudo-map-card";
+if (!customElements.get(componentName)) {
+    customElements.define(componentName, ValetudoMapCard);
 
-window.customCards = window.customCards || [];
-window.customCards.push({
-    type: "valetudo-map-card",
-    name: "Valetudo Map Card",
-    preview: false,
-    description: "Display the Map data of your Valetudo-enabled robot",
-});
+    window.customCards = window.customCards || [];
+    window.customCards.push({
+        type: componentName,
+        name: "Valetudo Map Card",
+        preview: false,
+        description: "Display the Map data of your Valetudo-enabled robot",
+    });
+}
