@@ -217,6 +217,216 @@ class ValetudoMapCard extends HTMLElement {
         return this.getEntities(attributes, "no_mop_area");
     }
 
+    drawMapCanvas(attributes, mapCtx, { widthScale, heightScale, mapLeftOffset, mapTopOffset, objectLeftOffset, objectTopOffset }) {
+        const config = this._config;
+
+        // Calculate colours
+        const homeAssistant = document.getElementsByTagName("home-assistant")[0];
+        const floorColor = this.calculateColor(homeAssistant, config.floor_color, "--valetudo-map-floor-color", "--secondary-background-color");
+        const wallColor = this.calculateColor(homeAssistant, config.wall_color, "--valetudo-map-wall-color", "--accent-color");
+        const currentlyCleanedZoneColor = this.calculateColor(homeAssistant, config.currently_cleaned_zone_color, "--valetudo-currently_cleaned_zone_color", "--secondary-text-color");
+        const noGoAreaColor = this.calculateColor(homeAssistant, config.no_go_area_color, "--valetudo-no-go-area-color", "--accent-color");
+        const noMopAreaColor = this.calculateColor(homeAssistant, config.no_mop_area_color, "--valetudo-no-mop-area-color", "--secondary-text-color");
+        const virtualWallColor = this.calculateColor(homeAssistant, config.virtual_wall_color, "--valetudo-virtual-wall-color", "--accent-color");
+
+        if (config.show_floor) {
+            mapCtx.globalAlpha = config.floor_opacity;
+
+            mapCtx.strokeStyle = floorColor;
+            mapCtx.lineWidth = 1;
+            mapCtx.fillStyle = floorColor;
+            mapCtx.beginPath();
+            let floorPoints = this.getFloorPoints(attributes);
+            if (floorPoints) {
+                for (let i = 0; i < floorPoints.length; i+=2) {
+                    let x = (floorPoints[i] * config.map_scale) - mapLeftOffset;
+                    let y = (floorPoints[i + 1] * config.map_scale) - mapTopOffset;
+                    if (this.isOutsideBounds(x, y, mapCtx.canvas, config)) {
+                        continue;
+                    }
+                    mapCtx.fillRect(x, y, config.map_scale, config.map_scale);
+                }
+            }
+
+            mapCtx.globalAlpha = 1;
+        }
+
+        let segmentAreas = this.getSegments(attributes);
+        if (segmentAreas && config.show_segments) {
+            const colorFinder = new FourColorTheoremSolver(segmentAreas, 6);
+            mapCtx.globalAlpha = config.segment_opacity;
+
+            for (let item of segmentAreas) {
+                mapCtx.strokeStyle = config.segment_colors[colorFinder.getColor(item.metaData.segmentId)];
+                mapCtx.lineWidth = 1;
+                mapCtx.fillStyle = config.segment_colors[colorFinder.getColor(item.metaData.segmentId)];
+                mapCtx.beginPath();
+                let segmentPoints = item["pixels"];
+                if (segmentPoints) {
+                    for (let i = 0; i < segmentPoints.length; i+=2) {
+                        let x = (segmentPoints[i] * config.map_scale) - mapLeftOffset;
+                        let y = (segmentPoints[i + 1] * config.map_scale) - mapTopOffset;
+                        if (this.isOutsideBounds(x, y, mapCtx.canvas, config)) {
+                            continue;
+                        }
+                        mapCtx.fillRect(x, y, config.map_scale, config.map_scale);
+                    }
+                }
+            }
+
+            mapCtx.globalAlpha = 1;
+        }
+
+        if (config.show_walls) {
+            mapCtx.globalAlpha = config.wall_opacity;
+
+            mapCtx.strokeStyle = wallColor;
+            mapCtx.lineWidth = 1;
+            mapCtx.fillStyle = wallColor;
+            mapCtx.beginPath();
+            let wallPoints = this.getWallPoints(attributes);
+            if (wallPoints) {
+                for (let i = 0; i < wallPoints.length; i+=2) {
+                    let x = (wallPoints[i] * config.map_scale) - mapLeftOffset;
+                    let y = (wallPoints[i + 1] * config.map_scale) - mapTopOffset;
+                    if (this.isOutsideBounds(x, y, mapCtx.canvas, config)) {
+                        continue;
+                    }
+                    mapCtx.fillRect(x, y, config.map_scale, config.map_scale);
+                }
+            }
+
+            mapCtx.globalAlpha = 1;
+        }
+
+        let activeZones = this.getActiveZones(attributes);
+        if (Array.isArray(activeZones) && activeZones.length > 0 && config.show_currently_cleaned_zones) {
+            mapCtx.globalAlpha = config.currently_cleaned_zone_opacity;
+
+            mapCtx.strokeStyle = currentlyCleanedZoneColor;
+            mapCtx.lineWidth = 2;
+            mapCtx.fillStyle = currentlyCleanedZoneColor;
+            for (let item of activeZones) {
+                mapCtx.globalAlpha = config.currently_cleaned_zone_opacity;
+                mapCtx.beginPath();
+                let points = item["points"];
+                for (let i = 0; i < points.length; i+=2) {
+                    let x = Math.floor(points[i] / widthScale) - objectLeftOffset - mapLeftOffset;
+                    let y = Math.floor(points[i + 1] / heightScale) - objectTopOffset - mapTopOffset;
+                    if (i === 0) {
+                        mapCtx.moveTo(x, y);
+                    } else {
+                        mapCtx.lineTo(x, y);
+                    }
+                    if (this.isOutsideBounds(x, y, mapCtx.canvas, config)) {
+                        // noinspection UnnecessaryContinueJS
+                        continue;
+                    }
+                }
+                mapCtx.fill();
+
+                if (config.show_currently_cleaned_zones_border) {
+                    mapCtx.closePath();
+                    mapCtx.globalAlpha = 1.0;
+                    mapCtx.stroke();
+                }
+            }
+            mapCtx.globalAlpha = 1.0;
+        }
+
+        let noGoAreas = this.getNoGoAreas(attributes);
+        if (noGoAreas && config.show_no_go_areas) {
+            mapCtx.strokeStyle = noGoAreaColor;
+            mapCtx.lineWidth = 2;
+            mapCtx.fillStyle = noGoAreaColor;
+            for (let item of noGoAreas) {
+                mapCtx.globalAlpha = config.no_go_area_opacity;
+                mapCtx.beginPath();
+                let points = item["points"];
+                for (let i = 0; i < points.length; i+=2) {
+                    let x = Math.floor(points[i] / widthScale) - objectLeftOffset - mapLeftOffset;
+                    let y = Math.floor(points[i + 1] / heightScale) - objectTopOffset - mapTopOffset;
+                    if (i === 0) {
+                        mapCtx.moveTo(x, y);
+                    } else {
+                        mapCtx.lineTo(x, y);
+                    }
+                    if (this.isOutsideBounds(x, y, mapCtx.canvas, config)) {
+                        // noinspection UnnecessaryContinueJS
+                        continue;
+                    }
+                }
+                mapCtx.fill();
+
+                if (config.show_no_go_area_border) {
+                    mapCtx.closePath();
+                    mapCtx.globalAlpha = 1.0;
+                    mapCtx.stroke();
+                }
+            }
+            mapCtx.globalAlpha = 1.0;
+        }
+
+        let noMopAreas = this.getNoMopAreas(attributes);
+        if (noMopAreas && config.show_no_mop_areas) {
+            mapCtx.strokeStyle = noMopAreaColor;
+            mapCtx.lineWidth = 2;
+            mapCtx.fillStyle = noMopAreaColor;
+            for (let item of noMopAreas) {
+                mapCtx.globalAlpha = config.no_mop_area_opacity;
+                mapCtx.beginPath();
+                let points = item["points"];
+                for (let i = 0; i < points.length; i+=2) {
+                    let x = Math.floor(points[i] / widthScale) - objectLeftOffset - mapLeftOffset;
+                    let y = Math.floor(points[i + 1] / heightScale) - objectTopOffset - mapTopOffset;
+                    if (i === 0) {
+                        mapCtx.moveTo(x, y);
+                    } else {
+                        mapCtx.lineTo(x, y);
+                    }
+                    if (this.isOutsideBounds(x, y, mapCtx.canvas, config)) {
+                        // noinspection UnnecessaryContinueJS
+                        continue;
+                    }
+                }
+                mapCtx.fill();
+
+                if (config.show_no_mop_area_border) {
+                    mapCtx.closePath();
+                    mapCtx.globalAlpha = 1.0;
+                    mapCtx.stroke();
+                }
+            }
+            mapCtx.globalAlpha = 1.0;
+        }
+
+        let virtualWallPoints = this.getVirtualWallPoints(attributes);
+        if (virtualWallPoints && config.show_virtual_walls && config.virtual_wall_width > 0) {
+            mapCtx.globalAlpha = config.virtual_wall_opacity;
+
+            mapCtx.strokeStyle = virtualWallColor;
+            mapCtx.lineWidth = config.virtual_wall_width;
+            mapCtx.beginPath();
+            for (let item of virtualWallPoints) {
+                let fromX = Math.floor(item["points"][0] / widthScale) - objectLeftOffset - mapLeftOffset;
+                let fromY = Math.floor(item["points"][1] / heightScale) - objectTopOffset - mapTopOffset;
+                let toX = Math.floor(item["points"][2] / widthScale) - objectLeftOffset - mapLeftOffset;
+                let toY = Math.floor(item["points"][3] / heightScale) - objectTopOffset - mapTopOffset;
+                if (this.isOutsideBounds(fromX, fromY, mapCtx.canvas, config)) {
+                    continue;
+                }
+                if (this.isOutsideBounds(toX, toY, mapCtx.canvas, config)) {
+                    continue;
+                }
+                mapCtx.moveTo(fromX, fromY);
+                mapCtx.lineTo(toX, toY);
+                mapCtx.stroke();
+            }
+
+            mapCtx.globalAlpha = 1;
+        }
+    }
+
     drawPathCanvas(attributes, pathCtx, { widthScale, heightScale, mapLeftOffset, mapTopOffset, objectLeftOffset, objectTopOffset }) {
         const config = this._config;
 
@@ -291,12 +501,6 @@ class ValetudoMapCard extends HTMLElement {
 
         // Calculate colours
         const homeAssistant = document.getElementsByTagName("home-assistant")[0];
-        const floorColor = this.calculateColor(homeAssistant, config.floor_color, "--valetudo-map-floor-color", "--secondary-background-color");
-        const wallColor = this.calculateColor(homeAssistant, config.wall_color, "--valetudo-map-wall-color", "--accent-color");
-        const currentlyCleanedZoneColor = this.calculateColor(homeAssistant, config.currently_cleaned_zone_color, "--valetudo-currently_cleaned_zone_color", "--secondary-text-color");
-        const noGoAreaColor = this.calculateColor(homeAssistant, config.no_go_area_color, "--valetudo-no-go-area-color", "--accent-color");
-        const noMopAreaColor = this.calculateColor(homeAssistant, config.no_mop_area_color, "--valetudo-no-mop-area-color", "--secondary-text-color");
-        const virtualWallColor = this.calculateColor(homeAssistant, config.virtual_wall_color, "--valetudo-virtual-wall-color", "--accent-color");
         const pathColor = this.calculateColor(homeAssistant, config.path_color, "--valetudo-map-path-color", "--primary-text-color");
         const chargerColor = this.calculateColor(homeAssistant, config.dock_color, "green");
         const vacuumColor = this.calculateColor(homeAssistant, config.vacuum_color, "--primary-text-color");
@@ -382,209 +586,14 @@ class ValetudoMapCard extends HTMLElement {
         containerContainer.appendChild(goToTargetContainer);
 
         const mapCtx = drawnMapCanvas.getContext("2d");
-        if (config.show_floor) {
-            mapCtx.globalAlpha = config.floor_opacity;
-
-            mapCtx.strokeStyle = floorColor;
-            mapCtx.lineWidth = 1;
-            mapCtx.fillStyle = floorColor;
-            mapCtx.beginPath();
-            let floorPoints = this.getFloorPoints(attributes);
-            if (floorPoints) {
-                for (let i = 0; i < floorPoints.length; i+=2) {
-                    let x = (floorPoints[i] * config.map_scale) - mapLeftOffset;
-                    let y = (floorPoints[i + 1] * config.map_scale) - mapTopOffset;
-                    if (this.isOutsideBounds(x, y, drawnMapCanvas, config)) {
-                        continue;
-                    }
-                    mapCtx.fillRect(x, y, config.map_scale, config.map_scale);
-                }
-            }
-
-            mapCtx.globalAlpha = 1;
-        }
-
-        let segmentAreas = this.getSegments(attributes);
-        if (segmentAreas && config.show_segments) {
-            const colorFinder = new FourColorTheoremSolver(segmentAreas, 6);
-            mapCtx.globalAlpha = config.segment_opacity;
-
-            for (let item of segmentAreas) {
-                mapCtx.strokeStyle = config.segment_colors[colorFinder.getColor(item.metaData.segmentId)];
-                mapCtx.lineWidth = 1;
-                mapCtx.fillStyle = config.segment_colors[colorFinder.getColor(item.metaData.segmentId)];
-                mapCtx.beginPath();
-                let segmentPoints = item["pixels"];
-                if (segmentPoints) {
-                    for (let i = 0; i < segmentPoints.length; i+=2) {
-                        let x = (segmentPoints[i] * config.map_scale) - mapLeftOffset;
-                        let y = (segmentPoints[i + 1] * config.map_scale) - mapTopOffset;
-                        if (this.isOutsideBounds(x, y, drawnMapCanvas, config)) {
-                            continue;
-                        }
-                        mapCtx.fillRect(x, y, config.map_scale, config.map_scale);
-                    }
-                }
-            }
-
-            mapCtx.globalAlpha = 1;
-        }
-
-        if (config.show_walls) {
-            mapCtx.globalAlpha = config.wall_opacity;
-
-            mapCtx.strokeStyle = wallColor;
-            mapCtx.lineWidth = 1;
-            mapCtx.fillStyle = wallColor;
-            mapCtx.beginPath();
-            let wallPoints = this.getWallPoints(attributes);
-            if (wallPoints) {
-                for (let i = 0; i < wallPoints.length; i+=2) {
-                    let x = (wallPoints[i] * config.map_scale) - mapLeftOffset;
-                    let y = (wallPoints[i + 1] * config.map_scale) - mapTopOffset;
-                    if (this.isOutsideBounds(x, y, drawnMapCanvas, config)) {
-                        continue;
-                    }
-                    mapCtx.fillRect(x, y, config.map_scale, config.map_scale);
-                }
-            }
-
-            mapCtx.globalAlpha = 1;
-        }
-
-        let activeZones = this.getActiveZones(attributes);
-        if (Array.isArray(activeZones) && activeZones.length > 0 && config.show_currently_cleaned_zones) {
-            mapCtx.globalAlpha = config.currently_cleaned_zone_opacity;
-
-            mapCtx.strokeStyle = currentlyCleanedZoneColor;
-            mapCtx.lineWidth = 2;
-            mapCtx.fillStyle = currentlyCleanedZoneColor;
-            for (let item of activeZones) {
-                mapCtx.globalAlpha = config.currently_cleaned_zone_opacity;
-                mapCtx.beginPath();
-                let points = item["points"];
-                for (let i = 0; i < points.length; i+=2) {
-                    let x = Math.floor(points[i] / widthScale) - objectLeftOffset - mapLeftOffset;
-                    let y = Math.floor(points[i + 1] / heightScale) - objectTopOffset - mapTopOffset;
-                    if (i === 0) {
-                        mapCtx.moveTo(x, y);
-                    } else {
-                        mapCtx.lineTo(x, y);
-                    }
-                    if (this.isOutsideBounds(x, y, drawnMapCanvas, config)) {
-                        // noinspection UnnecessaryContinueJS
-                        continue;
-                    }
-                }
-                mapCtx.fill();
-
-                if (config.show_currently_cleaned_zones_border) {
-                    mapCtx.closePath();
-                    mapCtx.globalAlpha = 1.0;
-                    mapCtx.stroke();
-                }
-            }
-            mapCtx.globalAlpha = 1.0;
-        }
-
-        let noGoAreas = this.getNoGoAreas(attributes);
-        if (noGoAreas && config.show_no_go_areas) {
-            mapCtx.strokeStyle = noGoAreaColor;
-            mapCtx.lineWidth = 2;
-            mapCtx.fillStyle = noGoAreaColor;
-            for (let item of noGoAreas) {
-                mapCtx.globalAlpha = config.no_go_area_opacity;
-                mapCtx.beginPath();
-                let points = item["points"];
-                for (let i = 0; i < points.length; i+=2) {
-                    let x = Math.floor(points[i] / widthScale) - objectLeftOffset - mapLeftOffset;
-                    let y = Math.floor(points[i + 1] / heightScale) - objectTopOffset - mapTopOffset;
-                    if (i === 0) {
-                        mapCtx.moveTo(x, y);
-                    } else {
-                        mapCtx.lineTo(x, y);
-                    }
-                    if (this.isOutsideBounds(x, y, drawnMapCanvas, config)) {
-                        // noinspection UnnecessaryContinueJS
-                        continue;
-                    }
-                }
-                mapCtx.fill();
-
-                if (config.show_no_go_area_border) {
-                    mapCtx.closePath();
-                    mapCtx.globalAlpha = 1.0;
-                    mapCtx.stroke();
-                }
-            }
-            mapCtx.globalAlpha = 1.0;
-        }
-
-        let noMopAreas = this.getNoMopAreas(attributes);
-        if (noMopAreas && config.show_no_mop_areas) {
-            mapCtx.strokeStyle = noMopAreaColor;
-            mapCtx.lineWidth = 2;
-            mapCtx.fillStyle = noMopAreaColor;
-            for (let item of noMopAreas) {
-                mapCtx.globalAlpha = config.no_mop_area_opacity;
-                mapCtx.beginPath();
-                let points = item["points"];
-                for (let i = 0; i < points.length; i+=2) {
-                    let x = Math.floor(points[i] / widthScale) - objectLeftOffset - mapLeftOffset;
-                    let y = Math.floor(points[i + 1] / heightScale) - objectTopOffset - mapTopOffset;
-                    if (i === 0) {
-                        mapCtx.moveTo(x, y);
-                    } else {
-                        mapCtx.lineTo(x, y);
-                    }
-                    if (this.isOutsideBounds(x, y, drawnMapCanvas, config)) {
-                        // noinspection UnnecessaryContinueJS
-                        continue;
-                    }
-                }
-                mapCtx.fill();
-
-                if (config.show_no_mop_area_border) {
-                    mapCtx.closePath();
-                    mapCtx.globalAlpha = 1.0;
-                    mapCtx.stroke();
-                }
-            }
-            mapCtx.globalAlpha = 1.0;
-        }
-
-        let virtualWallPoints = this.getVirtualWallPoints(attributes);
-        if (virtualWallPoints && config.show_virtual_walls && config.virtual_wall_width > 0) {
-            mapCtx.globalAlpha = config.virtual_wall_opacity;
-
-            mapCtx.strokeStyle = virtualWallColor;
-            mapCtx.lineWidth = config.virtual_wall_width;
-            mapCtx.beginPath();
-            for (let item of virtualWallPoints) {
-                let fromX = Math.floor(item["points"][0] / widthScale) - objectLeftOffset - mapLeftOffset;
-                let fromY = Math.floor(item["points"][1] / heightScale) - objectTopOffset - mapTopOffset;
-                let toX = Math.floor(item["points"][2] / widthScale) - objectLeftOffset - mapLeftOffset;
-                let toY = Math.floor(item["points"][3] / heightScale) - objectTopOffset - mapTopOffset;
-                if (this.isOutsideBounds(fromX, fromY, drawnMapCanvas, config)) {
-                    continue;
-                }
-                if (this.isOutsideBounds(toX, toY, drawnMapCanvas, config)) {
-                    continue;
-                }
-                mapCtx.moveTo(fromX, fromY);
-                mapCtx.lineTo(toX, toY);
-                mapCtx.stroke();
-            }
-
-            mapCtx.globalAlpha = 1;
-        }
-
         const pathCtx = pathCanvas.getContext("2d");
         pathCtx.globalAlpha = config.path_opacity;
         pathCtx.strokeStyle = pathColor;
         pathCtx.lineWidth = config.path_width;
 
-        this.drawPathCanvas(attributes, pathCtx, { widthScale, heightScale, mapLeftOffset, mapTopOffset, objectLeftOffset, objectTopOffset });
+        const dimensions = { widthScale, heightScale, mapLeftOffset, mapTopOffset, objectLeftOffset, objectTopOffset };
+        this.drawMapCanvas(attributes, mapCtx, dimensions);
+        this.drawPathCanvas(attributes, pathCtx, dimensions);
 
         // Put our newly generated map in there
         this.clearContainer(this.mapContainer);
@@ -1059,7 +1068,7 @@ class ValetudoMapCard extends HTMLElement {
     }
 }
 
-let componentName = "valetudo-map-card";
+let componentName = "valetudo-map-card2";
 if (!customElements.get(componentName)) {
     customElements.define(componentName, ValetudoMapCard);
 
