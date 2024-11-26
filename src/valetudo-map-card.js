@@ -601,6 +601,73 @@ class ValetudoMapCard extends HTMLElement {
         // Put our newly generated map in there
         this.clearContainer(this.mapContainer);
         this.mapContainer.appendChild(containerContainer);
+
+        if (config.full_width) {
+            containerContainer.style.width = 'auto';
+            containerContainer.style.height = 'auto';
+            containerContainer.style.aspectRatio = `${mapWidth} / ${mapHeight}`;
+
+            drawnMapCanvas.style.width = "100%";
+            pathCanvas.style.width = "100%";
+
+            const resizeObserver = new ResizeObserver((entries) => {
+                const entry = entries.length && entries[0];
+                if (!entry) {
+                    return;
+                }
+                const { width } = entry.contentRect;
+
+                const ratio = width / mapWidth;
+                const iconScale = (ratio / 2) * config.icon_scale;
+
+                if (config.show_dock && chargerInfo) {
+                    const dockLeft = Math.floor(chargerInfo[0] / pixelSize) - dimensions.mapLeftOffset;
+                    const dockTop = Math.floor(chargerInfo[1] / pixelSize) - dimensions.mapTopOffset;
+                    chargerHTML.style.left = `${(dockLeft / mapWidth) * 100}%`;
+                    chargerHTML.style.top = `${(dockTop / mapHeight) * 100}%`;
+                    chargerHTML.style.transform = `translate(-12px, -12px) scale(${iconScale}, ${iconScale}) rotate(-${config.rotate})`;
+                }
+
+                if (config.show_vacuum && robotInfo) {
+                    const robotLeft = Math.floor(robotInfo[0] / pixelSize) - dimensions.mapLeftOffset;
+                    const robotTop = Math.floor(robotInfo[1] / pixelSize) - dimensions.mapTopOffset;
+                    vacuumHTML.style.left = `${(robotLeft / mapWidth) * 100}%`;
+                    vacuumHTML.style.top = `${(robotTop / mapHeight) * 100}%`;
+                    
+                    vacuumHTML.style.transform = `translate(-12px, -12px) scale(${iconScale}, ${iconScale})`;
+
+                    const pathPoints = this.getPathPoints(attributes);
+                    if (Array.isArray(pathPoints) && pathPoints.length > 0 && (config.show_path && config.path_width > 0)) {
+                        // Update vacuum angle
+                        vacuumHTML.style.transform += ` rotate(${robotInfo[2]}deg)`;
+                    }
+                }
+
+                if (config.show_goto_target && goToInfo) {
+                    const targetLeft = Math.floor(goToInfo[0] / pixelSize) - dimensions.mapLeftOffset;
+                    const targetTop = Math.floor(goToInfo[1] / pixelSize) - dimensions.mapTopOffset;
+                    goToTargetHTML.style.left = `${(targetLeft / mapWidth) * 100}%`;
+                    goToTargetHTML.style.top = `${(targetTop / mapWidth) * 100}%`;
+                    goToTargetHTML.style.transform = `translate(-12px, -22px) scale(${iconScale}, ${iconScale})`;
+                }
+
+                // Natural number to avoid antialiasing in the canvas
+                const scale = Math.max(Math.ceil(width / mapWidth), 1);
+
+                drawnMapCanvas.width = scale * mapWidth;
+                drawnMapCanvas.height = scale * mapHeight;
+                pathCanvas.width = scale * mapWidth;
+                pathCanvas.height = scale * mapHeight;
+
+                mapCtx.scale(scale, scale);
+                pathCtx.scale(scale, scale);
+
+                this.drawMapCanvas(attributes, mapCtx, dimensions);
+                this.drawPathCanvas(attributes, pathCtx, dimensions);
+            });
+
+            resizeObserver.observe(drawnMapContainer);
+        }
     }
 
     clearContainer(container) {
@@ -1071,7 +1138,7 @@ class ValetudoMapCard extends HTMLElement {
     }
 }
 
-let componentName = "valetudo-map-card2";
+let componentName = "valetudo-map-card";
 if (!customElements.get(componentName)) {
     customElements.define(componentName, ValetudoMapCard);
 
