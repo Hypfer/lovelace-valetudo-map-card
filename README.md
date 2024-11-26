@@ -119,6 +119,7 @@ Then use map_scale and crop to make it fit.
 | vacuum_color                        | string  | '--primary-text-color'                                              | The color to use for the vacuum icon                                                                                                                                                                                
 | map_scale                           | number  | 1                                                                   | Scale the map by this value                                                                                                                                                                                         
 | icon_scale                          | number  | 1                                                                   | Scale the icons (vacuum & dock) by this value                                                                                                                                                                       
+| full_width                          | boolean | false                                                               | Scale the map to fit the whole card                                                                                                                                                                                  
 | rotate                              | number  | 0                                                                   | Value to rotate the map by (default is in deg, but a value like `2rad` is valid too)                                                                                                                                
 | left_padding                        | number  | 0                                                                   | Value that moves the map `number` pixels from left to right                                                                                                                                                         
 | crop                                | Object  | {top: 0, bottom: 0, left: 0, right: 0}                              | Crop the map                                                                                                                                                                                                        
@@ -137,6 +138,21 @@ Custom buttons can be added to this card when vacuum_entity is set. Each custom 
 | service_data | Object | {}                 | Optional service data that will be passed to the service 
 | icon         | string | mdi:radiobox-blank | The icon that will represent the custom button           
 | text         | string | ""                 | Optional text to display next to the icon                
+
+## Development
+
+1. Run Rollup in watch mode
+
+    ```sh
+    npm run dev
+    ```
+
+2. Enable **Advanced Mode** in your Home Assistant profile
+
+3. Add the bundle as a Lovelace resource in Home Assistant (**Settings > Dashboards > ⋮ > Resources > + Add Resource**)
+    ```
+    http://localhost:5000/valetudo-map-card.js
+    ```
 
 ## License
 

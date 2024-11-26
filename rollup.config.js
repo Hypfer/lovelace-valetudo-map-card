@@ -4,6 +4,19 @@ import nodeResolve from "rollup-plugin-node-resolve";
 import babel from "rollup-plugin-babel";
 import { terser } from "rollup-plugin-terser";
 import json from "@rollup/plugin-json";
+import serve from 'rollup-plugin-serve';
+
+const dev = process.env.ROLLUP_WATCH;
+
+/** @type {import("rollup-plugin-serve").ServeOptions} */
+const serveOpts = {
+    contentBase: ['./dist'],
+    host: '0.0.0.0',
+    port: 5000,
+    headers: {
+        'Access-Control-Allow-Origin': '*'
+    }
+};
 
 const plugins = [
     nodeResolve({}),
@@ -16,7 +29,8 @@ const plugins = [
             ["inline-json-import", {}]
         ]
     }),
-    terser(),
+    dev && serve(serveOpts),
+    !dev && terser(),
 ];
 
 export default [
