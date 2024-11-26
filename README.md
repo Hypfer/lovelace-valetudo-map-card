@@ -138,6 +138,21 @@ Custom buttons can be added to this card when vacuum_entity is set. Each custom 
 | icon         | string | mdi:radiobox-blank | The icon that will represent the custom button           
 | text         | string | ""                 | Optional text to display next to the icon                
 
+## Development
+
+1. Run Rollup in watch mode
+
+    ```sh
+    npm run dev
+    ```
+
+2. Enable **Advanced Mode** in your Home Assistant profile
+
+3. Add the bundle as a Lovelace resource in Home Assistant (**Settings > Dashboards > ⋮ > Resources > + Add Resource**)
+    ```
+    http://localhost:5000/valetudo-map-card.js
+    ```
+
 ## License
 
 Lovelace Valetudo Map Card is licensed under the MIT license.
