@@ -430,6 +430,13 @@ class ValetudoMapCard extends HTMLElement {
     drawPathCanvas(attributes, pathCtx, { widthScale, heightScale, mapLeftOffset, mapTopOffset, objectLeftOffset, objectTopOffset }) {
         const config = this._config;
 
+        const homeAssistant = document.getElementsByTagName("home-assistant")[0];
+        const pathColor = this.calculateColor(homeAssistant, config.path_color, "--valetudo-map-path-color", "--primary-text-color");
+
+        pathCtx.globalAlpha = config.path_opacity;
+        pathCtx.strokeStyle = pathColor;
+        pathCtx.lineWidth = config.path_width;
+
         let pathPoints = this.getPathPoints(attributes);
         if (Array.isArray(pathPoints) && pathPoints.length > 0 && (config.show_path && config.path_width > 0)) {
             for (let item of pathPoints) {
@@ -501,7 +508,6 @@ class ValetudoMapCard extends HTMLElement {
 
         // Calculate colours
         const homeAssistant = document.getElementsByTagName("home-assistant")[0];
-        const pathColor = this.calculateColor(homeAssistant, config.path_color, "--valetudo-map-path-color", "--primary-text-color");
         const chargerColor = this.calculateColor(homeAssistant, config.dock_color, "green");
         const vacuumColor = this.calculateColor(homeAssistant, config.vacuum_color, "--primary-text-color");
         const gotoTargetColor = this.calculateColor(homeAssistant, config.goto_target_color, "blue");
@@ -587,9 +593,6 @@ class ValetudoMapCard extends HTMLElement {
 
         const mapCtx = drawnMapCanvas.getContext("2d");
         const pathCtx = pathCanvas.getContext("2d");
-        pathCtx.globalAlpha = config.path_opacity;
-        pathCtx.strokeStyle = pathColor;
-        pathCtx.lineWidth = config.path_width;
 
         const dimensions = { widthScale, heightScale, mapLeftOffset, mapTopOffset, objectLeftOffset, objectTopOffset };
         this.drawMapCanvas(attributes, mapCtx, dimensions);
