@@ -217,6 +217,63 @@ class ValetudoMapCard extends HTMLElement {
         return this.getEntities(attributes, "no_mop_area");
     }
 
+    drawPathCanvas(attributes, pathCtx, { widthScale, heightScale, mapLeftOffset, mapTopOffset, objectLeftOffset, objectTopOffset }) {
+        const config = this._config;
+
+        let pathPoints = this.getPathPoints(attributes);
+        if (Array.isArray(pathPoints) && pathPoints.length > 0 && (config.show_path && config.path_width > 0)) {
+            for (let item of pathPoints) {
+                let x = 0;
+                let y = 0;
+                let first = true;
+                pathCtx.beginPath();
+                for (let i = 0; i < item.points.length; i+=2) {
+                    x = Math.floor((item.points[i]) / widthScale) - objectLeftOffset - mapLeftOffset;
+                    y = Math.floor((item.points[i + 1]) / heightScale) - objectTopOffset - mapTopOffset;
+                    if (this.isOutsideBounds(x, y, pathCtx.canvas, config)) {
+                        continue;
+                    }
+                    if (first) {
+                        pathCtx.moveTo(x, y);
+                        first = false;
+                    } else {
+                        pathCtx.lineTo(x, y);
+                    }
+                }
+                pathCtx.stroke();
+            }
+
+            pathCtx.globalAlpha = 1;
+        }
+
+        let predictedPathPoints = this.getPredictedPathPoints(attributes);
+        if (Array.isArray(predictedPathPoints) && predictedPathPoints.length > 0 && (config.show_predicted_path && config.path_width > 0)) {
+            pathCtx.setLineDash([5,3]);
+            for (let item of predictedPathPoints) {
+                let x = 0;
+                let y = 0;
+                let first = true;
+                pathCtx.beginPath();
+                for (let i = 0; i < item.points.length; i+=2) {
+                    x = Math.floor((item.points[i]) / widthScale) - objectLeftOffset - mapLeftOffset;
+                    y = Math.floor((item.points[i + 1]) / heightScale) - objectTopOffset - mapTopOffset;
+                    if (this.isOutsideBounds(x, y, pathCtx.canvas, config)) {
+                        continue;
+                    }
+                    if (first) {
+                        pathCtx.moveTo(x, y);
+                        first = false;
+                    } else {
+                        pathCtx.lineTo(x, y);
+                    }
+                }
+                pathCtx.stroke();
+            }
+
+            pathCtx.globalAlpha = 1;
+        }
+    }
+
     drawMap(attributes, mapHeight, mapWidth, boundingBox) {
         const config = this._config;
         const pixelSize = attributes.pixelSize;
@@ -293,6 +350,12 @@ class ValetudoMapCard extends HTMLElement {
             vacuumHTML.style.left = `${Math.floor(robotInfo[0] / widthScale) - objectLeftOffset - mapLeftOffset - (12 * config.icon_scale)}px`;
             vacuumHTML.style.top = `${Math.floor(robotInfo[1] / heightScale) - objectTopOffset - mapTopOffset - (12 * config.icon_scale)}px`;
             vacuumHTML.style.transform = `scale(${config.icon_scale}, ${config.icon_scale})`;
+
+            let pathPoints = this.getPathPoints(attributes);
+            if (Array.isArray(pathPoints) && pathPoints.length > 0 && (config.show_path && config.path_width > 0)) {
+                // Update vacuum angle
+                vacuumHTML.style.transform = `scale(${config.icon_scale}, ${config.icon_scale}) rotate(${robotInfo[2]}deg)`;
+            }
         }
         vacuumContainer.style.zIndex = 4;
         vacuumContainer.appendChild(vacuumHTML);
@@ -521,61 +584,7 @@ class ValetudoMapCard extends HTMLElement {
         pathCtx.strokeStyle = pathColor;
         pathCtx.lineWidth = config.path_width;
 
-        let pathPoints = this.getPathPoints(attributes);
-        if (Array.isArray(pathPoints) && pathPoints.length > 0 && (config.show_path && config.path_width > 0)) {
-            for (let item of pathPoints) {
-                let x = 0;
-                let y = 0;
-                let first = true;
-                pathCtx.beginPath();
-                for (let i = 0; i < item.points.length; i+=2) {
-                    x = Math.floor((item.points[i]) / widthScale) - objectLeftOffset - mapLeftOffset;
-                    y = Math.floor((item.points[i + 1]) / heightScale) - objectTopOffset - mapTopOffset;
-                    if (this.isOutsideBounds(x, y, drawnMapCanvas, config)) {
-                        continue;
-                    }
-                    if (first) {
-                        pathCtx.moveTo(x, y);
-                        first = false;
-                    } else {
-                        pathCtx.lineTo(x, y);
-                    }
-                }
-                pathCtx.stroke();
-            }
-
-            // Update vacuum angle
-            vacuumHTML.style.transform = `scale(${config.icon_scale}, ${config.icon_scale}) rotate(${robotInfo[2]}deg)`;
-
-            pathCtx.globalAlpha = 1;
-        }
-
-        let predictedPathPoints = this.getPredictedPathPoints(attributes);
-        if (Array.isArray(predictedPathPoints) && predictedPathPoints.length > 0 && (config.show_predicted_path && config.path_width > 0)) {
-            pathCtx.setLineDash([5,3]);
-            for (let item of predictedPathPoints) {
-                let x = 0;
-                let y = 0;
-                let first = true;
-                pathCtx.beginPath();
-                for (let i = 0; i < item.points.length; i+=2) {
-                    x = Math.floor((item.points[i]) / widthScale) - objectLeftOffset - mapLeftOffset;
-                    y = Math.floor((item.points[i + 1]) / heightScale) - objectTopOffset - mapTopOffset;
-                    if (this.isOutsideBounds(x, y, drawnMapCanvas, config)) {
-                        continue;
-                    }
-                    if (first) {
-                        pathCtx.moveTo(x, y);
-                        first = false;
-                    } else {
-                        pathCtx.lineTo(x, y);
-                    }
-                }
-                pathCtx.stroke();
-            }
-
-            pathCtx.globalAlpha = 1;
-        }
+        this.drawPathCanvas(attributes, pathCtx, { widthScale, heightScale, mapLeftOffset, mapTopOffset, objectLeftOffset, objectTopOffset });
 
         // Put our newly generated map in there
         this.clearContainer(this.mapContainer);
