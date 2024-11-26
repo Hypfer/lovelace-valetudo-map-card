@@ -218,31 +218,32 @@ class ValetudoMapCard extends HTMLElement {
     }
 
     drawMap(attributes, mapHeight, mapWidth, boundingBox) {
+        const config = this._config;
         const pixelSize = attributes.pixelSize;
 
-        const widthScale = pixelSize / this._config.map_scale;
-        const heightScale = pixelSize / this._config.map_scale;
+        const widthScale = pixelSize / config.map_scale;
+        const heightScale = pixelSize / config.map_scale;
 
         let objectLeftOffset = 0;
         let objectTopOffset = 0;
         let mapLeftOffset = 0;
         let mapTopOffset = 0;
 
-        mapLeftOffset = ((boundingBox.minX) - 1) * this._config.map_scale;
-        mapTopOffset = ((boundingBox.minY) - 1) * this._config.map_scale;
+        mapLeftOffset = ((boundingBox.minX) - 1) * config.map_scale;
+        mapTopOffset = ((boundingBox.minY) - 1) * config.map_scale;
 
         // Calculate colours
         const homeAssistant = document.getElementsByTagName("home-assistant")[0];
-        const floorColor = this.calculateColor(homeAssistant, this._config.floor_color, "--valetudo-map-floor-color", "--secondary-background-color");
-        const wallColor = this.calculateColor(homeAssistant, this._config.wall_color, "--valetudo-map-wall-color", "--accent-color");
-        const currentlyCleanedZoneColor = this.calculateColor(homeAssistant, this._config.currently_cleaned_zone_color, "--valetudo-currently_cleaned_zone_color", "--secondary-text-color");
-        const noGoAreaColor = this.calculateColor(homeAssistant, this._config.no_go_area_color, "--valetudo-no-go-area-color", "--accent-color");
-        const noMopAreaColor = this.calculateColor(homeAssistant, this._config.no_mop_area_color, "--valetudo-no-mop-area-color", "--secondary-text-color");
-        const virtualWallColor = this.calculateColor(homeAssistant, this._config.virtual_wall_color, "--valetudo-virtual-wall-color", "--accent-color");
-        const pathColor = this.calculateColor(homeAssistant, this._config.path_color, "--valetudo-map-path-color", "--primary-text-color");
-        const chargerColor = this.calculateColor(homeAssistant, this._config.dock_color, "green");
-        const vacuumColor = this.calculateColor(homeAssistant, this._config.vacuum_color, "--primary-text-color");
-        const gotoTargetColor = this.calculateColor(homeAssistant, this._config.goto_target_color, "blue");
+        const floorColor = this.calculateColor(homeAssistant, config.floor_color, "--valetudo-map-floor-color", "--secondary-background-color");
+        const wallColor = this.calculateColor(homeAssistant, config.wall_color, "--valetudo-map-wall-color", "--accent-color");
+        const currentlyCleanedZoneColor = this.calculateColor(homeAssistant, config.currently_cleaned_zone_color, "--valetudo-currently_cleaned_zone_color", "--secondary-text-color");
+        const noGoAreaColor = this.calculateColor(homeAssistant, config.no_go_area_color, "--valetudo-no-go-area-color", "--accent-color");
+        const noMopAreaColor = this.calculateColor(homeAssistant, config.no_mop_area_color, "--valetudo-no-mop-area-color", "--secondary-text-color");
+        const virtualWallColor = this.calculateColor(homeAssistant, config.virtual_wall_color, "--valetudo-virtual-wall-color", "--accent-color");
+        const pathColor = this.calculateColor(homeAssistant, config.path_color, "--valetudo-map-path-color", "--primary-text-color");
+        const chargerColor = this.calculateColor(homeAssistant, config.dock_color, "green");
+        const vacuumColor = this.calculateColor(homeAssistant, config.vacuum_color, "--primary-text-color");
+        const gotoTargetColor = this.calculateColor(homeAssistant, config.goto_target_color, "blue");
 
         // Create all objects
         const containerContainer = document.createElement("div");
@@ -250,29 +251,29 @@ class ValetudoMapCard extends HTMLElement {
 
         const drawnMapContainer = document.createElement("div");
         const drawnMapCanvas = document.createElement("canvas");
-        drawnMapCanvas.width = mapWidth * this._config.map_scale;
-        drawnMapCanvas.height = mapHeight * this._config.map_scale;
+        drawnMapCanvas.width = mapWidth * config.map_scale;
+        drawnMapCanvas.height = mapHeight * config.map_scale;
         drawnMapContainer.style.zIndex = 1;
         drawnMapContainer.appendChild(drawnMapCanvas);
 
         const chargerContainer = document.createElement("div");
         const chargerHTML = document.createElement("ha-icon");
         let chargerInfo = this.getChargerInfo(attributes);
-        if (this._config.show_dock && chargerInfo) {
+        if (config.show_dock && chargerInfo) {
             chargerHTML.style.position = "absolute"; // Needed in Home Assistant 0.110.0 and up
-            chargerHTML.icon = this._config.dock_icon || "mdi:flash";
-            chargerHTML.style.left = `${Math.floor(chargerInfo[0] / widthScale) - objectLeftOffset - mapLeftOffset - (12 * this._config.icon_scale)}px`;
-            chargerHTML.style.top = `${Math.floor(chargerInfo[1] / heightScale) - objectTopOffset - mapTopOffset - (12 * this._config.icon_scale)}px`;
+            chargerHTML.icon = config.dock_icon || "mdi:flash";
+            chargerHTML.style.left = `${Math.floor(chargerInfo[0] / widthScale) - objectLeftOffset - mapLeftOffset - (12 * config.icon_scale)}px`;
+            chargerHTML.style.top = `${Math.floor(chargerInfo[1] / heightScale) - objectTopOffset - mapTopOffset - (12 * config.icon_scale)}px`;
             chargerHTML.style.color = chargerColor;
-            chargerHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale}) rotate(-${this._config.rotate})`;
+            chargerHTML.style.transform = `scale(${config.icon_scale}, ${config.icon_scale}) rotate(-${config.rotate})`;
         }
         chargerContainer.style.zIndex = 2;
         chargerContainer.appendChild(chargerHTML);
 
         const pathContainer = document.createElement("div");
         const pathCanvas = document.createElement("canvas");
-        pathCanvas.width = mapWidth * this._config.map_scale;
-        pathCanvas.height = mapHeight * this._config.map_scale;
+        pathCanvas.width = mapWidth * config.map_scale;
+        pathCanvas.height = mapHeight * config.map_scale;
         pathContainer.style.zIndex = 3;
         pathContainer.appendChild(pathCanvas);
 
@@ -284,14 +285,14 @@ class ValetudoMapCard extends HTMLElement {
             robotInfo = this.lastValidRobotInfo;
         }
 
-        if (this._config.show_vacuum && robotInfo) {
+        if (config.show_vacuum && robotInfo) {
             this.lastValidRobotInfo = robotInfo;
             vacuumHTML.style.position = "absolute"; // Needed in Home Assistant 0.110.0 and up
-            vacuumHTML.icon = this._config.vacuum_icon || "mdi:robot-vacuum";
+            vacuumHTML.icon = config.vacuum_icon || "mdi:robot-vacuum";
             vacuumHTML.style.color = vacuumColor;
-            vacuumHTML.style.left = `${Math.floor(robotInfo[0] / widthScale) - objectLeftOffset - mapLeftOffset - (12 * this._config.icon_scale)}px`;
-            vacuumHTML.style.top = `${Math.floor(robotInfo[1] / heightScale) - objectTopOffset - mapTopOffset - (12 * this._config.icon_scale)}px`;
-            vacuumHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale})`;
+            vacuumHTML.style.left = `${Math.floor(robotInfo[0] / widthScale) - objectLeftOffset - mapLeftOffset - (12 * config.icon_scale)}px`;
+            vacuumHTML.style.top = `${Math.floor(robotInfo[1] / heightScale) - objectTopOffset - mapTopOffset - (12 * config.icon_scale)}px`;
+            vacuumHTML.style.transform = `scale(${config.icon_scale}, ${config.icon_scale})`;
         }
         vacuumContainer.style.zIndex = 4;
         vacuumContainer.appendChild(vacuumHTML);
@@ -299,13 +300,13 @@ class ValetudoMapCard extends HTMLElement {
         const goToTargetContainer = document.createElement("div");
         const goToTargetHTML = document.createElement("ha-icon");
         let goToInfo = this.getGoToInfo(attributes);
-        if (this._config.show_goto_target && goToInfo) {
+        if (config.show_goto_target && goToInfo) {
             goToTargetHTML.style.position = "absolute"; // Needed in Home Assistant 0.110.0 and up
-            goToTargetHTML.icon = this._config.goto_target_icon || "mdi:pin";
-            goToTargetHTML.style.left = `${Math.floor(goToInfo[0] / widthScale) - objectLeftOffset - mapLeftOffset - (12 * this._config.icon_scale)}px`;
-            goToTargetHTML.style.top = `${Math.floor(goToInfo[1] / heightScale) - objectTopOffset - mapTopOffset - (22 * this._config.icon_scale)}px`;
+            goToTargetHTML.icon = config.goto_target_icon || "mdi:pin";
+            goToTargetHTML.style.left = `${Math.floor(goToInfo[0] / widthScale) - objectLeftOffset - mapLeftOffset - (12 * config.icon_scale)}px`;
+            goToTargetHTML.style.top = `${Math.floor(goToInfo[1] / heightScale) - objectTopOffset - mapTopOffset - (22 * config.icon_scale)}px`;
             goToTargetHTML.style.color = gotoTargetColor;
-            goToTargetHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale})`;
+            goToTargetHTML.style.transform = `scale(${config.icon_scale}, ${config.icon_scale})`;
         }
         goToTargetContainer.style.zIndex = 5;
         goToTargetContainer.appendChild(goToTargetHTML);
@@ -318,8 +319,8 @@ class ValetudoMapCard extends HTMLElement {
         containerContainer.appendChild(goToTargetContainer);
 
         const mapCtx = drawnMapCanvas.getContext("2d");
-        if (this._config.show_floor) {
-            mapCtx.globalAlpha = this._config.floor_opacity;
+        if (config.show_floor) {
+            mapCtx.globalAlpha = config.floor_opacity;
 
             mapCtx.strokeStyle = floorColor;
             mapCtx.lineWidth = 1;
@@ -328,12 +329,12 @@ class ValetudoMapCard extends HTMLElement {
             let floorPoints = this.getFloorPoints(attributes);
             if (floorPoints) {
                 for (let i = 0; i < floorPoints.length; i+=2) {
-                    let x = (floorPoints[i] * this._config.map_scale) - mapLeftOffset;
-                    let y = (floorPoints[i + 1] * this._config.map_scale) - mapTopOffset;
-                    if (this.isOutsideBounds(x, y, drawnMapCanvas, this._config)) {
+                    let x = (floorPoints[i] * config.map_scale) - mapLeftOffset;
+                    let y = (floorPoints[i + 1] * config.map_scale) - mapTopOffset;
+                    if (this.isOutsideBounds(x, y, drawnMapCanvas, config)) {
                         continue;
                     }
-                    mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
+                    mapCtx.fillRect(x, y, config.map_scale, config.map_scale);
                 }
             }
 
@@ -341,24 +342,24 @@ class ValetudoMapCard extends HTMLElement {
         }
 
         let segmentAreas = this.getSegments(attributes);
-        if (segmentAreas && this._config.show_segments) {
+        if (segmentAreas && config.show_segments) {
             const colorFinder = new FourColorTheoremSolver(segmentAreas, 6);
-            mapCtx.globalAlpha = this._config.segment_opacity;
+            mapCtx.globalAlpha = config.segment_opacity;
 
             for (let item of segmentAreas) {
-                mapCtx.strokeStyle = this._config.segment_colors[colorFinder.getColor(item.metaData.segmentId)];
+                mapCtx.strokeStyle = config.segment_colors[colorFinder.getColor(item.metaData.segmentId)];
                 mapCtx.lineWidth = 1;
-                mapCtx.fillStyle = this._config.segment_colors[colorFinder.getColor(item.metaData.segmentId)];
+                mapCtx.fillStyle = config.segment_colors[colorFinder.getColor(item.metaData.segmentId)];
                 mapCtx.beginPath();
                 let segmentPoints = item["pixels"];
                 if (segmentPoints) {
                     for (let i = 0; i < segmentPoints.length; i+=2) {
-                        let x = (segmentPoints[i] * this._config.map_scale) - mapLeftOffset;
-                        let y = (segmentPoints[i + 1] * this._config.map_scale) - mapTopOffset;
-                        if (this.isOutsideBounds(x, y, drawnMapCanvas, this._config)) {
+                        let x = (segmentPoints[i] * config.map_scale) - mapLeftOffset;
+                        let y = (segmentPoints[i + 1] * config.map_scale) - mapTopOffset;
+                        if (this.isOutsideBounds(x, y, drawnMapCanvas, config)) {
                             continue;
                         }
-                        mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
+                        mapCtx.fillRect(x, y, config.map_scale, config.map_scale);
                     }
                 }
             }
@@ -366,8 +367,8 @@ class ValetudoMapCard extends HTMLElement {
             mapCtx.globalAlpha = 1;
         }
 
-        if (this._config.show_walls) {
-            mapCtx.globalAlpha = this._config.wall_opacity;
+        if (config.show_walls) {
+            mapCtx.globalAlpha = config.wall_opacity;
 
             mapCtx.strokeStyle = wallColor;
             mapCtx.lineWidth = 1;
@@ -376,12 +377,12 @@ class ValetudoMapCard extends HTMLElement {
             let wallPoints = this.getWallPoints(attributes);
             if (wallPoints) {
                 for (let i = 0; i < wallPoints.length; i+=2) {
-                    let x = (wallPoints[i] * this._config.map_scale) - mapLeftOffset;
-                    let y = (wallPoints[i + 1] * this._config.map_scale) - mapTopOffset;
-                    if (this.isOutsideBounds(x, y, drawnMapCanvas, this._config)) {
+                    let x = (wallPoints[i] * config.map_scale) - mapLeftOffset;
+                    let y = (wallPoints[i + 1] * config.map_scale) - mapTopOffset;
+                    if (this.isOutsideBounds(x, y, drawnMapCanvas, config)) {
                         continue;
                     }
-                    mapCtx.fillRect(x, y, this._config.map_scale, this._config.map_scale);
+                    mapCtx.fillRect(x, y, config.map_scale, config.map_scale);
                 }
             }
 
@@ -389,14 +390,14 @@ class ValetudoMapCard extends HTMLElement {
         }
 
         let activeZones = this.getActiveZones(attributes);
-        if (Array.isArray(activeZones) && activeZones.length > 0 && this._config.show_currently_cleaned_zones) {
-            mapCtx.globalAlpha = this._config.currently_cleaned_zone_opacity;
+        if (Array.isArray(activeZones) && activeZones.length > 0 && config.show_currently_cleaned_zones) {
+            mapCtx.globalAlpha = config.currently_cleaned_zone_opacity;
 
             mapCtx.strokeStyle = currentlyCleanedZoneColor;
             mapCtx.lineWidth = 2;
             mapCtx.fillStyle = currentlyCleanedZoneColor;
             for (let item of activeZones) {
-                mapCtx.globalAlpha = this._config.currently_cleaned_zone_opacity;
+                mapCtx.globalAlpha = config.currently_cleaned_zone_opacity;
                 mapCtx.beginPath();
                 let points = item["points"];
                 for (let i = 0; i < points.length; i+=2) {
@@ -407,14 +408,14 @@ class ValetudoMapCard extends HTMLElement {
                     } else {
                         mapCtx.lineTo(x, y);
                     }
-                    if (this.isOutsideBounds(x, y, drawnMapCanvas, this._config)) {
+                    if (this.isOutsideBounds(x, y, drawnMapCanvas, config)) {
                         // noinspection UnnecessaryContinueJS
                         continue;
                     }
                 }
                 mapCtx.fill();
 
-                if (this._config.show_currently_cleaned_zones_border) {
+                if (config.show_currently_cleaned_zones_border) {
                     mapCtx.closePath();
                     mapCtx.globalAlpha = 1.0;
                     mapCtx.stroke();
@@ -424,12 +425,12 @@ class ValetudoMapCard extends HTMLElement {
         }
 
         let noGoAreas = this.getNoGoAreas(attributes);
-        if (noGoAreas && this._config.show_no_go_areas) {
+        if (noGoAreas && config.show_no_go_areas) {
             mapCtx.strokeStyle = noGoAreaColor;
             mapCtx.lineWidth = 2;
             mapCtx.fillStyle = noGoAreaColor;
             for (let item of noGoAreas) {
-                mapCtx.globalAlpha = this._config.no_go_area_opacity;
+                mapCtx.globalAlpha = config.no_go_area_opacity;
                 mapCtx.beginPath();
                 let points = item["points"];
                 for (let i = 0; i < points.length; i+=2) {
@@ -440,14 +441,14 @@ class ValetudoMapCard extends HTMLElement {
                     } else {
                         mapCtx.lineTo(x, y);
                     }
-                    if (this.isOutsideBounds(x, y, drawnMapCanvas, this._config)) {
+                    if (this.isOutsideBounds(x, y, drawnMapCanvas, config)) {
                         // noinspection UnnecessaryContinueJS
                         continue;
                     }
                 }
                 mapCtx.fill();
 
-                if (this._config.show_no_go_area_border) {
+                if (config.show_no_go_area_border) {
                     mapCtx.closePath();
                     mapCtx.globalAlpha = 1.0;
                     mapCtx.stroke();
@@ -457,12 +458,12 @@ class ValetudoMapCard extends HTMLElement {
         }
 
         let noMopAreas = this.getNoMopAreas(attributes);
-        if (noMopAreas && this._config.show_no_mop_areas) {
+        if (noMopAreas && config.show_no_mop_areas) {
             mapCtx.strokeStyle = noMopAreaColor;
             mapCtx.lineWidth = 2;
             mapCtx.fillStyle = noMopAreaColor;
             for (let item of noMopAreas) {
-                mapCtx.globalAlpha = this._config.no_mop_area_opacity;
+                mapCtx.globalAlpha = config.no_mop_area_opacity;
                 mapCtx.beginPath();
                 let points = item["points"];
                 for (let i = 0; i < points.length; i+=2) {
@@ -473,14 +474,14 @@ class ValetudoMapCard extends HTMLElement {
                     } else {
                         mapCtx.lineTo(x, y);
                     }
-                    if (this.isOutsideBounds(x, y, drawnMapCanvas, this._config)) {
+                    if (this.isOutsideBounds(x, y, drawnMapCanvas, config)) {
                         // noinspection UnnecessaryContinueJS
                         continue;
                     }
                 }
                 mapCtx.fill();
 
-                if (this._config.show_no_mop_area_border) {
+                if (config.show_no_mop_area_border) {
                     mapCtx.closePath();
                     mapCtx.globalAlpha = 1.0;
                     mapCtx.stroke();
@@ -490,21 +491,21 @@ class ValetudoMapCard extends HTMLElement {
         }
 
         let virtualWallPoints = this.getVirtualWallPoints(attributes);
-        if (virtualWallPoints && this._config.show_virtual_walls && this._config.virtual_wall_width > 0) {
-            mapCtx.globalAlpha = this._config.virtual_wall_opacity;
+        if (virtualWallPoints && config.show_virtual_walls && config.virtual_wall_width > 0) {
+            mapCtx.globalAlpha = config.virtual_wall_opacity;
 
             mapCtx.strokeStyle = virtualWallColor;
-            mapCtx.lineWidth = this._config.virtual_wall_width;
+            mapCtx.lineWidth = config.virtual_wall_width;
             mapCtx.beginPath();
             for (let item of virtualWallPoints) {
                 let fromX = Math.floor(item["points"][0] / widthScale) - objectLeftOffset - mapLeftOffset;
                 let fromY = Math.floor(item["points"][1] / heightScale) - objectTopOffset - mapTopOffset;
                 let toX = Math.floor(item["points"][2] / widthScale) - objectLeftOffset - mapLeftOffset;
                 let toY = Math.floor(item["points"][3] / heightScale) - objectTopOffset - mapTopOffset;
-                if (this.isOutsideBounds(fromX, fromY, drawnMapCanvas, this._config)) {
+                if (this.isOutsideBounds(fromX, fromY, drawnMapCanvas, config)) {
                     continue;
                 }
-                if (this.isOutsideBounds(toX, toY, drawnMapCanvas, this._config)) {
+                if (this.isOutsideBounds(toX, toY, drawnMapCanvas, config)) {
                     continue;
                 }
                 mapCtx.moveTo(fromX, fromY);
@@ -516,12 +517,12 @@ class ValetudoMapCard extends HTMLElement {
         }
 
         const pathCtx = pathCanvas.getContext("2d");
-        pathCtx.globalAlpha = this._config.path_opacity;
+        pathCtx.globalAlpha = config.path_opacity;
         pathCtx.strokeStyle = pathColor;
-        pathCtx.lineWidth = this._config.path_width;
+        pathCtx.lineWidth = config.path_width;
 
         let pathPoints = this.getPathPoints(attributes);
-        if (Array.isArray(pathPoints) && pathPoints.length > 0 && (this._config.show_path && this._config.path_width > 0)) {
+        if (Array.isArray(pathPoints) && pathPoints.length > 0 && (config.show_path && config.path_width > 0)) {
             for (let item of pathPoints) {
                 let x = 0;
                 let y = 0;
@@ -530,7 +531,7 @@ class ValetudoMapCard extends HTMLElement {
                 for (let i = 0; i < item.points.length; i+=2) {
                     x = Math.floor((item.points[i]) / widthScale) - objectLeftOffset - mapLeftOffset;
                     y = Math.floor((item.points[i + 1]) / heightScale) - objectTopOffset - mapTopOffset;
-                    if (this.isOutsideBounds(x, y, drawnMapCanvas, this._config)) {
+                    if (this.isOutsideBounds(x, y, drawnMapCanvas, config)) {
                         continue;
                     }
                     if (first) {
@@ -544,13 +545,13 @@ class ValetudoMapCard extends HTMLElement {
             }
 
             // Update vacuum angle
-            vacuumHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale}) rotate(${robotInfo[2]}deg)`;
+            vacuumHTML.style.transform = `scale(${config.icon_scale}, ${config.icon_scale}) rotate(${robotInfo[2]}deg)`;
 
             pathCtx.globalAlpha = 1;
         }
 
         let predictedPathPoints = this.getPredictedPathPoints(attributes);
-        if (Array.isArray(predictedPathPoints) && predictedPathPoints.length > 0 && (this._config.show_predicted_path && this._config.path_width > 0)) {
+        if (Array.isArray(predictedPathPoints) && predictedPathPoints.length > 0 && (config.show_predicted_path && config.path_width > 0)) {
             pathCtx.setLineDash([5,3]);
             for (let item of predictedPathPoints) {
                 let x = 0;
@@ -560,7 +561,7 @@ class ValetudoMapCard extends HTMLElement {
                 for (let i = 0; i < item.points.length; i+=2) {
                     x = Math.floor((item.points[i]) / widthScale) - objectLeftOffset - mapLeftOffset;
                     y = Math.floor((item.points[i + 1]) / heightScale) - objectTopOffset - mapTopOffset;
-                    if (this.isOutsideBounds(x, y, drawnMapCanvas, this._config)) {
+                    if (this.isOutsideBounds(x, y, drawnMapCanvas, config)) {
                         continue;
                     }
                     if (first) {
