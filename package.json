@@ -7,7 +7,8 @@
     "lint": "eslint -c .automated.eslintrc.json .",
     "lint_fix": "eslint -c .automated.eslintrc.json . --fix",
 
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "dev": "rollup -c -w"
   },
   "repository": {
     "type": "git",
@@ -34,6 +35,7 @@
     "rollup-plugin-node-resolve": "5.2.0",
     "rollup-plugin-terser": "7.0.2",
     "rollup-plugin-typescript2": "0.33.0",
+    "rollup-plugin-serve": "1.1.1",
     "typescript": "4.8.2",
     "@rollup/plugin-json": "4.1.0",
     "babel-plugin-inline-json-import": "0.3.2",
