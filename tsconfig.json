@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "module": "es2020",
+        "moduleResolution": "node",
+        "target": "es5",
+        "resolveJsonModule": true,
+        "allowSyntheticDefaultImports": true
+    }
+}
