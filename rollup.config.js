@@ -21,7 +21,7 @@ const plugins = [
 
 export default [
     {
-        input: "src/valetudo-map-card.js",
+        input: "src/valetudo-map-card.ts",
         output: {
             dir: "dist",
             format: "es",

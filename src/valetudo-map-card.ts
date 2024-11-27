@@ -1,9 +1,14 @@
-import {FourColorTheoremSolver} from "./ts-lib/colors/FourColorTheoremSolver";
 import * as pako from "pako";
-import {extractZtxtPngChunks} from "./lib/pngUtils";
-import {DEFAULT_CARD_CONFIG, POLL_INTERVAL_STATE_MAP} from "./res/consts";
-import {preprocessMap} from "./ts-lib/mapUtils";
+import { HomeAssistant } from "custom-card-helpers";
+import { HassEntity } from "home-assistant-js-websocket";
+
 import packageJson from "../package.json";
+import { FourColorTheoremSolver } from "./lib/colors/FourColorTheoremSolver";
+import { preprocessMap } from "./lib/mapUtils";
+import { extractZtxtPngChunks } from "./lib/pngUtils";
+import { RawMapData, RawMapEntity, RawMapEntityType, RawMapLayer, RawMapLayerType } from "./lib/RawMapData";
+import { BoundingBox, Configuration, CropConfig, HaIconElement, RobotInfo } from "./lib/types";
+import { DEFAULT_CARD_CONFIG, POLL_INTERVAL_STATE_MAP } from "./res/consts";
 
 console.info(
     `%c   Valetudo-Map-Card   \n%c   Version ${packageJson.version}   `,
@@ -12,6 +17,32 @@ console.info(
 );
 
 class ValetudoMapCard extends HTMLElement {
+    _hass: HomeAssistant;
+    _config: Configuration;
+    
+    drawingMap: boolean;
+    drawingControls: boolean;
+    lastUpdatedControls: string;
+    lastMapPoll: Date;
+    isPollingMap: boolean;
+    lastRobotState: string;
+    pollInterval: number;
+    lastValidRobotInfo: RobotInfo | null;
+
+    cardContainer: HTMLElement;
+    cardContainerStyle: HTMLStyleElement;
+    cardHeader: HTMLDivElement;
+    cardTitle: HTMLDivElement;
+    entityWarning1: HTMLElement;
+    entityWarning2: HTMLElement;
+    mapContainer: HTMLDivElement;
+    mapContainerStyle: HTMLStyleElement;
+    controlContainer: HTMLDivElement;
+    controlContainerStyle: HTMLStyleElement;
+    infoBox: HTMLDivElement;
+    controlFlexBox: HTMLDivElement;
+    customControlFlexBox: HTMLDivElement;
+
     constructor() {
         super();
 
@@ -27,8 +58,8 @@ class ValetudoMapCard extends HTMLElement {
         this.cardContainer = document.createElement("ha-card");
         this.cardContainer.id = "valetudoMapCard";
         this.cardContainerStyle = document.createElement("style");
-        this.shadowRoot.appendChild(this.cardContainer);
-        this.shadowRoot.appendChild(this.cardContainerStyle);
+        this.shadowRoot?.appendChild(this.cardContainer);
+        this.shadowRoot?.appendChild(this.cardContainerStyle);
 
         this.cardHeader = document.createElement("div");
         this.cardHeader.setAttribute("class", "card-header");
@@ -64,19 +95,19 @@ class ValetudoMapCard extends HTMLElement {
         return { vacuum: "valetudo_REPLACEME" };
     }
 
-    getMapEntityName(vacuum_name) {
+    getMapEntityName(vacuum_name: string) {
         return "camera." + vacuum_name + "_map_data";
     }
 
-    getVacuumEntityName(vacuum_name) {
+    getVacuumEntityName(vacuum_name: string) {
         return "vacuum." + vacuum_name;
     }
 
-    getMapEntity(vacuum_name) {
+    getMapEntity(vacuum_name: string) {
         return this._hass.states[this.getMapEntityName(vacuum_name)];
     }
 
-    getVacuumEntity(vacuum_name) {
+    getVacuumEntity(vacuum_name: string) {
         return this._hass.states[this.getVacuumEntityName(vacuum_name)];
     }
 
@@ -84,11 +115,11 @@ class ValetudoMapCard extends HTMLElement {
         return !this.drawingMap;
     }
 
-    shouldDrawControls(state) {
+    shouldDrawControls(state: HassEntity) {
         return !this.drawingControls && this.lastUpdatedControls !== state.last_updated;
     }
 
-    calculateColor(container, ...colors) {
+    calculateColor(container: Element, ...colors: (string | undefined)[]) {
         for (let color of colors) {
             if (!color) {
                 continue;
@@ -102,14 +133,16 @@ class ValetudoMapCard extends HTMLElement {
             }
             return color;
         }
+
+        return '';
     }
 
-    isOutsideBounds(x, y, drawnMapCanvas, config) {
-        return (x < this._config.crop.left) || (x > drawnMapCanvas.width) || (y < config.crop.top) || (y > drawnMapCanvas.height);
+    isOutsideBounds(x: number, y: number, drawnMapCanvas: HTMLCanvasElement, config: Configuration) {
+        return (x < config.crop.left) || (x > drawnMapCanvas.width) || (y < config.crop.top) || (y > drawnMapCanvas.height);
     }
 
-    getLayers(attributes, type, maxCount) {
-        let layers = [];
+    getLayers(attributes: RawMapData, type: RawMapLayerType, maxCount?: number) {
+        let layers: RawMapLayer[] = [];
         for (let layer of attributes.layers) {
             if (layer.type === type) {
                 layers.push(layer);
@@ -123,8 +156,8 @@ class ValetudoMapCard extends HTMLElement {
         return layers;
     }
 
-    getEntities(attributes, type, maxCount) {
-        let entities = [];
+    getEntities(attributes: RawMapData, type: RawMapEntityType, maxCount?: number) {
+        let entities: RawMapEntity[] = [];
         for (let entity of attributes.entities) {
             if (entity.type === type) {
                 entities.push(entity);
@@ -138,7 +171,7 @@ class ValetudoMapCard extends HTMLElement {
         return entities;
     }
 
-    getChargerInfo(attributes) {
+    getChargerInfo(attributes: RawMapData) {
         let layer = this.getEntities(attributes, "charger_location", 1)[0];
         if (layer === undefined) {
             return null;
@@ -147,7 +180,7 @@ class ValetudoMapCard extends HTMLElement {
         return [layer.points[0], layer.points[1]];
     }
 
-    getRobotInfo(attributes) {
+    getRobotInfo(attributes: RawMapData): RobotInfo | null {
         let layer = this.getEntities(attributes, "robot_position", 1)[0];
         if (layer === undefined) {
             return null;
@@ -156,7 +189,7 @@ class ValetudoMapCard extends HTMLElement {
         return [layer.points[0], layer.points[1], layer.metaData.angle];
     }
 
-    getGoToInfo(attributes) {
+    getGoToInfo(attributes: RawMapData) {
 
         let layer = this.getEntities(attributes, "go_to_target", 1)[0];
         if (layer === undefined) {
@@ -167,7 +200,7 @@ class ValetudoMapCard extends HTMLElement {
 
     }
 
-    getFloorPoints(attributes, ) {
+    getFloorPoints(attributes: RawMapData) {
 
         let layer = this.getLayers(attributes, "floor", 1)[0];
         if (layer === undefined) {
@@ -178,13 +211,13 @@ class ValetudoMapCard extends HTMLElement {
 
     }
 
-    getSegments(attributes) {
+    getSegments(attributes: RawMapData) {
 
         return this.getLayers(attributes, "segment");
 
     }
 
-    getWallPoints(attributes) {
+    getWallPoints(attributes: RawMapData) {
         let layer = this.getLayers(attributes, "wall", 1)[0];
         if (layer === undefined) {
             return null;
@@ -193,31 +226,31 @@ class ValetudoMapCard extends HTMLElement {
         return layer.pixels;
     }
 
-    getVirtualWallPoints(attributes) {
+    getVirtualWallPoints(attributes: RawMapData) {
         return this.getEntities(attributes, "virtual_wall");
     }
 
-    getPathPoints(attributes) {
+    getPathPoints(attributes: RawMapData) {
         return this.getEntities(attributes, "path");
     }
 
-    getPredictedPathPoints(attributes) {
+    getPredictedPathPoints(attributes: RawMapData) {
         return this.getEntities(attributes, "predicted_path");
     }
 
-    getActiveZones(attributes) {
+    getActiveZones(attributes: RawMapData) {
         return this.getEntities(attributes, "active_zone");
     }
 
-    getNoGoAreas(attributes) {
+    getNoGoAreas(attributes: RawMapData) {
         return this.getEntities(attributes, "no_go_area");
     }
 
-    getNoMopAreas(attributes) {
+    getNoMopAreas(attributes: RawMapData) {
         return this.getEntities(attributes, "no_mop_area");
     }
 
-    drawMap(attributes, mapHeight, mapWidth, boundingBox) {
+    drawMap(attributes: RawMapData, mapHeight: number, mapWidth: number, boundingBox: BoundingBox) {
         const pixelSize = attributes.pixelSize;
 
         const widthScale = pixelSize / this._config.map_scale;
@@ -252,7 +285,7 @@ class ValetudoMapCard extends HTMLElement {
         const drawnMapCanvas = document.createElement("canvas");
         drawnMapCanvas.width = mapWidth * this._config.map_scale;
         drawnMapCanvas.height = mapHeight * this._config.map_scale;
-        drawnMapContainer.style.zIndex = 1;
+        drawnMapContainer.style.zIndex = "1";
         drawnMapContainer.appendChild(drawnMapCanvas);
 
         const chargerContainer = document.createElement("div");
@@ -266,14 +299,14 @@ class ValetudoMapCard extends HTMLElement {
             chargerHTML.style.color = chargerColor;
             chargerHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale}) rotate(-${this._config.rotate})`;
         }
-        chargerContainer.style.zIndex = 2;
+        chargerContainer.style.zIndex = "2";
         chargerContainer.appendChild(chargerHTML);
 
         const pathContainer = document.createElement("div");
         const pathCanvas = document.createElement("canvas");
         pathCanvas.width = mapWidth * this._config.map_scale;
         pathCanvas.height = mapHeight * this._config.map_scale;
-        pathContainer.style.zIndex = 3;
+        pathContainer.style.zIndex = "3";
         pathContainer.appendChild(pathCanvas);
 
         const vacuumContainer = document.createElement("div");
@@ -293,7 +326,7 @@ class ValetudoMapCard extends HTMLElement {
             vacuumHTML.style.top = `${Math.floor(robotInfo[1] / heightScale) - objectTopOffset - mapTopOffset - (12 * this._config.icon_scale)}px`;
             vacuumHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale})`;
         }
-        vacuumContainer.style.zIndex = 4;
+        vacuumContainer.style.zIndex = "4";
         vacuumContainer.appendChild(vacuumHTML);
 
         const goToTargetContainer = document.createElement("div");
@@ -307,7 +340,7 @@ class ValetudoMapCard extends HTMLElement {
             goToTargetHTML.style.color = gotoTargetColor;
             goToTargetHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale})`;
         }
-        goToTargetContainer.style.zIndex = 5;
+        goToTargetContainer.style.zIndex = "5";
         goToTargetContainer.appendChild(goToTargetHTML);
 
         // Put objects in container
@@ -317,7 +350,7 @@ class ValetudoMapCard extends HTMLElement {
         containerContainer.appendChild(vacuumContainer);
         containerContainer.appendChild(goToTargetContainer);
 
-        const mapCtx = drawnMapCanvas.getContext("2d");
+        const mapCtx = drawnMapCanvas.getContext("2d")!;
         if (this._config.show_floor) {
             mapCtx.globalAlpha = this._config.floor_opacity;
 
@@ -515,7 +548,7 @@ class ValetudoMapCard extends HTMLElement {
             mapCtx.globalAlpha = 1;
         }
 
-        const pathCtx = pathCanvas.getContext("2d");
+        const pathCtx = pathCanvas.getContext("2d")!;
         pathCtx.globalAlpha = this._config.path_opacity;
         pathCtx.strokeStyle = pathColor;
         pathCtx.lineWidth = this._config.path_width;
@@ -543,8 +576,10 @@ class ValetudoMapCard extends HTMLElement {
                 pathCtx.stroke();
             }
 
-            // Update vacuum angle
-            vacuumHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale}) rotate(${robotInfo[2]}deg)`;
+            if (robotInfo) {
+                // Update vacuum angle
+                vacuumHTML.style.transform = `scale(${this._config.icon_scale}, ${this._config.icon_scale}) rotate(${robotInfo[2]}deg)`;
+            }
 
             pathCtx.globalAlpha = 1;
         }
@@ -581,13 +616,13 @@ class ValetudoMapCard extends HTMLElement {
         this.mapContainer.appendChild(containerContainer);
     }
 
-    clearContainer(container) {
+    clearContainer(container: Element) {
         while (container.firstChild) {
             container.firstChild.remove();
         }
     }
 
-    drawControls(infoEntity) {
+    drawControls(infoEntity: HassEntity) {
     // Start drawing controls
         this.drawingControls = true;
 
@@ -728,7 +763,7 @@ class ValetudoMapCard extends HTMLElement {
     }
 
     // noinspection JSUnusedGlobalSymbols
-    setConfig(config) {
+    setConfig(config: Configuration) {
         this._config = Object.assign(
             {},
             DEFAULT_CARD_CONFIG,
@@ -752,7 +787,7 @@ class ValetudoMapCard extends HTMLElement {
 
         // Crop settings
         if (this._config.crop !== Object(this._config.crop)) {
-            this._config.crop = {};
+            this._config.crop = {} as CropConfig;
         }
         if (this._config.crop.top === undefined) {
             this._config.crop.top = 0;
@@ -783,7 +818,7 @@ class ValetudoMapCard extends HTMLElement {
     }
 
     // noinspection JSUnusedGlobalSymbols
-    set hass(hass) {
+    set hass(hass: HomeAssistant) {
         if (hass === undefined) {
             // Home Assistant 0.110.0 may call this function with undefined sometimes if inside another card
             return;
@@ -811,7 +846,7 @@ class ValetudoMapCard extends HTMLElement {
                         this.handleDrawing(hass, mapEntity, mapData);
                     }
                 }).catch(e => {
-                    this.handleDrawing(hass, mapEntity,{});
+                    this.handleDrawing(hass, mapEntity,{} as RawMapData);
 
                     console.warn(e);
                 }).finally(() => {
@@ -828,7 +863,7 @@ class ValetudoMapCard extends HTMLElement {
         }
     }
 
-    async loadImageAndExtractMapData(url) {
+    async loadImageAndExtractMapData(url: string): Promise<RawMapData | null> {
         if (this.isPollingMap === false ) {
             this.isPollingMap = true;
 
@@ -861,7 +896,7 @@ class ValetudoMapCard extends HTMLElement {
         }
     }
 
-    shouldDisplayButton(buttonName, vacuumState) {
+    shouldDisplayButton(buttonName: string, vacuumState: unknown) {
         switch (vacuumState) {
             case "on":
             case "auto":
@@ -889,7 +924,7 @@ class ValetudoMapCard extends HTMLElement {
     }
 
 
-    handleDrawing(hass, mapEntity, attributes) {
+    handleDrawing(hass: HomeAssistant, mapEntity: HassEntity, attributes: RawMapData) {
         let infoEntity = this.getVacuumEntity(this._config.vacuum);
 
         let canDrawMap = false;
@@ -930,10 +965,10 @@ class ValetudoMapCard extends HTMLElement {
 
         if (canDrawMap) {
             // Calculate map height and width
-            let width;
-            let height;
+            let width: number;
+            let height: number;
 
-            let boundingBox = {
+            let boundingBox: BoundingBox = {
                 minX: attributes.size.x / attributes.pixelSize,
                 minY: attributes.size.y / attributes.pixelSize,
                 maxX: 0,
@@ -963,11 +998,11 @@ class ValetudoMapCard extends HTMLElement {
 
             // Calculate desired container height
             let containerHeight = (mapHeight * this._config.map_scale) - this._config.crop.top;
-            let minHeight = this._config.min_height;
+            let minHeight = Number(this._config.min_height);
 
             // Want height based on container width
-            if (String(this._config.min_height).endsWith("w")) {
-                minHeight = this._config.min_height.slice(0, -1) * this.mapContainer.offsetWidth;
+            if (typeof this._config.min_height === 'string' && this._config.min_height.endsWith("w")) {
+                minHeight = Number(this._config.min_height.slice(0, -1)) * this.mapContainer.offsetWidth;
             }
 
             let containerMinHeightPadding = minHeight > containerHeight ? (minHeight - containerHeight) / 2 : 0;
@@ -1046,6 +1081,18 @@ class ValetudoMapCard extends HTMLElement {
     // noinspection JSUnusedGlobalSymbols
     getCardSize() {
         return 1;
+    }
+}
+
+declare global {
+    // eslint-disable-next-line no-unused-vars
+    interface Window {
+        customCards: { type: string, name: string, preview?: boolean, description?: string }[];
+    }
+
+    // eslint-disable-next-line no-unused-vars
+    interface HTMLElementTagNameMap {
+        "ha-icon": HaIconElement;
     }
 }
 

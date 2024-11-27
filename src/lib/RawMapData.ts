@@ -1,4 +1,6 @@
 export interface RawMapData {
+    __class?: string;
+    
     metaData: RawMapDataMetaData;
     size: {
         x: number;
@@ -45,23 +47,18 @@ export interface RawMapLayerMetaData {
     active?: boolean;
 }
 
-export enum RawMapLayerType {
-    Floor = "floor",
-    Segment = "segment",
-    Wall = "wall",
-}
+export type RawMapLayerType = "floor" | "segment" | "wall"
 
-export enum RawMapEntityType {
-    ChargerLocation = "charger_location",
-    RobotPosition = "robot_position",
-    GoToTarget = "go_to_target",
-    Path = "path",
-    PredictedPath = "predicted_path",
-    VirtualWall = "virtual_wall",
-    NoGoArea = "no_go_area",
-    NoMopArea = "no_mop_area",
-    ActiveZone = "active_zone",
-}
+export type RawMapEntityType =
+    | "charger_location"
+    | "robot_position"
+    | "go_to_target"
+    | "path"
+    | "predicted_path"
+    | "virtual_wall"
+    | "no_go_area"
+    | "no_mop_area"
+    | "active_zone";
 
 export interface RawMapDataMetaData {
     version: number;
