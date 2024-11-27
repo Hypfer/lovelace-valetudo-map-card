@@ -4,7 +4,7 @@
  * See https://github.com/hughsk/png-chunks-extract/blob/d098d583f3ab3877c1e4613ec9353716f86e2eec/LICENSE.md for more information.
  */
 
-export function extractZtxtPngChunks (data) {
+export function extractZtxtPngChunks (data: Uint8Array | Buffer) {
     // Used for fast-ish conversion between uint8s and uint32s/int32s.
     // Also required in order to remain agnostic for both Node Buffers and
     // Uint8Arrays.
@@ -37,7 +37,7 @@ export function extractZtxtPngChunks (data) {
         throw new Error("Invalid .png file header: possibly caused by DOS-Unix line ending conversion?");
     }
 
-    const chunks = [];
+    const chunks: { keyword: string, data: Uint8Array }[] = [];
     let ended = false;
     let idx = 8;
 

@@ -40,8 +40,8 @@ export class FourColorTheoremSolver {
      * The segment ID is extracted from the layer metadata in the first constructor parameter of this class.
      * @returns {number} The segment color, represented as an integer. Starts at 0 and goes up the minimal number of colors required to color the map without collisions.
      */
-    getColor(segmentId: string) : SegmentColorId {
-        if (this.areaGraph === undefined) {
+    getColor(segmentId?: string) : SegmentColorId {
+        if (!segmentId || this.areaGraph === undefined) {
             // Layer preprocessing seems to have failed. Just return a default value for any input.
             return 0;
         }
@@ -79,7 +79,7 @@ export class FourColorTheoremSolver {
         }
 
         filteredLayers.forEach((layer) => {
-            const allPixels = [];
+            const allPixels: { x: number, y: number }[] = [];
             for (let index = 0; index < layer.pixels.length - 1; index += 2) {
                 const p = {
                     x: layer.pixels[index],
@@ -170,7 +170,7 @@ export class FourColorTheoremSolver {
             y <= boundaries.maxY;
             y = this.stepFunction(y)
         ) {
-            let rowFirstSegmentId = undefined;
+            let rowFirstSegmentId: PossibleSegmentId = undefined;
             for (
                 let x = boundaries.minX;
                 x <= boundaries.maxX;
@@ -185,7 +185,7 @@ export class FourColorTheoremSolver {
             x <= boundaries.maxX;
             x = this.stepFunction(x)
         ) {
-            let colFirstSegmentId = undefined;
+            let colFirstSegmentId: PossibleSegmentId = undefined;
             for (
                 let y = boundaries.minY;
                 y <= boundaries.maxY;

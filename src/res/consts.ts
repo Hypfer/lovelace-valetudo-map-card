@@ -1,3 +1,5 @@
+import { Configuration } from "../lib/types";
+
 export const DEFAULT_CARD_CONFIG = Object.freeze({
     // Title settings
     title: "Vacuum",
@@ -64,9 +66,9 @@ export const DEFAULT_CARD_CONFIG = Object.freeze({
 
     // Crop settings
     min_height: 0
-});
+} satisfies Partial<Configuration>);
 
-export const POLL_INTERVAL_STATE_MAP = Object.freeze({
+export const POLL_INTERVAL_STATE_MAP: Record<string, number> = Object.freeze({
     "cleaning": 3*1000,
     "paused": 15*1000,
     "idle": 2*60*1000,
