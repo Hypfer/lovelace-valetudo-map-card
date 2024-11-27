@@ -39,6 +39,7 @@
     "@rollup/plugin-json": "4.1.0",
     "babel-plugin-inline-json-import": "0.3.2",
     
+    "home-assistant-js-websocket": "6.1.1",
     "pako": "2.0.4"
   }
 }
