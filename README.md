@@ -6,7 +6,7 @@ Display the map from a valetudo-enabled robot in a home assistant dashboard card
 
 It is highly recommended to use [HACS](https://hacs.xyz/) for managing custom extensions of Home Assistant.
 
-Follow the HACS [installation instructions](https://hacs.xyz/docs/installation/prerequisites).
+Follow the HACS [installation instructions](https://hacs.xyz/docs/use/download/prerequisites/).
 
 It is necessary to "take control" over the dashboards before downloading the "Valetudo Map Card".
 1. Go to the Overview dashboard
